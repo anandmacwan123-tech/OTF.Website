@@ -89,7 +89,7 @@
   .student-list a,
   .student-list .row {
     display: flex;
-    align-items: baseline;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 1.5rem;
     padding: 0.75rem 0;
@@ -107,7 +107,12 @@
   .student-list .disciplines {
     color: var(--muted);
     text-align: right;
-    font-weight: 400;
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.25;
+    flex-shrink: 0;
   }
 
   /* ─── FACES VIEW ─── */
