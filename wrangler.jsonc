@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
-  "name": "otf-website",
+  "name": "otfshow",
   "compatibility_date": "2026-05-14",
   "assets": {
     "directory": "./",
