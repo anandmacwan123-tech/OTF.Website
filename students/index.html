@@ -217,8 +217,13 @@
   const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
   if (!name) { fail('Student not found'); return; }
 
-  // CSV parser — quoted fields, doubled-quote escape, CRLF/LF newlines
+  // CSV/TSV parser — quoted fields, doubled-quote escape, CRLF/LF newlines.
+  // Auto-detects delimiter by sampling the first 5 lines.
   function parseCSV(text) {
+    const sample = text.split(/\r?\n/).slice(0, 5).join('\n');
+    const tabs = (sample.match(/\t/g) || []).length;
+    const commas = (sample.match(/,/g) || []).length;
+    const delim = tabs > commas ? '\t' : ',';
     const rows = [];
     let row = [], field = '', inQuotes = false;
     for (let i = 0; i < text.length; i++) {
@@ -230,7 +235,7 @@
         } else { field += c; }
       } else if (c === '"') {
         inQuotes = true;
-      } else if (c === ',') {
+      } else if (c === delim) {
         row.push(field); field = '';
       } else if (c === '\n' || c === '\r') {
         if (c === '\r' && text[i + 1] === '\n') i++;
@@ -406,9 +411,13 @@
       return r.text();
     })
     .then(text => {
+      console.log('[OTF] Raw CSV (first 800 chars):\n' + text.slice(0, 800));
       const rows = parseCSV(text);
       const objs = toObjects(rows);
       console.log(`[OTF] CSV parsed: ${rows.length} raw rows, ${objs.length} data objects`);
+      console.log('[OTF] Raw row 0 (cells:', rows[0]?.length, '):', rows[0]);
+      if (rows.length > 1) console.log('[OTF] Raw row 1 (cells:', rows[1]?.length, '):', rows[1]);
+      if (rows.length > 2) console.log('[OTF] Raw row 2 (cells:', rows[2]?.length, '):', rows[2]);
       if (rows.length) console.log('[OTF] Header row used:', objs.length ? Object.keys(objs[0]) : rows[0]);
       if (objs.length) console.log('[OTF] First data row:', objs[0]);
       const row = matchRow(objs, name);
