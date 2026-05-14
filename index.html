@@ -141,7 +141,8 @@
 
     const LIFETIME_MS = 900;
     const MAX_ACTIVE = 3;
-    const FRONT_LIFETIME_MULT_MOBILE = 1.5;
+    const FRONT_CHANCE = 0.35;
+    const FRONT_CHANCE_MOBILE_MULT = 1.5;
     const mobileMQ = window.matchMedia('(max-width: 768px)');
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
@@ -170,12 +171,9 @@
       if (active.size > 0 && Math.random() < 0.4) return;
 
       const h = imgHeight();
-      // ~35% chance to appear in front of the video
-      const inFront = Math.random() < 0.35;
-      const zIndex = inFront ? 3 : 1;
-      const lifetime = inFront && mobileMQ.matches
-        ? LIFETIME_MS * FRONT_LIFETIME_MULT_MOBILE
-        : LIFETIME_MS;
+      // 35% chance on desktop, 1.5× that on mobile (~52.5%)
+      const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
+      const zIndex = Math.random() < frontChance ? 3 : 1;
 
       const img = document.createElement('img');
       img.className = 'student-img';
@@ -203,7 +201,7 @@
       setTimeout(() => {
         img.remove();
         active.delete(img);
-      }, lifetime);
+      }, LIFETIME_MS);
     }
 
     requestAnimationFrame(() => {
