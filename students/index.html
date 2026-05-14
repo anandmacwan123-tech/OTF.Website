@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTF — Student Portfolio</title>
+<meta name="description" content="A student portfolio from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta name="theme-color" content="#ffffff">
+<meta property="og:title" content="OTF — Student Portfolio">
+<meta property="og:description" content="A student portfolio from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta property="og:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="OTF — Ravensbourne Graphic Design Show">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="OTF">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OTF — Student Portfolio">
+<meta name="twitter:description" content="A student portfolio from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta name="twitter:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
+<link rel="icon" type="image/jpeg" href="/Favicon.jpg">
+<link rel="apple-touch-icon" href="/Favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fff;
+    --fg: #000;
+    --muted: #555;
+  }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 4vh 5vw 8rem;
+  }
+
+  .portfolio[hidden] { display: none; }
+
+  .state {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .hero-headshot {
+    height: clamp(220px, 36vh, 420px);
+    width: auto;
+    display: block;
+  }
+
+  .hero-name {
+    font-weight: 700;
+    font-size: clamp(2.5rem, 8vw, 64pt);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+    text-transform: uppercase;
+  }
+
+  .hero-practices {
+    font-weight: 400;
+    font-size: clamp(1.25rem, 3.5vw, 32pt);
+    line-height: 1.15;
+    letter-spacing: -0.06em;
+    color: var(--muted);
+  }
+
+  .bio {
+    max-width: 60ch;
+    margin: 0 auto 5rem;
+    font-size: clamp(1rem, 1.2vw + 0.5rem, 1.25rem);
+    line-height: 1.5;
+  }
+
+  .projects {
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+  }
+
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .project .images {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .project img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .project-desc {
+    max-width: 60ch;
+    margin: 0 auto;
+    font-size: clamp(1rem, 1.2vw + 0.5rem, 1.25rem);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  /* Layout 2 — hero side-by-side, projects in 2-col grid */
+  body[data-layout="2"] .hero {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+  body[data-layout="2"] .hero-text {
+    flex: 1 1 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  body[data-layout="2"] .hero-headshot {
+    order: 2;
+    height: clamp(260px, 42vh, 480px);
+  }
+  body[data-layout="2"] .bio {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  body[data-layout="2"] .projects {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 2rem;
+  }
+  body[data-layout="2"] .project-desc {
+    text-align: left;
+    margin: 0;
+  }
+  @media (max-width: 720px) {
+    body[data-layout="2"] .projects { grid-template-columns: 1fr; }
+  }
+
+  /* Layout 3 — name first, headshot below right, bio left, alternating project widths */
+  body[data-layout="3"] .hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name     name"
+      "practices headshot";
+    align-items: end;
+    text-align: left;
+    gap: 1.5rem 3rem;
+  }
+  body[data-layout="3"] .hero-name { grid-area: name; }
+  body[data-layout="3"] .hero-practices { grid-area: practices; align-self: end; }
+  body[data-layout="3"] .hero-headshot {
+    grid-area: headshot;
+    height: clamp(220px, 34vh, 380px);
+    justify-self: end;
+  }
+  body[data-layout="3"] .bio {
+    margin: 0 0 5rem;
+  }
+  body[data-layout="3"] .project:nth-child(even) {
+    max-width: 60%;
+    align-self: flex-end;
+  }
+  body[data-layout="3"] .project:nth-child(odd) {
+    max-width: 85%;
+  }
+  body[data-layout="3"] .project-desc { text-align: left; margin: 0; }
+  @media (max-width: 720px) {
+    body[data-layout="3"] .hero {
+      grid-template-columns: 1fr;
+      grid-template-areas: "name" "headshot" "practices";
+    }
+    body[data-layout="3"] .hero-headshot { justify-self: start; }
+    body[data-layout="3"] .project:nth-child(even),
+    body[data-layout="3"] .project:nth-child(odd) {
+      max-width: none;
+      align-self: stretch;
+    }
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    z-index: 10;
+    padding: 1rem 4vw;
+    background: var(--bg);
+  }
+  .nav a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+  .nav a:hover { opacity: 0.55; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+  <p class="state" id="state">Loading…</p>
+
+  <main class="portfolio" id="portfolio" hidden>
+    <header class="hero">
+      <img class="hero-headshot" id="heroHeadshot" alt="">
+      <div class="hero-text">
+        <h1 class="hero-name" id="heroName"></h1>
+        <p class="hero-practices" id="heroPractices"></p>
+      </div>
+    </header>
+    <section class="bio" id="bio"></section>
+    <section class="projects" id="projects"></section>
+  </main>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="/showcase/">[BACK]</a>
+    <a href="/visit/">[VISIT]</a>
+    <a href="/info/">[INFO]</a>
+    <a href="/index/">[INDEX]</a>
+  </nav>
+
+<script>
+(() => {
+  // __MANIFEST_START__
+    const MANIFEST = {
+      "Anand": ["Anand_Based.webp", "Anand_Evolving.webp", "Anand_NCI.webp", "Anand_RaveBadge.webp", "Anand_ThinkingBlock.webp"],
+      "Arnete": ["Arnete_Aqva.webp", "Arnete_Atsijungti.webp", "Arnete_InthePresenceofGreen.webp", "Arnete_Postcard Series.webp"],
+      "Becky": ["Becky_Kopparberg1.webp", "Becky_Kopparberg2-1.webp", "Becky_Kopparberg2.webp"],
+      "Carolina": ["Carolina_Aqua.webp", "Carolina_Packaging.webp", "Carolina_Zine.webp"],
+      "Charles": ["Charles_Agneshouse.webp", "Charles_KpopZine.webp", "Charles_TMS.webp"],
+      "Darcy": ["Darcy_Untitled.webp"],
+      "Divine": ["Divine_ABOTABOT.webp", "Divine_TerraCotta.webp", "Divine_UntitledZine.webp"],
+      "Elise": ["Elise_Tera1.webp", "Elise_Tera2.webp", "Elise_Tera3.webp"],
+      "Emily": ["Emily_4THGENZine.webp", "Emily_Globular.webp", "Emily_Sign.webp"],
+      "Jaeden": ["Jaeden_FameSucks.webp", "Jaeden_FameSucks1.webp", "Jaeden_FameSucks2.webp"],
+      "Jamie": ["Jamie_HemDuyen.webp", "Jamie_Kynexus.webp"],
+      "Jenna": ["Jenna_Aer.webp", "Jenna_Privacy Matters.webp", "Jenna_Veil.webp"],
+      "Jess": ["Jess_Aqya.webp", "Jess_CFTSOC.webp", "Jess_Untitled.webp"],
+      "Kami": ["Kami_FOOF1.webp", "Kami_FOOF2.webp", "Kami_FOOF3.webp"],
+      "Kye": ["Kye_HeadphonesAd.webp", "Kye_IncensePackaging.webp", "Kye_Untitled.webp"],
+      "Martim": ["Martim_5PP.webp", "Martim_B33ChairPoster.webp", "Martim_Reflections.webp"],
+      "Maseray": ["Maseray_IgnisStudios.webp", "Maseray_LordandSaviour.webp", "Maseray_ThedesignersArchive.webp"],
+      "Nikol": ["Nikol_Aquari.webp", "Nikol_CREATEPoster.webp", "Nikol_WWTPLUposter.webp"],
+      "Noora": ["Noora_Lipstick.webp", "Noora_PFI.webp", "Noora_RP.webp"],
+      "Nora": ["Nora_Overstack.webp", "Nora_PhobiaFiles.webp", "Nora_ShakenNotStirred.webp", "Nora_ShakenNotStirred2.webp", "Nora_SmultringerPhotography.webp", "Nora_SmultringerPhotography2.webp"]
+    };
+    // __MANIFEST_END__
+
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+  const stateEl = document.getElementById('state');
+  const portfolioEl = document.getElementById('portfolio');
+
+  function fail(msg) {
+    stateEl.textContent = msg;
+  }
+
+  const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+  // Resolve slug to canonical student name from MANIFEST keys
+  const slug = decodeURIComponent(location.pathname).replace(/^\/students\/?/, '').replace(/\/$/, '').toLowerCase();
+  if (!slug) { fail('Student not found'); return; }
+
+  const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
+  if (!name) { fail('Student not found'); return; }
+
+  // Random layout
+  document.body.dataset.layout = String(1 + Math.floor(Math.random() * 3));
+
+  // CSV parser — quoted fields, doubled-quote escape, CRLF/LF newlines
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        row.push(field); field = '';
+      } else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); rows.push(row);
+        row = []; field = '';
+      } else {
+        field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function toObjects(rows) {
+    if (!rows.length) return [];
+    const headers = rows[0].map(h => h.trim());
+    return rows.slice(1).filter(r => r.some(c => c && c.trim()))
+      .map(r => {
+        const o = {};
+        headers.forEach((h, i) => { o[h] = (r[i] ?? '').trim(); });
+        return o;
+      });
+  }
+
+  // Group project filenames into projects keyed by base name.
+  function projectGroups(name, files) {
+    const prefixRe = new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '_');
+    const stripDigits = /(\d+(-\d+)?|-\d+)$/;
+    const order = [];
+    const groups = new Map();
+    for (const file of files) {
+      const stem = file.replace(/\.webp$/i, '').replace(prefixRe, '');
+      const base = stem.replace(stripDigits, '') || stem;
+      if (!groups.has(base)) { groups.set(base, []); order.push(base); }
+      groups.get(base).push(file);
+    }
+    for (const arr of groups.values()) arr.sort((a, b) => a.localeCompare(b));
+    return order.map(k => groups.get(k));
+  }
+
+  function renderBasic(row) {
+    // Headshot
+    const hs = document.getElementById('heroHeadshot');
+    hs.src = enc(`/Student Work/Headshots/${name}.webp`);
+    hs.alt = `${name} — portrait`;
+    hs.onerror = () => { hs.remove(); };
+
+    // Name + practices
+    document.getElementById('heroName').textContent = name.toUpperCase();
+    const practices = row
+      ? [row.Practice1, row.Practice2, row.Practice3].filter(p => p && p.length)
+      : ['Design practice1', 'Design practice2', 'Design practice3'];
+    document.getElementById('heroPractices').textContent = practices.join(', ');
+
+    // Bio
+    const bioEl = document.getElementById('bio');
+    if (row && row.Bio) {
+      const p = document.createElement('p');
+      p.textContent = row.Bio;
+      bioEl.appendChild(p);
+    } else {
+      bioEl.remove();
+    }
+
+    // Title + OG/Twitter
+    document.title = `${name} — OTF`;
+    const setMeta = (sel, value) => {
+      const el = document.querySelector(sel);
+      if (el) el.setAttribute('content', value);
+    };
+    setMeta('meta[property="og:title"]', `${name} — OTF`);
+    setMeta('meta[name="twitter:title"]', `${name} — OTF`);
+
+    portfolioEl.hidden = false;
+    stateEl.remove();
+  }
+
+  function renderProjects(row) {
+    const files = MANIFEST[name] || [];
+    const groups = projectGroups(name, files);
+    const container = document.getElementById('projects');
+
+    groups.forEach((groupFiles, i) => {
+      const desc = row ? (row[`Project${i + 1}_Desc`] || '') : '';
+      if (!groupFiles.length && !desc) return;
+
+      const article = document.createElement('article');
+      article.className = 'project';
+
+      if (groupFiles.length) {
+        const imagesDiv = document.createElement('div');
+        imagesDiv.className = 'images';
+        for (const file of groupFiles) {
+          const img = document.createElement('img');
+          img.src = enc(`/Student Work/Projects/${file}`);
+          img.alt = '';
+          img.loading = 'lazy';
+          imagesDiv.appendChild(img);
+        }
+        article.appendChild(imagesDiv);
+      }
+
+      if (desc) {
+        const p = document.createElement('p');
+        p.className = 'project-desc';
+        p.textContent = desc;
+        article.appendChild(p);
+      }
+
+      container.appendChild(article);
+    });
+  }
+
+  // Fetch CSV → find row → render
+  fetch(SHEET_URL, { cache: 'no-store' })
+    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+    .then(text => {
+      const objs = toObjects(parseCSV(text));
+      const row = objs.find(o => (o.Name || '').toLowerCase() === name.toLowerCase()) || null;
+      renderBasic(row);
+      renderProjects(row);
+    })
+    .catch(() => {
+      renderBasic(null);
+      renderProjects(null);
+      // Inline notice that copy couldn't load
+      const notice = document.createElement('p');
+      notice.className = 'state';
+      notice.style.position = 'static';
+      notice.style.inset = 'auto';
+      notice.style.color = 'var(--muted)';
+      notice.style.margin = '2rem auto';
+      notice.textContent = "Couldn't load profile";
+      portfolioEl.appendChild(notice);
+    });
+})();
+</script>
+</body>
+</html>

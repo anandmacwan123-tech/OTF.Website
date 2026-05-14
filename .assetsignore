@@ -5,6 +5,7 @@
 .claude/
 node_modules/
 scripts/
+src/
 wrangler.jsonc
 *.log
 *.md

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Scans `Student Work/Headshots/` and `Student Work/Projects/` and rewrites the
-// MANIFEST block inside `showcase/index.html` between the __MANIFEST_START__ /
-// __MANIFEST_END__ sentinels. Run after adding/removing/renaming any asset.
+// MANIFEST block inside every page listed in PAGES, between the
+// __MANIFEST_START__ / __MANIFEST_END__ sentinels. Run after adding/removing/
+// renaming any asset.
 //
 // Usage:  node scripts/generate-manifest.mjs
 // Run from the repo root.
@@ -12,7 +13,10 @@ import { resolve } from 'node:path';
 const ROOT = process.cwd();
 const HEADSHOTS_DIR = resolve(ROOT, 'Student Work/Headshots');
 const PROJECTS_DIR = resolve(ROOT, 'Student Work/Projects');
-const PAGE = resolve(ROOT, 'showcase/index.html');
+const PAGES = [
+  resolve(ROOT, 'showcase/index.html'),
+  resolve(ROOT, 'students/index.html'),
+];
 
 const IMAGE_EXT = /\.webp$/i;
 
@@ -91,16 +95,17 @@ function renderManifest(obj) {
 }
 
 const block = renderManifest(manifest);
-
-const page = readFileSync(PAGE, 'utf8');
 const re = /(\/\/ __MANIFEST_START__)[\s\S]*?(\/\/ __MANIFEST_END__)/;
-if (!re.test(page)) {
-  console.error(`✘  Could not find __MANIFEST_START__ / __MANIFEST_END__ sentinels in ${PAGE}`);
-  process.exit(1);
+
+for (const page of PAGES) {
+  const text = readFileSync(page, 'utf8');
+  if (!re.test(text)) {
+    console.error(`✘  Could not find __MANIFEST_START__ / __MANIFEST_END__ sentinels in ${page}`);
+    process.exit(1);
+  }
+  const updated = text.replace(re, `$1\n    ${block}\n    $2`);
+  writeFileSync(page, updated);
 }
 
-const updated = page.replace(re, `$1\n    ${block}\n    $2`);
-writeFileSync(PAGE, updated);
-
 const total = Object.values(manifest).reduce((n, arr) => n + arr.length, 0);
-console.log(`✓ Manifest written: ${students.length} students, ${total} project files.`);
+console.log(`✓ Manifest written to ${PAGES.length} pages: ${students.length} students, ${total} project files.`);
