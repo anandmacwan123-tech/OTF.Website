@@ -60,7 +60,7 @@
     -webkit-user-drag: none;
     display: block;
     width: auto;
-    height: clamp(280px, 55vh, 620px);
+    height: auto;
   }
 
   .media-wrap {
@@ -261,6 +261,8 @@
         currentStudent = name;
         projectQueue = shuffled(MANIFEST[name] || []);
         activeIdx = nextIdx;
+        for (const el of placed) el.remove();
+        placed.clear();
       };
 
       const onerror = () => {
@@ -284,10 +286,7 @@
     if (reducedMotion) return;
 
     const active = new Set();
-
-    function imgHeight() {
-      return Math.round(Math.max(280, Math.min(620, window.innerHeight * 0.55)));
-    }
+    const placed = new Set();
 
     function spawn() {
       if (!currentStudent) return;
@@ -295,7 +294,6 @@
       if (active.size >= MAX_ACTIVE) return;
       if (active.size > 0 && Math.random() < 0.4) return;
 
-      const h = imgHeight();
       const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
       const zIndex = Math.random() < frontChance ? 3 : 1;
 
@@ -311,13 +309,15 @@
       const place = () => {
         active.delete(img);
         const W = window.innerWidth, H = window.innerHeight;
-        const w = img.getBoundingClientRect().width || h;
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
         const margin = 8;
         const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
         const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin * 2));
         img.style.left = x + 'px';
         img.style.top = y + 'px';
         img.style.visibility = 'visible';
+        placed.add(img);
       };
       img.addEventListener('load', place, { once: true });
       img.addEventListener('error', () => {
@@ -340,6 +340,8 @@
       resizeT = setTimeout(() => {
         for (const el of active) el.remove();
         active.clear();
+        for (const el of placed) el.remove();
+        placed.clear();
       }, 120);
     });
 
@@ -347,6 +349,8 @@
       if (document.visibilityState === 'visible') {
         for (const el of active) el.remove();
         active.clear();
+        for (const el of placed) el.remove();
+        placed.clear();
       }
     });
   })();
