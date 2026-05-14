@@ -67,10 +67,25 @@
   .view[hidden] { display: none; }
 
   /* ─── LIST VIEW ─── */
-  .list-view {
-    max-width: var(--col-text);
-    margin: 0 auto;
+
+  .search-input {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-family: inherit;
+    font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
   }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input::-webkit-search-cancel-button,
+  .search-input::-webkit-search-decoration { display: none; }
 
   .student-list {
     list-style: none;
@@ -230,7 +245,10 @@
 
   <main class="content" id="content" hidden>
     <section class="view list-view" id="listView">
-      <ul class="student-list" id="studentList"></ul>
+      <div class="list-wrap" style="max-width: var(--col-text); margin: 0 auto;">
+        <input type="search" id="search" class="search-input" placeholder="Search" autocomplete="off" spellcheck="false" aria-label="Search students">
+        <ul class="student-list" id="studentList"></ul>
+      </div>
     </section>
 
     <section class="view faces-view" id="facesView" hidden>
@@ -286,6 +304,9 @@
   const facesView = document.getElementById('facesView');
   const listBtn = document.getElementById('listBtn');
   const facesBtn = document.getElementById('facesBtn');
+  const searchEl = document.getElementById('search');
+
+  let allEntries = [];
 
   const enc = p => p.split('/').map(encodeURIComponent).join('/');
   const HAS_HEADSHOT = new Set(Object.keys(MANIFEST));
@@ -474,7 +495,18 @@
   listBtn.addEventListener('click', () => setView('list'));
   facesBtn.addEventListener('click', () => setView('faces'));
 
+  searchEl.addEventListener('input', () => {
+    const q = searchEl.value.trim().toLowerCase();
+    const filtered = q
+      ? allEntries.filter(e =>
+          e.displayName.toLowerCase().includes(q) ||
+          e.disciplines.toLowerCase().includes(q))
+      : allEntries;
+    renderList(filtered);
+  });
+
   function reveal(entries) {
+    allEntries = entries;
     renderList(entries);
     renderFaces(entries);
     contentEl.hidden = false;
