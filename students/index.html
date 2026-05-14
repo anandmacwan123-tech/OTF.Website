@@ -247,16 +247,47 @@
     return rows;
   }
 
-  // Convert raw CSV rows into objects. Tolerates a banner/title row above the
-  // headers by scanning for the first row that contains a "Name" cell.
+  // The published sheet exports a row of "#,#,#,..." instead of real headers,
+  // so we use a hardcoded schema (column order confirmed by the user).
+  const COLUMNS = [
+    '#',                                  // 0
+    'Headshot',                           // 1
+    'Name',                               // 2
+    'Name translated',                    // 3
+    'Language',                           // 4
+    'Confidence',                         // 5
+    'Notes',                              // 6
+    'Bio',                                // 7
+    'Bio translated',                     // 8
+    'Project images (link)',              // 9
+    'Project description 1',              // 10
+    'Project description 1 translated',   // 11
+    'Project description 2',              // 12
+    'Project description 2 translated',   // 13
+    'Project description 3',              // 14
+    'Project description 3 translated',   // 15
+    'Project description 4',              // 16
+    'Project description 4 translated',   // 17
+    'Project description 5',              // 18
+    'Project description 5 translated',   // 19
+  ];
+
+  // Convert raw CSV rows to objects. If the first row contains a real "Name"
+  // cell, use the CSV's own headers; otherwise fall back to the hardcoded
+  // COLUMNS schema and skip a placeholder row (e.g. "#,#,#,...") if present.
   function toObjects(rows) {
     if (!rows.length) return [];
-    let headerIdx = rows.findIndex(r =>
-      r.some(c => c && c.trim().toLowerCase() === 'name')
-    );
-    if (headerIdx === -1) headerIdx = 0;
-    const headers = rows[headerIdx].map(h => h.trim());
-    return rows.slice(headerIdx + 1)
+    const hasRealHeader = rows[0].some(c => c && c.trim().toLowerCase() === 'name');
+    let headers, dataStart;
+    if (hasRealHeader) {
+      headers = rows[0].map(h => h.trim());
+      dataStart = 1;
+    } else {
+      headers = COLUMNS;
+      const placeholder = rows[0].every(c => !c.trim() || c.trim() === '#');
+      dataStart = placeholder ? 1 : 0;
+    }
+    return rows.slice(dataStart)
       .filter(r => r.some(c => c && c.trim()))
       .map(r => {
         const o = {};
