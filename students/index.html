@@ -72,31 +72,29 @@
   }
 
   .hero-media {
-    position: relative;
-    display: inline-block;
-    line-height: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 1.25rem;
   }
 
   .hero-headshot {
     height: clamp(280px, 50vh, 560px);
     width: auto;
     display: block;
+    flex-shrink: 0;
   }
 
   .hero-practices {
-    position: absolute;
-    bottom: 0.75rem;
-    right: 0.75rem;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 0.5rem;
+    padding-bottom: 0.75rem;
     font-weight: 500;
     font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    text-align: right;
     color: var(--fg);
   }
 
