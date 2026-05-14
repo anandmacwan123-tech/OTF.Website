@@ -60,7 +60,7 @@
     -webkit-user-drag: none;
     display: block;
     width: auto;
-    height: clamp(240px, 42vh, 510px);
+    height: clamp(280px, 55vh, 620px);
   }
 
   .media-wrap {
@@ -286,7 +286,7 @@
     const active = new Set();
 
     function imgHeight() {
-      return Math.round(Math.max(240, Math.min(510, window.innerHeight * 0.42)));
+      return Math.round(Math.max(280, Math.min(620, window.innerHeight * 0.55)));
     }
 
     function spawn() {
