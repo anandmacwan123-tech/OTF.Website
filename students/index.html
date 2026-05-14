@@ -242,10 +242,17 @@
     return rows;
   }
 
+  // Convert raw CSV rows into objects. Tolerates a banner/title row above the
+  // headers by scanning for the first row that contains a "Name" cell.
   function toObjects(rows) {
     if (!rows.length) return [];
-    const headers = rows[0].map(h => h.trim());
-    return rows.slice(1).filter(r => r.some(c => c && c.trim()))
+    let headerIdx = rows.findIndex(r =>
+      r.some(c => c && c.trim().toLowerCase() === 'name')
+    );
+    if (headerIdx === -1) headerIdx = 0;
+    const headers = rows[headerIdx].map(h => h.trim());
+    return rows.slice(headerIdx + 1)
+      .filter(r => r.some(c => c && c.trim()))
       .map(r => {
         const o = {};
         headers.forEach((h, i) => { o[h] = (r[i] ?? '').trim(); });
@@ -389,17 +396,27 @@
     }) || null;
   }
 
-  fetch(SHEET_URL, { cache: 'no-store' })
+  // Cache-bust so Google re-serves the published CSV (otherwise we sometimes
+  // get a stale or empty version edge-cached by them).
+  const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+
+  fetch(sheetUrl, { cache: 'no-store' })
     .then(r => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
     })
     .then(text => {
-      const objs = toObjects(parseCSV(text));
+      const rows = parseCSV(text);
+      const objs = toObjects(rows);
+      console.log(`[OTF] CSV parsed: ${rows.length} raw rows, ${objs.length} data objects`);
+      if (rows.length) console.log('[OTF] Header row used:', objs.length ? Object.keys(objs[0]) : rows[0]);
+      if (objs.length) console.log('[OTF] First data row:', objs[0]);
       const row = matchRow(objs, name);
       if (!row) {
         console.warn(`[OTF] No sheet row matched "${name}". Names found in sheet:`,
           objs.map(o => field(o, 'Name')).filter(Boolean));
+      } else {
+        console.log(`[OTF] Matched row for "${name}":`, row);
       }
       renderBasic(row);
       renderProjects(row);
