@@ -313,24 +313,31 @@
         const w = img.naturalHeight > 0
           ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
           : renderedH;
-        const margin = 8;
         const hs = headshotLink.getBoundingClientRect();
         const hsMidY = hs.top + hs.height / 2;
         const hsArea = hs.width * hs.height;
 
         const ok = (x, y) => {
-          // Reject if overlapping the top half of the headshot
+          // At least 70% of the image must be within the viewport
+          const visW = Math.max(0, Math.min(x + w, W) - Math.max(x, 0));
+          const visH = Math.max(0, Math.min(y + renderedH, H) - Math.max(y, 0));
+          if (visW * visH < 0.7 * w * renderedH) return false;
+          // Must not overlap the top half of the headshot
           if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
-          // Reject if covering more than 30% of the headshot
+          // Must not cover more than 30% of the headshot
           const ow = Math.max(0, Math.min(x + w, hs.right) - Math.max(x, hs.left));
           const oh = Math.max(0, Math.min(y + renderedH, hs.bottom) - Math.max(y, hs.top));
           return ow * oh <= 0.3 * hsArea;
         };
 
+        // Sample from a range that allows up to 30% of the image off-screen on any edge
+        const xMin = -Math.round(w * 0.3), xMax = W - Math.round(w * 0.7);
+        const yMin = -Math.round(renderedH * 0.3), yMax = H - Math.round(renderedH * 0.7);
+
         let x, y, tries = 0;
         do {
-          x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
-          y = Math.round(margin + Math.random() * Math.max(0, H - renderedH - margin * 2));
+          x = Math.round(xMin + Math.random() * (xMax - xMin));
+          y = Math.round(yMin + Math.random() * (yMax - yMin));
           tries++;
         } while (!ok(x, y) && tries < 20);
 
