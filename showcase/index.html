@@ -48,7 +48,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3vh 4vw;
+    padding: 3vh 4vw 4rem;
     gap: 2.5vh;
     overflow: hidden;
   }
@@ -95,19 +95,24 @@
   .headshot.active { opacity: 1; }
 
   .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
     display: flex;
     justify-content: center;
     gap: clamp(1.5rem, 5vw, 4rem);
-    position: relative;
-    z-index: 2;
+    z-index: 10;
+    padding: 1rem 4vw;
+    background: var(--bg);
   }
 
   .nav a {
     color: #000;
     text-decoration: none;
     font-weight: 500;
-    font-size: clamp(0.95rem, 1.1vw + 0.55rem, 1.2rem);
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -191,7 +196,6 @@
     const mobileMQ = window.matchMedia('(max-width: 768px)');
 
     const HEADSHOT_INTERVAL_MS = reducedMotion ? 6000 : 3000;
-    const LIFETIME_MS = 900;
     const MAX_ACTIVE = 3;
     const FRONT_CHANCE = 0.35;
     const FRONT_CHANCE_MOBILE_MULT = 1.5;
@@ -305,6 +309,7 @@
       img.style.visibility = 'hidden';
 
       const place = () => {
+        active.delete(img);
         const W = window.innerWidth, H = window.innerHeight;
         const w = img.getBoundingClientRect().width || h;
         const margin = 8;
@@ -322,11 +327,6 @@
 
       document.body.appendChild(img);
       active.add(img);
-
-      setTimeout(() => {
-        img.remove();
-        active.delete(img);
-      }, LIFETIME_MS);
     }
 
     requestAnimationFrame(() => {
