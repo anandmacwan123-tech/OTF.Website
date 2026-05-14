@@ -6,7 +6,7 @@
 <title>OTF — Student Showcase</title>
 <meta name="description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
 <link rel="canonical" href="https://otfshow.anandmacwan123.workers.dev/showcase/">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="OTF — Student Showcase">
 <meta property="og:description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
 <meta property="og:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
@@ -30,13 +30,13 @@
 
   :root {
     --red: #FF002F;
-    --bg: #000;
+    --bg: #fff;
   }
 
   html, body {
     background: var(--bg);
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    color: #fff;
+    color: #000;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -94,28 +94,17 @@
 
   .headshot.active { opacity: 1; }
 
-  .caption {
+  .nav {
     width: 100%;
-    text-align: center;
-    color: #fff;
-    font-weight: 500;
-    font-size: clamp(0.95rem, 1.1vw + 0.55rem, 1.2rem);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    position: relative;
-    z-index: 2;
-    min-height: 1.5em;
-  }
-
-  .cta {
-    width: 100%;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
     position: relative;
     z-index: 2;
   }
 
-  .cta a {
-    color: #fff;
+  .nav a {
+    color: #000;
     text-decoration: none;
     font-weight: 500;
     font-size: clamp(0.95rem, 1.1vw + 0.55rem, 1.2rem);
@@ -126,7 +115,7 @@
     transition: opacity 0.2s ease;
   }
 
-  .cta a:hover { opacity: 0.65; }
+  .nav a:hover { opacity: 0.55; }
 
   .sr-only {
     position: absolute;
@@ -159,11 +148,11 @@
     </a>
   </div>
 
-  <div class="caption" id="caption" aria-live="polite"></div>
-
-  <div class="cta">
-    <a href="/">[BACK TO INVITE]</a>
-  </div>
+  <nav class="nav" aria-label="Primary">
+    <a href="/visit/">[VISIT]</a>
+    <a href="/info/">[INFO]</a>
+    <a href="/index/">[INDEX]</a>
+  </nav>
 
   <script>
   (() => {
@@ -221,15 +210,24 @@
     /* ───── Headshot slideshow ───── */
 
     const headshotLink = document.getElementById('headshotLink');
-    const caption = document.getElementById('caption');
     const imgs = [
       document.getElementById('headshotA'),
       document.getElementById('headshotB'),
     ];
     let activeIdx = 0;            // which img element currently has .active
     let currentStudent = null;    // drives the background spawn pool
+    let projectQueue = [];        // shuffled remaining projects for current student
     const recentStudents = [];
     const brokenStudents = new Set();
+
+    function shuffled(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
 
     function pickStudent() {
       const eligible = STUDENTS.filter(n => !brokenStudents.has(n));
@@ -256,8 +254,8 @@
         currentImg.classList.remove('active');
         headshotLink.href = `/students/${name.toLowerCase()}/`;
         headshotLink.setAttribute('aria-label', `Open ${name}'s portfolio`);
-        caption.textContent = name;
         currentStudent = name;
+        projectQueue = shuffled(MANIFEST[name] || []);
         activeIdx = nextIdx;
       };
 
@@ -289,8 +287,7 @@
 
     function spawn() {
       if (!currentStudent) return;
-      const projects = MANIFEST[currentStudent];
-      if (!projects || projects.length === 0) return;
+      if (projectQueue.length === 0) return;
       if (active.size >= MAX_ACTIVE) return;
       if (active.size > 0 && Math.random() < 0.4) return;
 
@@ -298,7 +295,7 @@
       const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
       const zIndex = Math.random() < frontChance ? 3 : 1;
 
-      const file = projects[Math.floor(Math.random() * projects.length)];
+      const file = projectQueue.pop();
 
       const img = document.createElement('img');
       img.className = 'student-img';
