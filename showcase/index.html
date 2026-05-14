@@ -314,8 +314,26 @@
           ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
           : renderedH;
         const margin = 8;
-        const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
-        const y = Math.round(margin + Math.random() * Math.max(0, H - renderedH - margin * 2));
+        const hs = headshotLink.getBoundingClientRect();
+        const hsMidY = hs.top + hs.height / 2;
+        const hsArea = hs.width * hs.height;
+
+        const ok = (x, y) => {
+          // Reject if overlapping the top half of the headshot
+          if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
+          // Reject if covering more than 30% of the headshot
+          const ow = Math.max(0, Math.min(x + w, hs.right) - Math.max(x, hs.left));
+          const oh = Math.max(0, Math.min(y + renderedH, hs.bottom) - Math.max(y, hs.top));
+          return ow * oh <= 0.3 * hsArea;
+        };
+
+        let x, y, tries = 0;
+        do {
+          x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
+          y = Math.round(margin + Math.random() * Math.max(0, H - renderedH - margin * 2));
+          tries++;
+        } while (!ok(x, y) && tries < 20);
+
         img.style.left = x + 'px';
         img.style.top = y + 'px';
         img.style.visibility = 'visible';
