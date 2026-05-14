@@ -141,10 +141,15 @@
 
     const LIFETIME_MS = 900;
     const MAX_ACTIVE = 3;
+    const FRONT_LIFETIME_MULT_MOBILE = 1.5;
+    const mobileMQ = window.matchMedia('(max-width: 768px)');
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
     const active = new Set();
     const recentNames = [];
+
+    // Warm the browser cache so spawns never wait on a network round-trip.
+    NAMES.forEach(name => { (new Image()).src = enc(`Student Work/${name}.webp`); });
 
     function imgHeight() {
       return Math.round(Math.max(240, Math.min(510, window.innerHeight * 0.42)));
@@ -166,7 +171,11 @@
 
       const h = imgHeight();
       // ~35% chance to appear in front of the video
-      const zIndex = Math.random() < 0.35 ? 3 : 1;
+      const inFront = Math.random() < 0.35;
+      const zIndex = inFront ? 3 : 1;
+      const lifetime = inFront && mobileMQ.matches
+        ? LIFETIME_MS * FRONT_LIFETIME_MULT_MOBILE
+        : LIFETIME_MS;
 
       const img = document.createElement('img');
       img.className = 'student-img';
@@ -194,7 +203,7 @@
       setTimeout(() => {
         img.remove();
         active.delete(img);
-      }, LIFETIME_MS);
+      }, lifetime);
     }
 
     requestAnimationFrame(() => {
