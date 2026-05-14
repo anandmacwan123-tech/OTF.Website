@@ -60,7 +60,7 @@
     -webkit-user-drag: none;
     display: block;
     width: auto;
-    height: auto;
+    height: clamp(280px, 55vh, 620px);
   }
 
   .media-wrap {
@@ -309,11 +309,13 @@
       const place = () => {
         active.delete(img);
         const W = window.innerWidth, H = window.innerHeight;
-        const w = img.naturalWidth;
-        const h = img.naturalHeight;
+        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)));
+        const w = img.naturalHeight > 0
+          ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
+          : renderedH;
         const margin = 8;
         const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
-        const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin * 2));
+        const y = Math.round(margin + Math.random() * Math.max(0, H - renderedH - margin * 2));
         img.style.left = x + 'px';
         img.style.top = y + 'px';
         img.style.visibility = 'visible';
