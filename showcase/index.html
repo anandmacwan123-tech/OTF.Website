@@ -212,9 +212,9 @@
 
     // Warm cache for every headshot and every project file.
     STUDENTS.forEach(name => {
-      (new Image()).src = enc(`Student Work/Headshots/${name}.webp`);
+      (new Image()).src = enc(`/Student Work/Headshots/${name}.webp`);
       (MANIFEST[name] || []).forEach(file => {
-        (new Image()).src = enc(`Student Work/Projects/${file}`);
+        (new Image()).src = enc(`/Student Work/Projects/${file}`);
       });
     });
 
@@ -271,7 +271,7 @@
       nextImg.onload = onload;
       nextImg.onerror = onerror;
       nextImg.alt = `${name} — student portrait`;
-      nextImg.src = enc(`Student Work/Headshots/${name}.webp`);
+      nextImg.src = enc(`/Student Work/Headshots/${name}.webp`);
     }
 
     swapHeadshot();
@@ -302,7 +302,7 @@
 
       const img = document.createElement('img');
       img.className = 'student-img';
-      img.src = enc(`Student Work/Projects/${file}`);
+      img.src = enc(`/Student Work/Projects/${file}`);
       img.alt = '';
       img.style.zIndex = zIndex;
       img.style.visibility = 'hidden';
