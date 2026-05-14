@@ -16,6 +16,7 @@ const PROJECTS_DIR = resolve(ROOT, 'Student Work/Projects');
 const PAGES = [
   resolve(ROOT, 'showcase/index.html'),
   resolve(ROOT, 'students/index.html'),
+  resolve(ROOT, 'index/index.html'),
 ];
 
 const IMAGE_EXT = /\.webp$/i;
