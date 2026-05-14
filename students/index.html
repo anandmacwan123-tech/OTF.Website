@@ -290,6 +290,18 @@
     return '';
   }
 
+  // Case-insensitive column getter — sheet headers occasionally have stray
+  // casing or whitespace.
+  function field(row, ...names) {
+    if (!row) return '';
+    const keys = Object.keys(row);
+    for (const n of names) {
+      const k = keys.find(k => k.toLowerCase() === n.toLowerCase());
+      if (k && row[k]) return row[k];
+    }
+    return '';
+  }
+
   function renderBasic(row) {
     const hs = document.getElementById('heroHeadshot');
     hs.src = enc(`/Student Work/Headshots/${name}.webp`);
@@ -297,16 +309,17 @@
     hs.onerror = () => { hs.remove(); };
 
     const practices = row
-      ? [row.Practice1, row.Practice2, row.Practice3].filter(p => p && p.length)
+      ? [field(row, 'Practice1'), field(row, 'Practice2'), field(row, 'Practice3')]
+          .filter(p => p && p.length)
       : [];
     const practicesEl = document.getElementById('heroPractices');
     if (practices.length) practicesEl.textContent = practices.join(', ');
     else practicesEl.remove();
 
     const bioEl = document.getElementById('bio');
-    if (row && row.Bio) {
-      // Allow paragraph breaks on double newlines in the cell
-      for (const para of row.Bio.split(/\n{2,}|\r\n\r\n/)) {
+    const bioText = field(row, 'Bio');
+    if (bioText) {
+      for (const para of bioText.split(/\n{2,}|\r\n\r\n/)) {
         const p = document.createElement('p');
         p.textContent = para.trim();
         if (p.textContent) bioEl.appendChild(p);
@@ -363,15 +376,36 @@
     });
   }
 
+  // Match the slug to the sheet's Name column. Tries exact match, then a
+  // first-token match (so "Anand Macwan" in the sheet matches slug "anand").
+  function matchRow(objs, slug) {
+    const target = slug.toLowerCase();
+    return objs.find(o => {
+      const n = field(o, 'Name').toLowerCase().trim();
+      if (!n) return false;
+      if (n === target) return true;
+      const first = n.split(/\s+/)[0];
+      return first === target;
+    }) || null;
+  }
+
   fetch(SHEET_URL, { cache: 'no-store' })
-    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
     .then(text => {
       const objs = toObjects(parseCSV(text));
-      const row = objs.find(o => (o.Name || '').toLowerCase() === name.toLowerCase()) || null;
+      const row = matchRow(objs, name);
+      if (!row) {
+        console.warn(`[OTF] No sheet row matched "${name}". Names found in sheet:`,
+          objs.map(o => field(o, 'Name')).filter(Boolean));
+      }
       renderBasic(row);
       renderProjects(row);
     })
-    .catch(() => {
+    .catch(err => {
+      console.error('[OTF] Sheet fetch failed:', err);
       renderBasic(null);
       renderProjects(null);
       const notice = document.createElement('p');
