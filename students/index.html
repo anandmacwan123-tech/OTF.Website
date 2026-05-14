@@ -29,7 +29,9 @@
   :root {
     --bg: #fff;
     --fg: #000;
-    --muted: #555;
+    --muted: #6a6a6a;
+    --col-text: 540px;
+    --col-image: 960px;
   }
 
   html, body {
@@ -43,7 +45,7 @@
   body {
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 4vh 5vw 8rem;
+    padding: 6vh 5vw 8rem;
   }
 
   .portfolio[hidden] { display: none; }
@@ -57,156 +59,65 @@
     font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--muted);
   }
 
   .hero {
+    max-width: var(--col-image);
+    margin: 0 auto 5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-    gap: 1.5rem;
-    margin-bottom: 4rem;
+    gap: 2rem;
   }
 
   .hero-headshot {
-    height: clamp(220px, 36vh, 420px);
+    height: clamp(280px, 50vh, 560px);
     width: auto;
     display: block;
   }
 
-  .hero-name {
-    font-weight: 700;
-    font-size: clamp(2.5rem, 8vw, 64pt);
-    line-height: 0.95;
-    letter-spacing: -0.06em;
-    text-transform: uppercase;
-  }
-
   .hero-practices {
+    max-width: var(--col-text);
+    text-align: center;
     font-weight: 400;
-    font-size: clamp(1.25rem, 3.5vw, 32pt);
-    line-height: 1.15;
-    letter-spacing: -0.06em;
-    color: var(--muted);
+    font-size: clamp(1.125rem, 1.2vw + 0.75rem, 1.5rem);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: var(--fg);
   }
 
   .bio {
-    max-width: 60ch;
-    margin: 0 auto 5rem;
-    font-size: clamp(1rem, 1.2vw + 0.5rem, 1.25rem);
-    line-height: 1.5;
+    max-width: var(--col-text);
+    margin: 0 auto 7rem;
+    font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
+    line-height: 1.55;
+    letter-spacing: -0.01em;
   }
+
+  .bio p + p { margin-top: 1rem; }
 
   .projects {
     display: flex;
     flex-direction: column;
-    gap: 6rem;
+    gap: 7rem;
+    max-width: var(--col-image);
+    margin: 0 auto;
   }
 
-  .project {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+  .project { display: flex; flex-direction: column; gap: 1.5rem; }
 
-  .project .images {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
+  .project .images { display: flex; flex-direction: column; gap: 1rem; }
 
-  .project img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+  .project img { display: block; width: 100%; height: auto; }
 
   .project-desc {
-    max-width: 60ch;
-    margin: 0 auto;
-    font-size: clamp(1rem, 1.2vw + 0.5rem, 1.25rem);
-    line-height: 1.5;
-    text-align: center;
-  }
-
-  /* Layout 2 — hero side-by-side, projects in 2-col grid */
-  body[data-layout="2"] .hero {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    text-align: left;
-    gap: 3rem;
-    flex-wrap: wrap;
-  }
-  body[data-layout="2"] .hero-text {
-    flex: 1 1 360px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  body[data-layout="2"] .hero-headshot {
-    order: 2;
-    height: clamp(260px, 42vh, 480px);
-  }
-  body[data-layout="2"] .bio {
-    margin-left: 0;
-    margin-right: auto;
-  }
-  body[data-layout="2"] .projects {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3rem 2rem;
-  }
-  body[data-layout="2"] .project-desc {
-    text-align: left;
-    margin: 0;
-  }
-  @media (max-width: 720px) {
-    body[data-layout="2"] .projects { grid-template-columns: 1fr; }
-  }
-
-  /* Layout 3 — name first, headshot below right, bio left, alternating project widths */
-  body[data-layout="3"] .hero {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "name     name"
-      "practices headshot";
-    align-items: end;
-    text-align: left;
-    gap: 1.5rem 3rem;
-  }
-  body[data-layout="3"] .hero-name { grid-area: name; }
-  body[data-layout="3"] .hero-practices { grid-area: practices; align-self: end; }
-  body[data-layout="3"] .hero-headshot {
-    grid-area: headshot;
-    height: clamp(220px, 34vh, 380px);
-    justify-self: end;
-  }
-  body[data-layout="3"] .bio {
-    margin: 0 0 5rem;
-  }
-  body[data-layout="3"] .project:nth-child(even) {
-    max-width: 60%;
-    align-self: flex-end;
-  }
-  body[data-layout="3"] .project:nth-child(odd) {
-    max-width: 85%;
-  }
-  body[data-layout="3"] .project-desc { text-align: left; margin: 0; }
-  @media (max-width: 720px) {
-    body[data-layout="3"] .hero {
-      grid-template-columns: 1fr;
-      grid-template-areas: "name" "headshot" "practices";
-    }
-    body[data-layout="3"] .hero-headshot { justify-self: start; }
-    body[data-layout="3"] .project:nth-child(even),
-    body[data-layout="3"] .project:nth-child(odd) {
-      max-width: none;
-      align-self: stretch;
-    }
+    max-width: var(--col-text);
+    margin: 0.5rem auto 0;
+    font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
+    line-height: 1.55;
+    letter-spacing: -0.01em;
   }
 
   .nav {
@@ -252,10 +163,7 @@
   <main class="portfolio" id="portfolio" hidden>
     <header class="hero">
       <img class="hero-headshot" id="heroHeadshot" alt="">
-      <div class="hero-text">
-        <h1 class="hero-name" id="heroName"></h1>
-        <p class="hero-practices" id="heroPractices"></p>
-      </div>
+      <p class="hero-practices" id="heroPractices"></p>
     </header>
     <section class="bio" id="bio"></section>
     <section class="projects" id="projects"></section>
@@ -299,21 +207,15 @@
   const stateEl = document.getElementById('state');
   const portfolioEl = document.getElementById('portfolio');
 
-  function fail(msg) {
-    stateEl.textContent = msg;
-  }
+  function fail(msg) { stateEl.textContent = msg; }
 
   const enc = p => p.split('/').map(encodeURIComponent).join('/');
 
   // Resolve slug to canonical student name from MANIFEST keys
   const slug = decodeURIComponent(location.pathname).replace(/^\/students\/?/, '').replace(/\/$/, '').toLowerCase();
   if (!slug) { fail('Student not found'); return; }
-
   const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
   if (!name) { fail('Student not found'); return; }
-
-  // Random layout
-  document.body.dataset.layout = String(1 + Math.floor(Math.random() * 3));
 
   // CSV parser — quoted fields, doubled-quote escape, CRLF/LF newlines
   function parseCSV(text) {
@@ -325,9 +227,7 @@
         if (c === '"') {
           if (text[i + 1] === '"') { field += '"'; i++; }
           else { inQuotes = false; }
-        } else {
-          field += c;
-        }
+        } else { field += c; }
       } else if (c === '"') {
         inQuotes = true;
       } else if (c === ',') {
@@ -336,9 +236,7 @@
         if (c === '\r' && text[i + 1] === '\n') i++;
         row.push(field); rows.push(row);
         row = []; field = '';
-      } else {
-        field += c;
-      }
+      } else { field += c; }
     }
     if (field.length || row.length) { row.push(field); rows.push(row); }
     return rows;
@@ -368,34 +266,56 @@
       groups.get(base).push(file);
     }
     for (const arr of groups.values()) arr.sort((a, b) => a.localeCompare(b));
-    return order.map(k => groups.get(k));
+    return order.map(base => ({ base, files: groups.get(base) }));
+  }
+
+  // Look up a description for a project group. Try several column conventions:
+  //   1. Exact base name      e.g. "Based"
+  //   2. Base name + "_Desc"  e.g. "Based_Desc"
+  //   3. "<Name>_<base>"      e.g. "Anand_Based"
+  //   4. ProjectN_Desc        e.g. "Project1_Desc" (positional fallback)
+  function lookupDesc(row, name, base, index) {
+    if (!row) return '';
+    const candidates = [
+      base,
+      `${base}_Desc`,
+      `${name}_${base}`,
+      `Project${index + 1}_Desc`,
+    ];
+    // Case-insensitive header lookup
+    const keys = Object.keys(row);
+    for (const cand of candidates) {
+      const key = keys.find(k => k.toLowerCase() === cand.toLowerCase());
+      if (key && row[key]) return row[key];
+    }
+    return '';
   }
 
   function renderBasic(row) {
-    // Headshot
     const hs = document.getElementById('heroHeadshot');
     hs.src = enc(`/Student Work/Headshots/${name}.webp`);
     hs.alt = `${name} — portrait`;
     hs.onerror = () => { hs.remove(); };
 
-    // Name + practices
-    document.getElementById('heroName').textContent = name.toUpperCase();
     const practices = row
       ? [row.Practice1, row.Practice2, row.Practice3].filter(p => p && p.length)
-      : ['Design practice1', 'Design practice2', 'Design practice3'];
-    document.getElementById('heroPractices').textContent = practices.join(', ');
+      : [];
+    const practicesEl = document.getElementById('heroPractices');
+    if (practices.length) practicesEl.textContent = practices.join(', ');
+    else practicesEl.remove();
 
-    // Bio
     const bioEl = document.getElementById('bio');
     if (row && row.Bio) {
-      const p = document.createElement('p');
-      p.textContent = row.Bio;
-      bioEl.appendChild(p);
+      // Allow paragraph breaks on double newlines in the cell
+      for (const para of row.Bio.split(/\n{2,}|\r\n\r\n/)) {
+        const p = document.createElement('p');
+        p.textContent = para.trim();
+        if (p.textContent) bioEl.appendChild(p);
+      }
     } else {
       bioEl.remove();
     }
 
-    // Title + OG/Twitter
     document.title = `${name} — OTF`;
     const setMeta = (sel, value) => {
       const el = document.querySelector(sel);
@@ -413,17 +333,17 @@
     const groups = projectGroups(name, files);
     const container = document.getElementById('projects');
 
-    groups.forEach((groupFiles, i) => {
-      const desc = row ? (row[`Project${i + 1}_Desc`] || '') : '';
-      if (!groupFiles.length && !desc) return;
+    groups.forEach((group, i) => {
+      const desc = lookupDesc(row, name, group.base, i);
+      if (!group.files.length && !desc) return;
 
       const article = document.createElement('article');
       article.className = 'project';
 
-      if (groupFiles.length) {
+      if (group.files.length) {
         const imagesDiv = document.createElement('div');
         imagesDiv.className = 'images';
-        for (const file of groupFiles) {
+        for (const file of group.files) {
           const img = document.createElement('img');
           img.src = enc(`/Student Work/Projects/${file}`);
           img.alt = '';
@@ -444,7 +364,6 @@
     });
   }
 
-  // Fetch CSV → find row → render
   fetch(SHEET_URL, { cache: 'no-store' })
     .then(r => r.ok ? r.text() : Promise.reject(r.status))
     .then(text => {
@@ -456,7 +375,6 @@
     .catch(() => {
       renderBasic(null);
       renderProjects(null);
-      // Inline notice that copy couldn't load
       const notice = document.createElement('p');
       notice.className = 'state';
       notice.style.position = 'static';
