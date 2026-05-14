@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTF — Student Showcase</title>
+<meta name="description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
+<link rel="canonical" href="https://otfshow.anandmacwan123.workers.dev/showcase/">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="OTF — Student Showcase">
+<meta property="og:description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta property="og:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="OTF — Ravensbourne Graphic Design Show">
+<meta property="og:url" content="https://otfshow.anandmacwan123.workers.dev/showcase/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OTF">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OTF — Student Showcase">
+<meta name="twitter:description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta name="twitter:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
+<link rel="icon" type="image/jpeg" href="/Favicon.jpg">
+<link rel="apple-touch-icon" href="/Favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #FF002F;
+    --bg: #000;
+  }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 4vw;
+    gap: 2.5vh;
+    overflow: hidden;
+  }
+
+  .student-img {
+    position: fixed;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    display: block;
+    width: auto;
+    height: clamp(240px, 42vh, 510px);
+  }
+
+  .media-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .headshot-link {
+    display: inline-block;
+    position: relative;
+    height: clamp(280px, 55vh, 620px);
+    line-height: 0;
+  }
+
+  .headshot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    opacity: 0;
+    transition: opacity 600ms ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .headshot.active { opacity: 1; }
+
+  .caption {
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-weight: 500;
+    font-size: clamp(0.95rem, 1.1vw + 0.55rem, 1.2rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+    min-height: 1.5em;
+  }
+
+  .cta {
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: clamp(0.95rem, 1.1vw + 0.55rem, 1.2rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: inline-block;
+    transition: opacity 0.2s ease;
+  }
+
+  .cta a:hover { opacity: 0.65; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .headshot { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <h1 class="sr-only">OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London</h1>
+  <p class="sr-only">
+    Browse this year's graduating graphic designers from Ravensbourne University London.
+    Click any portrait to open that student's portfolio.
+  </p>
+
+  <div class="media-wrap">
+    <a id="headshotLink" class="headshot-link" href="/" aria-label="Open student portfolio">
+      <img id="headshotA" class="headshot" alt="">
+      <img id="headshotB" class="headshot" alt="">
+    </a>
+  </div>
+
+  <div class="caption" id="caption" aria-live="polite"></div>
+
+  <div class="cta">
+    <a href="/">[BACK TO INVITE]</a>
+  </div>
+
+  <script>
+  (() => {
+    // __MANIFEST_START__
+    const MANIFEST = {
+    };
+    // __MANIFEST_END__
+
+    const STUDENTS = Object.keys(MANIFEST);
+    if (STUDENTS.length === 0) {
+      // No assets yet — leave page idle (centre stays empty).
+      return;
+    }
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mobileMQ = window.matchMedia('(max-width: 768px)');
+
+    const HEADSHOT_INTERVAL_MS = reducedMotion ? 6000 : 3000;
+    const LIFETIME_MS = 900;
+    const MAX_ACTIVE = 3;
+    const FRONT_CHANCE = 0.35;
+    const FRONT_CHANCE_MOBILE_MULT = 1.5;
+    const SPAWN_INTERVAL_MS = 180;
+
+    const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+    // Warm cache for every headshot and every project file.
+    STUDENTS.forEach(name => {
+      (new Image()).src = enc(`Student Work/Headshots/${name}.webp`);
+      (MANIFEST[name] || []).forEach(file => {
+        (new Image()).src = enc(`Student Work/Projects/${file}`);
+      });
+    });
+
+    /* ───── Headshot slideshow ───── */
+
+    const headshotLink = document.getElementById('headshotLink');
+    const caption = document.getElementById('caption');
+    const imgs = [
+      document.getElementById('headshotA'),
+      document.getElementById('headshotB'),
+    ];
+    let activeIdx = 0;            // which img element currently has .active
+    let currentStudent = null;    // drives the background spawn pool
+    const recentStudents = [];
+    const brokenStudents = new Set();
+
+    function pickStudent() {
+      const eligible = STUDENTS.filter(n => !brokenStudents.has(n));
+      if (eligible.length === 0) return null;
+      const pool = eligible.filter(n => !recentStudents.includes(n));
+      const list = pool.length ? pool : eligible;
+      const name = list[Math.floor(Math.random() * list.length)];
+      recentStudents.push(name);
+      const window_ = Math.min(8, eligible.length - 1);
+      while (recentStudents.length > window_) recentStudents.shift();
+      return name;
+    }
+
+    function swapHeadshot() {
+      const name = pickStudent();
+      if (!name) return;
+
+      const nextIdx = 1 - activeIdx;
+      const nextImg = imgs[nextIdx];
+      const currentImg = imgs[activeIdx];
+
+      const onload = () => {
+        nextImg.classList.add('active');
+        currentImg.classList.remove('active');
+        headshotLink.href = `/students/${name.toLowerCase()}/`;
+        headshotLink.setAttribute('aria-label', `Open ${name}'s portfolio`);
+        caption.textContent = name;
+        currentStudent = name;
+        activeIdx = nextIdx;
+      };
+
+      const onerror = () => {
+        brokenStudents.add(name);
+        nextImg.onload = nextImg.onerror = null;
+        // Try again immediately (within this same tick).
+        swapHeadshot();
+      };
+
+      nextImg.onload = onload;
+      nextImg.onerror = onerror;
+      nextImg.alt = `${name} — student portrait`;
+      nextImg.src = enc(`Student Work/Headshots/${name}.webp`);
+    }
+
+    swapHeadshot();
+    setInterval(swapHeadshot, HEADSHOT_INTERVAL_MS);
+
+    /* ───── Background spawn loop (filtered to currentStudent's projects) ───── */
+
+    if (reducedMotion) return;
+
+    const active = new Set();
+
+    function imgHeight() {
+      return Math.round(Math.max(240, Math.min(510, window.innerHeight * 0.42)));
+    }
+
+    function spawn() {
+      if (!currentStudent) return;
+      const projects = MANIFEST[currentStudent];
+      if (!projects || projects.length === 0) return;
+      if (active.size >= MAX_ACTIVE) return;
+      if (active.size > 0 && Math.random() < 0.4) return;
+
+      const h = imgHeight();
+      const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
+      const zIndex = Math.random() < frontChance ? 3 : 1;
+
+      const file = projects[Math.floor(Math.random() * projects.length)];
+
+      const img = document.createElement('img');
+      img.className = 'student-img';
+      img.src = enc(`Student Work/Projects/${file}`);
+      img.alt = '';
+      img.style.zIndex = zIndex;
+      img.style.visibility = 'hidden';
+
+      const place = () => {
+        const W = window.innerWidth, H = window.innerHeight;
+        const w = img.getBoundingClientRect().width || h;
+        const margin = 8;
+        const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
+        const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin * 2));
+        img.style.left = x + 'px';
+        img.style.top = y + 'px';
+        img.style.visibility = 'visible';
+      };
+      img.addEventListener('load', place, { once: true });
+      img.addEventListener('error', () => {
+        img.remove();
+        active.delete(img);
+      }, { once: true });
+
+      document.body.appendChild(img);
+      active.add(img);
+
+      setTimeout(() => {
+        img.remove();
+        active.delete(img);
+      }, LIFETIME_MS);
+    }
+
+    requestAnimationFrame(() => {
+      spawn();
+      setInterval(spawn, SPAWN_INTERVAL_MS);
+    });
+
+    let resizeT;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(() => {
+        for (const el of active) el.remove();
+        active.clear();
+      }, 120);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        for (const el of active) el.remove();
+        active.clear();
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
