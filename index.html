@@ -134,12 +134,12 @@
 
     const NAMES = [
       'Anand','Arnete','Becky','Carolina','Charles','Darcy','Divine','Elise',
-      'Emily','Jaeden','Jamie','Jenna','Jess','Kami','Kye','Maiya','Martim',
+      'Emily','Jaeden','Jamie','Jenna','Jess','Kami','Kye','Martim','Maseray',
       'Nikol','Noora','Nora','Nuria','Oli','Oscar','Rebecca','Sam','Sara','Sasha',
       'Sebastian','Shalom','Surayya','Taleb','Tallulah','Valentina','Vanessa','Will'
     ];
 
-    const LIFETIME_MS = 500;
+    const LIFETIME_MS = 900;
     const MAX_ACTIVE = 3;
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
@@ -164,13 +164,7 @@
       // Natural randomness — sometimes don't add another so count varies 1–3
       if (active.size > 0 && Math.random() < 0.4) return;
 
-      const W = window.innerWidth, H = window.innerHeight;
       const h = imgHeight();
-      const margin = 8;
-      // Use h as rough estimate for width too (images are portrait-ish)
-      const x = Math.round(margin + Math.random() * (W - h - margin * 2));
-      const y = Math.round(margin + Math.random() * (H - h - margin * 2));
-
       // ~35% chance to appear in front of the video
       const zIndex = Math.random() < 0.35 ? 3 : 1;
 
@@ -178,9 +172,21 @@
       img.className = 'student-img';
       img.src = enc(`Student Work/${pickName()}.webp`);
       img.alt = '';
-      img.style.left = x + 'px';
-      img.style.top = y + 'px';
       img.style.zIndex = zIndex;
+      // Hide until we know the real width — avoids clipping wide images
+      img.style.visibility = 'hidden';
+
+      const place = () => {
+        const W = window.innerWidth, H = window.innerHeight;
+        const w = img.getBoundingClientRect().width || h;
+        const margin = 8;
+        const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
+        const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin * 2));
+        img.style.left = x + 'px';
+        img.style.top = y + 'px';
+        img.style.visibility = 'visible';
+      };
+      img.addEventListener('load', place, { once: true });
 
       document.body.appendChild(img);
       active.add(img);
