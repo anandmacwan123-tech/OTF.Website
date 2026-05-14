@@ -269,20 +269,19 @@
     return order.map(base => ({ base, files: groups.get(base) }));
   }
 
-  // Look up a description for a project group. Try several column conventions:
-  //   1. Exact base name      e.g. "Based"
-  //   2. Base name + "_Desc"  e.g. "Based_Desc"
-  //   3. "<Name>_<base>"      e.g. "Anand_Based"
-  //   4. ProjectN_Desc        e.g. "Project1_Desc" (positional fallback)
+  // Look up a description for a project group. The sheet uses positional
+  // columns: "Project description 1" .. "Project description 5". The base
+  // name fallbacks below let the schema evolve later without code changes.
   function lookupDesc(row, name, base, index) {
     if (!row) return '';
     const candidates = [
+      `Project description ${index + 1}`,
+      `Project Description ${index + 1}`,
+      `Project${index + 1}_Desc`,
       base,
       `${base}_Desc`,
       `${name}_${base}`,
-      `Project${index + 1}_Desc`,
     ];
-    // Case-insensitive header lookup
     const keys = Object.keys(row);
     for (const cand of candidates) {
       const key = keys.find(k => k.toLowerCase() === cand.toLowerCase());
