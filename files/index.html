@@ -264,6 +264,56 @@
     0% { opacity: 0.4; } 50% { opacity: 0.7; } 100% { opacity: 0.4; }
   }
   .loading { animation: shimmer 1.4s ease-in-out infinite; }
+
+  /* ── Task bar (bottom-right) ──────────────────────────────────────── */
+  #taskBar {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    min-width: 220px;
+    max-width: 340px;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 0.75rem 1rem;
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+    transform: translateY(0);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  #taskBar[hidden] {
+    display: flex;
+    opacity: 0;
+    transform: translateY(0.5rem);
+    pointer-events: none;
+  }
+  .task-label {
+    font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .task-detail {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.65);
+    word-break: break-all;
+  }
+  .task-progress {
+    height: 2px; width: 100%;
+    background: rgba(255,255,255,0.15);
+    overflow: hidden; position: relative;
+  }
+  .task-progress::after {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0;
+    width: 40%; background: rgba(255,255,255,0.9);
+    animation: taskSlide 1.2s ease-in-out infinite;
+  }
+  @keyframes taskSlide {
+    0% { left: -40%; } 100% { left: 100%; }
+  }
+  #taskBar.task-done .task-progress { display: none; }
+  #taskBar.task-error { background: var(--red); }
 </style>
 </head>
 <body>
@@ -297,6 +347,13 @@
     <aside id="sidebar"></aside>
     <main id="detail"><p class="hint">Select a student</p></main>
   </div>
+</div>
+
+<!-- Bottom-right task bar -->
+<div id="taskBar" hidden>
+  <span class="task-label">Working…</span>
+  <span class="task-detail"></span>
+  <span class="task-progress"></span>
 </div>
 
 <!-- Confirmation modal -->
@@ -533,35 +590,91 @@
     });
   }
 
+  // ── Task bar ───────────────────────────────────────────────────────
+  const taskBarEl = $('taskBar');
+  const taskLabelEl = taskBarEl.querySelector('.task-label');
+  const taskDetailEl = taskBarEl.querySelector('.task-detail');
+  let taskHideTimer = null;
+
+  function showTask(label, detail = '') {
+    clearTimeout(taskHideTimer);
+    taskBarEl.classList.remove('task-done', 'task-error');
+    taskLabelEl.textContent = label;
+    taskDetailEl.textContent = detail;
+    taskBarEl.removeAttribute('hidden');
+  }
+  function finishTask(label, detail = '', isError = false) {
+    clearTimeout(taskHideTimer);
+    taskBarEl.classList.add(isError ? 'task-error' : 'task-done');
+    taskLabelEl.textContent = label;
+    taskDetailEl.textContent = detail;
+    taskHideTimer = setTimeout(() => taskBarEl.setAttribute('hidden', ''), isError ? 4500 : 1800);
+  }
+
+  // ── JPG/JPEG → WebP conversion (browser canvas) ───────────────────
+  function convertJpegToWebP(file, quality = 0.92) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          URL.revokeObjectURL(url);
+          if (!blob) return reject(new Error('WebP encoding failed'));
+          const newName = file.name.replace(/\.(jpg|jpeg)$/i, '.webp');
+          resolve(new File([blob], newName, { type: 'image/webp' }));
+        }, 'image/webp', quality);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not decode image')); };
+      img.src = url;
+    });
+  }
+
   async function doUpload(fileList, student, isHeadshot) {
+    const total = fileList.length;
+    let idx = 0;
     for (const file of fileList) {
+      idx++;
       const lower = file.name.toLowerCase();
+      const isJpeg = /\.(jpg|jpeg)$/.test(lower);
       const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
       const isVid = /\.(mp4|webm)$/.test(lower);
       if (!isImg && !isVid) { alert(`Unsupported file type: ${file.name}`); continue; }
-      if (isHeadshot && !lower.endsWith('.webp')) {
-        alert(`Headshot must be .webp — convert ${file.name} first.`); continue;
+      if (isHeadshot && !isJpeg && !lower.endsWith('.webp')) {
+        alert(`Headshot must be .webp or .jpg — got ${file.name}.`); continue;
       }
-      setStatus(`Uploading ${file.name}…`);
+
+      const counter = total > 1 ? `${idx}/${total} · ` : '';
+      let workFile = file;
       try {
-        const b64 = await fileToBase64(file);
+        if (isJpeg) {
+          showTask(`${counter}Converting`, file.name);
+          workFile = await convertJpegToWebP(file);
+        }
+
+        showTask(`${counter}Uploading`, workFile.name);
+        const b64 = await fileToBase64(workFile);
+
         if (isHeadshot) {
           const path = `${HS_DIR}/${student}.webp`;
           await atomicCommit([{ path, content: b64 }], `replace headshot for ${student}`);
         } else {
-          const ext = lower.match(/\.[^.]+$/)?.[0] || '';
-          const suffix = file.name.slice(0, -ext.length).replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
+          const ext = workFile.name.toLowerCase().match(/\.[^.]+$/)?.[0] || '';
+          const suffix = workFile.name.slice(0, -ext.length).replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
           const newName = `${student}_${suffix}${ext}`;
           await atomicCommit([{ path: `${PR_DIR}/${newName}`, content: b64 }], `upload ${newName}`);
         }
-        setStatus('Committed ✓');
+        finishTask(`${counter}Uploaded ✓`, workFile.name);
         await refresh();
       } catch(e) {
-        setStatus('');
-        alert('Upload failed: ' + e.message);
+        finishTask('Failed', e.message, true);
+        return;
       }
     }
-    setTimeout(() => setStatus(''), 2000);
   }
 
   async function doRename(file, newSuffix) {
@@ -569,32 +682,28 @@
     const student = currentStudent;
     const newName = `${student}_${newSuffix}${ext}`;
     if (newName === file.name) return;
-    setStatus(`Renaming…`);
+    showTask('Renaming', `${file.name} → ${newName}`);
     try {
       await atomicCommit([
         { path: file.path, delete: true },
         { path: `${PR_DIR}/${newName}`, sha: file.sha },
       ], `rename ${file.name} → ${newName}`);
-      setStatus('Committed ✓');
+      finishTask('Renamed ✓', newName);
       await refresh();
     } catch(e) {
-      setStatus('');
-      alert('Rename failed: ' + e.message);
+      finishTask('Rename failed', e.message, true);
     }
-    setTimeout(() => setStatus(''), 2000);
   }
 
   async function doDelete(file) {
-    setStatus(`Deleting…`);
+    showTask('Deleting', file.name);
     try {
       await atomicCommit([{ path: file.path, delete: true }], `delete ${file.name}`);
-      setStatus('Committed ✓');
+      finishTask('Deleted ✓', file.name);
       await refresh();
     } catch(e) {
-      setStatus('');
-      alert('Delete failed: ' + e.message);
+      finishTask('Delete failed', e.message, true);
     }
-    setTimeout(() => setStatus(''), 2000);
   }
 
   // ── Modal ──────────────────────────────────────────────────────────
@@ -684,7 +793,7 @@
     if (isHeadshot) {
       const replBtn = mkBtn('⟲ Replace', () => {
         const inp = Object.assign(document.createElement('input'), {
-          type: 'file', accept: '.webp',
+          type: 'file', accept: '.webp,.jpg,.jpeg',
         });
         inp.addEventListener('change', () => doUpload(inp.files, currentStudent, true));
         inp.click();
