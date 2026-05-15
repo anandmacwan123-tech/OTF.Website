@@ -308,20 +308,25 @@
       });
   }
 
-  // Group project filenames into projects keyed by base name.
+  // Group project filenames into projects keyed by storage name.
+  // Supports new convention: <Student>_<Project>_<N>.webp
+  // Skips Unassigned files and collapses Untitled<K> → display "Untitled".
   function projectGroups(name, files) {
     const prefixRe = new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '_');
-    const stripDigits = /(\d+(-\d+)?|-\d+)$/;
     const order = [];
     const groups = new Map();
     for (const file of files) {
       const stem = file.replace(/\.webp$/i, '').replace(prefixRe, '');
-      const base = stem.replace(stripDigits, '') || stem;
-      if (!groups.has(base)) { groups.set(base, []); order.push(base); }
-      groups.get(base).push(file);
+      const m = stem.match(/^(.+)_(\d+)$/);
+      const project = m ? m[1] : stem;
+      const n = m ? +m[2] : 0;
+      if (project === 'Unassigned') continue;
+      const displayName = /^Untitled\d+$/.test(project) ? 'Untitled' : project;
+      if (!groups.has(project)) { groups.set(project, { displayName, files: [] }); order.push(project); }
+      groups.get(project).files.push({ file, n });
     }
-    for (const arr of groups.values()) arr.sort((a, b) => a.localeCompare(b));
-    return order.map(base => ({ base, files: groups.get(base) }));
+    for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n);
+    return order.map(p => ({ base: groups.get(p).displayName, files: groups.get(p).files.map(x => x.file) }));
   }
 
   // Look up a description for a project group. The sheet uses positional
