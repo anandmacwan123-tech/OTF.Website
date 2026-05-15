@@ -534,6 +534,18 @@
   const SENT_END   = '// __MANIFEST_END__';
   const LS_PAT = 'otf_library_pat';
   const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+  const STUDENT_LIST = [
+    'Anand Macwan', 'Becky Smith', 'Charles Latagan', 'Darcy Young',
+    'Divine Ojiaku', 'Jaeden Small', 'Jamie Donnelly', 'Jenna Winckless',
+    'Jess Shrimpton', 'Kaila Webb', 'Kami Vasquez Quiceno', 'Kye Goff',
+    'Martim Freitas Pereira', 'Maseray Maiya Sesay', 'Nikol Aleksandrova',
+    'Noora Ghodrati', 'Nora Ashani', 'Nuria Vargas Santana', 'Olya Grishina',
+    'Oscar Vigdal', 'Rebecca Whippy', 'Sam Fletcher', 'Sara Jurkowska',
+    'Sasha Brown', 'Sebastian McLean', 'Shalom Milton-Gorvie', 'Surayya Ahmadzada',
+    'Taleb Cherif', 'Tallulah Stott', 'Vanessa Franko', 'Will Vint',
+    'Emily Amankwaah', 'Carolina Almeida Ferreira', 'Arnete Kuncyte',
+    'Oli Parker', 'Valentina Labriola', 'Elise Havis',
+  ];
   const ORDER_PATH = 'Student Work/projects-order.json';
 
   // ── State ──────────────────────────────────────────────────────────
@@ -633,11 +645,7 @@
     headshots = hs.filter(f => f.type === 'file').map(toFile);
     projects  = pr.filter(f => f.type === 'file').map(toFile);
 
-    // Load student names from the Google Sheet (non-fatal on failure)
-    try {
-      const names = await loadSheet();
-      csvStudents = names.map(fullName => ({ slug: fullName.split(' ')[0], fullName }));
-    } catch { csvStudents = []; }
+    csvStudents = STUDENT_LIST.map(fullName => ({ slug: fullName.split(' ')[0], fullName }));
 
     // Load persistent project order (file may not exist → 404)
     try {
