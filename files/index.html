@@ -390,6 +390,7 @@
   let headshots      = []; // { name, sha, downloadUrl, path }
   let projects       = []; // { name, sha, downloadUrl, path }
   let currentStudent = null;
+  const thumbCache   = new Map(); // sha → objectURL
 
   // ── DOM ────────────────────────────────────────────────────────────
   const $ = id => document.getElementById(id);
@@ -441,6 +442,19 @@
   async function ghBlob(base64) {
     const r = await gh('POST', '/git/blobs', { content: base64, encoding: 'base64' });
     return r.sha;
+  }
+
+  // ── Authenticated thumbnail loader ─────────────────────────────────
+  async function loadThumb(file) {
+    if (thumbCache.has(file.sha)) return thumbCache.get(file.sha);
+    const resp = await fetch(file.downloadUrl, {
+      headers: { Authorization: `Bearer ${pat}` },
+    });
+    if (!resp.ok) throw new Error(`${resp.status}`);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    thumbCache.set(file.sha, url);
+    return url;
   }
 
   // ── Fetch assets ───────────────────────────────────────────────────
@@ -773,10 +787,12 @@
       thumb.innerHTML = '<span class="video-icon">▶</span>';
     } else {
       const img = document.createElement('img');
-      img.src = file.downloadUrl;
       img.alt = file.name;
-      img.loading = 'lazy';
+      thumb.classList.add('loading');
       thumb.appendChild(img);
+      loadThumb(file)
+        .then(url => { img.src = url; thumb.classList.remove('loading'); })
+        .catch(() => { thumb.classList.remove('loading'); });
     }
     card.appendChild(thumb);
 
