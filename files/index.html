@@ -106,6 +106,24 @@
   }
   .sign-out-btn:hover { color: var(--fg); }
 
+  /* Save / Discard */
+  .save-btn {
+    font: inherit; font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: var(--fg); color: var(--bg);
+    border: none; padding: 0.4rem 0.9rem; cursor: pointer;
+  }
+  .save-btn:hover { opacity: 0.75; }
+  .discard-btn {
+    font: inherit; font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: none; border: none; cursor: pointer; color: var(--muted);
+  }
+  .discard-btn:hover { color: var(--fg); }
+
+  /* Pending indicator */
+  .file-card.pending .filename::after { content: ' ·'; font-weight: 700; }
+
   /* Layout: sidebar + main */
   .app-body {
     display: flex; flex: 1; overflow: hidden;
@@ -340,6 +358,8 @@
     <h1>OTF Library</h1>
     <div class="header-right">
       <span id="status"></span>
+      <button class="discard-btn" id="discardBtn" hidden>Discard</button>
+      <button class="save-btn" id="saveBtn" hidden>Save</button>
       <button class="sign-out-btn" id="signOut">Sign out</button>
     </div>
   </header>
@@ -387,10 +407,11 @@
 
   // ── State ──────────────────────────────────────────────────────────
   let pat            = '';
-  let headshots      = []; // { name, sha, downloadUrl, path }
-  let projects       = []; // { name, sha, downloadUrl, path }
+  let headshots      = []; // { name, sha, path, localUrl?, isPending? }
+  let projects       = []; // { name, sha, path, localUrl?, isPending? }
   let currentStudent = null;
   const thumbCache   = new Map(); // sha → objectURL
+  let pendingQueue   = []; // changes awaiting commit: { path, content?, sha?, delete? }
 
   // ── DOM ────────────────────────────────────────────────────────────
   const $ = id => document.getElementById(id);
@@ -448,6 +469,7 @@
   // Uses the Git Blobs API (api.github.com) rather than raw.githubusercontent.com
   // because raw URLs block CORS preflight from non-github.com origins.
   async function loadThumb(file) {
+    if (file.localUrl) return file.localUrl;
     if (thumbCache.has(file.sha)) return thumbCache.get(file.sha);
     const data = await gh('GET', `/git/blobs/${file.sha}`);
     const binary = atob(data.content.replace(/\n/g, ''));
@@ -630,8 +652,8 @@
     taskHideTimer = setTimeout(() => taskBarEl.setAttribute('hidden', ''), isError ? 4500 : 1800);
   }
 
-  // ── JPG/JPEG → WebP conversion (browser canvas) ───────────────────
-  function convertJpegToWebP(file, quality = 0.92) {
+  // ── Image → WebP conversion (browser canvas, handles JPEG + PNG) ──
+  function convertToWebP(file, quality = 0.92) {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
@@ -639,12 +661,11 @@
         const canvas = document.createElement('canvas');
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+        canvas.getContext('2d').drawImage(img, 0, 0);
         canvas.toBlob(blob => {
           URL.revokeObjectURL(url);
           if (!blob) return reject(new Error('WebP encoding failed'));
-          const newName = file.name.replace(/\.(jpg|jpeg)$/i, '.webp');
+          const newName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp');
           resolve(new File([blob], newName, { type: 'image/webp' }));
         }, 'image/webp', quality);
       };
@@ -659,36 +680,43 @@
     for (const file of fileList) {
       idx++;
       const lower = file.name.toLowerCase();
-      const isJpeg = /\.(jpg|jpeg)$/.test(lower);
+      const needsConvert = /\.(jpg|jpeg|png)$/.test(lower);
       const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
       const isVid = /\.(mp4|webm)$/.test(lower);
       if (!isImg && !isVid) { alert(`Unsupported file type: ${file.name}`); continue; }
-      if (isHeadshot && !isJpeg && !lower.endsWith('.webp')) {
-        alert(`Headshot must be .webp or .jpg — got ${file.name}.`); continue;
-      }
 
       const counter = total > 1 ? `${idx}/${total} · ` : '';
       let workFile = file;
       try {
-        if (isJpeg) {
+        if (needsConvert) {
           showTask(`${counter}Converting`, file.name);
-          workFile = await convertJpegToWebP(file);
+          workFile = await convertToWebP(file);
         }
 
-        showTask(`${counter}Uploading`, workFile.name);
+        showTask(`${counter}Reading`, workFile.name);
         const b64 = await fileToBase64(workFile);
+        const localUrl = URL.createObjectURL(workFile);
 
         if (isHeadshot) {
           const path = `${HS_DIR}/${student}.webp`;
-          await atomicCommit([{ path, content: b64 }], `replace headshot for ${student}`);
+          const entry = { name: workFile.name, sha: null, path, localUrl, isPending: true };
+          const i = headshots.findIndex(h => h.path === path);
+          if (i >= 0) { if (headshots[i].localUrl) URL.revokeObjectURL(headshots[i].localUrl); headshots[i] = entry; }
+          else headshots.push(entry);
+          pendingQueue = pendingQueue.filter(c => c.path !== path);
+          pendingQueue.push({ path, content: b64 });
         } else {
           const ext = workFile.name.toLowerCase().match(/\.[^.]+$/)?.[0] || '';
           const suffix = workFile.name.slice(0, -ext.length).replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
           const newName = `${student}_${suffix}${ext}`;
-          await atomicCommit([{ path: `${PR_DIR}/${newName}`, content: b64 }], `upload ${newName}`);
+          const path = `${PR_DIR}/${newName}`;
+          projects.push({ name: newName, sha: null, path, localUrl, isPending: true });
+          pendingQueue = pendingQueue.filter(c => c.path !== path);
+          pendingQueue.push({ path, content: b64 });
         }
-        finishTask(`${counter}Uploaded ✓`, workFile.name);
-        await refresh();
+
+        finishTask(`${counter}Staged ✓`, workFile.name);
+        renderSidebar(); renderDetail(); updateSaveBtn();
       } catch(e) {
         finishTask('Failed', e.message, true);
         return;
@@ -696,33 +724,78 @@
     }
   }
 
-  async function doRename(file, newSuffix) {
+  function doRename(file, newSuffix) {
     const ext = file.name.match(/\.[^.]+$/)?.[0] || '';
-    const student = currentStudent;
-    const newName = `${student}_${newSuffix}${ext}`;
+    const newName = `${currentStudent}_${newSuffix}${ext}`;
+    const newPath = `${PR_DIR}/${newName}`;
     if (newName === file.name) return;
-    showTask('Renaming', `${file.name} → ${newName}`);
-    try {
-      await atomicCommit([
-        { path: file.path, delete: true },
-        { path: `${PR_DIR}/${newName}`, sha: file.sha },
-      ], `rename ${file.name} → ${newName}`);
-      finishTask('Renamed ✓', newName);
-      await refresh();
-    } catch(e) {
-      finishTask('Rename failed', e.message, true);
+
+    const i = projects.findIndex(p => p.path === file.path);
+    if (i >= 0) projects[i] = { ...projects[i], name: newName, path: newPath, isPending: true };
+
+    // If this was a staged upload, just update its path in the queue
+    const stagedAdd = pendingQueue.find(c => c.path === file.path && c.content);
+    if (stagedAdd) {
+      stagedAdd.path = newPath;
+    } else {
+      pendingQueue = pendingQueue.filter(c => c.path !== file.path && c.path !== newPath);
+      pendingQueue.push({ path: file.path, delete: true });
+      pendingQueue.push({ path: newPath, sha: file.sha });
+    }
+
+    renderDetail(); updateSaveBtn();
+  }
+
+  function doDelete(file) {
+    if (file.localUrl) URL.revokeObjectURL(file.localUrl);
+    headshots = headshots.filter(h => h.path !== file.path);
+    projects  = projects.filter(p => p.path !== file.path);
+
+    // If it was only staged (not yet on GitHub), just drop it from the queue
+    const stagedAdd = pendingQueue.find(c => c.path === file.path && c.content);
+    if (stagedAdd) {
+      pendingQueue = pendingQueue.filter(c => c.path !== file.path);
+    } else {
+      pendingQueue = pendingQueue.filter(c => c.path !== file.path);
+      if (file.sha) pendingQueue.push({ path: file.path, delete: true });
+    }
+
+    renderSidebar(); renderDetail(); updateSaveBtn();
+  }
+
+  // ── Save / Discard ─────────────────────────────────────────────────
+  function updateSaveBtn() {
+    const saveBtn = $('saveBtn');
+    const discardBtn = $('discardBtn');
+    if (pendingQueue.length > 0) {
+      saveBtn.removeAttribute('hidden');
+      discardBtn.removeAttribute('hidden');
+      saveBtn.textContent = `Save (${pendingQueue.length})`;
+    } else {
+      saveBtn.setAttribute('hidden', '');
+      discardBtn.setAttribute('hidden', '');
     }
   }
 
-  async function doDelete(file) {
-    showTask('Deleting', file.name);
+  async function doSave() {
+    if (!pendingQueue.length) return;
+    showTask('Saving…', `${pendingQueue.length} change${pendingQueue.length !== 1 ? 's' : ''}`);
     try {
-      await atomicCommit([{ path: file.path, delete: true }], `delete ${file.name}`);
-      finishTask('Deleted ✓', file.name);
+      await atomicCommit(pendingQueue, 'batch update');
+      pendingQueue = [];
+      finishTask('Saved ✓', '');
       await refresh();
     } catch(e) {
-      finishTask('Delete failed', e.message, true);
+      finishTask('Save failed', e.message, true);
     }
+  }
+
+  async function doDiscard() {
+    for (const f of [...headshots, ...projects]) {
+      if (f.localUrl) URL.revokeObjectURL(f.localUrl);
+    }
+    pendingQueue = [];
+    await refresh();
   }
 
   // ── Modal ──────────────────────────────────────────────────────────
@@ -781,7 +854,7 @@
 
   function makeCard(file, isHeadshot) {
     const card = document.createElement('div');
-    card.className = 'file-card';
+    card.className = 'file-card' + (file.isPending ? ' pending' : '');
 
     // Thumb
     const thumb = document.createElement('div');
@@ -814,7 +887,7 @@
     if (isHeadshot) {
       const replBtn = mkBtn('⟲ Replace', () => {
         const inp = Object.assign(document.createElement('input'), {
-          type: 'file', accept: '.webp,.jpg,.jpeg',
+          type: 'file', accept: '.webp,.jpg,.jpeg,.png',
         });
         inp.addEventListener('change', () => doUpload(inp.files, currentStudent, true));
         inp.click();
@@ -908,6 +981,7 @@
     if (currentStudent && !studentNames().includes(currentStudent)) currentStudent = null;
     renderSidebar();
     renderDetail();
+    updateSaveBtn();
   }
 
   // ── Auth ───────────────────────────────────────────────────────────
@@ -946,6 +1020,9 @@
       patError.textContent = 'Invalid token or no access to this repo.';
     }
   });
+
+  $('saveBtn').addEventListener('click', doSave);
+  $('discardBtn').addEventListener('click', doDiscard);
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);
