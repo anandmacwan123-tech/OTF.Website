@@ -521,6 +521,7 @@
   const patInput     = $('patInput');
   const patError     = $('patError');
   const modalEl      = $('modal');
+  const uploadModalEl = $('uploadModal');
 
   function setStatus(msg) { statusEl.textContent = msg; }
 
@@ -1003,6 +1004,132 @@
     renderDetail();
   }
 
+  function parseCSV(csv) {
+    const lines = csv.split('\n').filter(l => l.trim());
+    return lines.slice(1).map(line => {
+      const cols = [];
+      let cur = '', inQ = false;
+      for (const ch of line) {
+        if (ch === '"') inQ = !inQ;
+        else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else cur += ch;
+      }
+      cols.push(cur.trim());
+      return cols;
+    });
+  }
+
+  async function loadSheet() {
+    if (sheetCache) return sheetCache;
+    const resp = await fetch(SHEET_URL);
+    if (!resp.ok) throw new Error('Sheet fetch failed');
+    const csv = await resp.text();
+    const rows = parseCSV(csv);
+    sheetCache = rows.map(r => r[2]).filter(Boolean);
+    return sheetCache;
+  }
+
+  function slugToFullName(slug, names) {
+    const lower = slug.toLowerCase();
+    return names.find(n => n && n.split(' ')[0].toLowerCase() === lower) || null;
+  }
+
+  function appendRow(container, src, dest, warn) {
+    const row = document.createElement('div');
+    row.className = 'upl-row';
+    const srcEl = document.createElement('span');
+    srcEl.className = 'upl-src';
+    srcEl.textContent = src;
+    const arrow = document.createElement('span');
+    arrow.className = 'upl-arrow';
+    arrow.textContent = '→';
+    const destEl = document.createElement('span');
+    destEl.className = warn ? 'upl-dest upl-warn' : 'upl-dest';
+    destEl.textContent = dest;
+    row.append(srcEl, arrow, destEl);
+    container.appendChild(row);
+  }
+
+  function showUploadModal() {
+    $('uplRows').innerHTML = '';
+    $('uplStatus').textContent = '';
+    $('uploadModal').removeAttribute('hidden');
+  }
+  function hideUploadModal() { $('uploadModal').setAttribute('hidden', ''); }
+
+  async function processMassUpload(fileList) {
+    const files = Array.from(fileList);
+    const rowsEl = $('uplRows');
+    const statusEl2 = $('uplStatus');
+    rowsEl.innerHTML = '';
+    statusEl2.textContent = `Processing 0/${files.length}…`;
+
+    let names = null;
+    try { names = await loadSheet(); } catch { /* fallback */ }
+
+    const batchNextN = new Map();
+
+    const processOne = async (file, idx) => {
+      statusEl2.textContent = `Processing ${idx + 1}/${files.length}…`;
+      const lower = file.name.toLowerCase();
+      const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
+      if (!isImg) { appendRow(rowsEl, file.name, '⚠ unsupported file type', true); return; }
+
+      let workFile = file;
+      try {
+        if (/\.(jpg|jpeg|png)$/.test(lower)) workFile = await convertToWebP(file);
+      } catch(e) {
+        appendRow(rowsEl, file.name, `⚠ conversion failed: ${e.message}`, true);
+        return;
+      }
+
+      const stem = workFile.name.replace(/\.webp$/i, '');
+      const underIdx = stem.indexOf('_');
+      const slug = underIdx > 0 ? stem.slice(0, underIdx) : stem;
+      const studentMatch = studentNames().find(s => s.toLowerCase() === slug.toLowerCase());
+      if (!studentMatch) {
+        appendRow(rowsEl, file.name, `⚠ no matching student (${slug})`, true);
+        return;
+      }
+
+      const displayName = (names && slugToFullName(slug, names)) || studentMatch;
+
+      if (underIdx < 0) {
+        // Headshot
+        const b64 = await fileToBase64(workFile);
+        const localUrl = URL.createObjectURL(workFile);
+        const path = `${HS_DIR}/${studentMatch}.webp`;
+        const entry = { name: `${studentMatch}.webp`, sha: null, path, localUrl, isPending: true };
+        const i = headshots.findIndex(h => h.path === path);
+        if (i >= 0) { if (headshots[i].localUrl) URL.revokeObjectURL(headshots[i].localUrl); headshots[i] = entry; }
+        else headshots.push(entry);
+        pendingQueue = pendingQueue.filter(c => c.path !== path);
+        pendingQueue.push({ path, content: b64 });
+        appendRow(rowsEl, file.name, `${displayName}'s Headshot`);
+      } else {
+        let projectKey = stem.slice(underIdx + 1).replace(/_\d+$/, '') || stem.slice(underIdx + 1);
+        if (!projectKey) projectKey = 'Unassigned';
+        const batchKey = `${studentMatch}|${projectKey}`;
+        if (!batchNextN.has(batchKey)) batchNextN.set(batchKey, nextNFor(studentMatch, projectKey));
+        const n = batchNextN.get(batchKey);
+        batchNextN.set(batchKey, n + 1);
+        const newName = `${studentMatch}_${projectKey}_${n}.webp`;
+        const path = `${PR_DIR}/${newName}`;
+        const b64 = await fileToBase64(workFile);
+        const localUrl = URL.createObjectURL(workFile);
+        projects.push({ name: newName, sha: null, path, localUrl, isPending: true });
+        pendingQueue = pendingQueue.filter(c => c.path !== path);
+        pendingQueue.push({ path, content: b64 });
+        appendRow(rowsEl, file.name, `${displayName} · ${projectKey}`);
+      }
+      updateSaveBtn();
+    };
+
+    await withLimit(files.map((f, i) => () => processOne(f, i)), 4);
+    statusEl2.textContent = `Done — ${files.length} file${files.length !== 1 ? 's' : ''} processed`;
+    renderSidebar(); renderDetail(); updateSaveBtn();
+  }
+
   function doDelete(file) {
     if (file.localUrl) URL.revokeObjectURL(file.localUrl);
     headshots = headshots.filter(h => h.path !== file.path);
@@ -1040,6 +1167,7 @@
     try {
       await atomicCommit(pendingQueue, 'batch update');
       pendingQueue = [];
+      pendingNewProjects = [];
       finishTask('Saved ✓', '');
       await refresh();
     } catch(e) {
@@ -1052,6 +1180,7 @@
       if (f.localUrl) URL.revokeObjectURL(f.localUrl);
     }
     pendingQueue = [];
+    pendingNewProjects = [];
     await refresh();
   }
 
@@ -1351,6 +1480,20 @@
 
   $('saveBtn').addEventListener('click', doSave);
   $('discardBtn').addEventListener('click', doDiscard);
+
+  $('uploadBtn').addEventListener('click', showUploadModal);
+  $('uploadClose').addEventListener('click', hideUploadModal);
+  $('uploadDone').addEventListener('click', hideUploadModal);
+
+  const uplDropEl = $('uplDrop');
+  const uplPickerEl = $('uplPicker');
+  uplPickerEl.addEventListener('change', () => processMassUpload(uplPickerEl.files));
+  uplDropEl.addEventListener('dragover', e => { e.preventDefault(); uplDropEl.classList.add('drag-over'); });
+  uplDropEl.addEventListener('dragleave', () => uplDropEl.classList.remove('drag-over'));
+  uplDropEl.addEventListener('drop', e => {
+    e.preventDefault(); uplDropEl.classList.remove('drag-over');
+    processMassUpload(e.dataTransfer.files);
+  });
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);
