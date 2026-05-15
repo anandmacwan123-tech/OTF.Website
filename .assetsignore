@@ -1,0 +1,11 @@
+.git/
+.gitignore
+.assetsignore
+.DS_Store
+.claude/
+node_modules/
+scripts/
+src/
+wrangler.jsonc
+*.log
+*.md

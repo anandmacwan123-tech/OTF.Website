@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTF — Student Showcase</title>
+<meta name="description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
+<link rel="canonical" href="https://otfshow.anandmacwan123.workers.dev/showcase/">
+<meta name="theme-color" content="#ffffff">
+<meta property="og:title" content="OTF — Student Showcase">
+<meta property="og:description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta property="og:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="OTF — Ravensbourne Graphic Design Show">
+<meta property="og:url" content="https://otfshow.anandmacwan123.workers.dev/showcase/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OTF">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OTF — Student Showcase">
+<meta name="twitter:description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
+<meta name="twitter:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
+<link rel="icon" type="image/jpeg" href="/Favicon.jpg">
+<link rel="apple-touch-icon" href="/Favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #FF002F;
+    --bg: #fff;
+  }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 4vw 4rem;
+    gap: 2.5vh;
+    overflow: hidden;
+  }
+
+  .student-img {
+    position: fixed;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    display: block;
+    width: auto;
+    height: clamp(280px, 55vh, 620px);
+  }
+
+  .media-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .headshot-link {
+    display: inline-block;
+    position: relative;
+    height: clamp(280px, 55vh, 620px);
+    line-height: 0;
+  }
+
+  .headshot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    opacity: 0;
+    transition: opacity 600ms ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .headshot.active { opacity: 1; }
+
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    z-index: 10;
+    padding: 1rem 4vw;
+    background: var(--bg);
+  }
+
+  .nav a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: inline-block;
+    transition: opacity 0.2s ease;
+  }
+
+  .nav a:hover { opacity: 0.55; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .headshot { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <h1 class="sr-only">OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London</h1>
+  <p class="sr-only">
+    Browse this year's graduating graphic designers from Ravensbourne University London.
+    Click any portrait to open that student's portfolio.
+  </p>
+
+  <div class="media-wrap">
+    <a id="headshotLink" class="headshot-link" href="/" aria-label="Open student portfolio">
+      <img id="headshotA" class="headshot" alt="">
+      <img id="headshotB" class="headshot" alt="">
+    </a>
+  </div>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="/visit/">[VISIT]</a>
+    <a href="/info/">[INFO]</a>
+    <a href="/index/">[INDEX]</a>
+  </nav>
+
+  <script>
+  (() => {
+    // __MANIFEST_START__
+    const MANIFEST = {
+      "Anand": ["Anand_Based.webp", "Anand_Evolving.webp", "Anand_NCI.webp", "Anand_RaveBadge.webp", "Anand_ThinkingBlock.webp"],
+      "Arnete": ["Arnete_Aqva.webp", "Arnete_Atsijungti.webp", "Arnete_InthePresenceofGreen.webp", "Arnete_Postcard Series.webp"],
+      "Becky": ["Becky_Kopparberg1.webp", "Becky_Kopparberg2-1.webp", "Becky_Kopparberg2.webp"],
+      "Carolina": ["Carolina_Aqua.webp", "Carolina_Packaging.webp", "Carolina_Zine.webp"],
+      "Charles": ["Charles_Agneshouse.webp", "Charles_KpopZine.webp", "Charles_TMS.webp"],
+      "Darcy": ["Darcy_Untitled.webp"],
+      "Divine": ["Divine_ABOTABOT.webp", "Divine_TerraCotta.webp", "Divine_UntitledZine.webp"],
+      "Elise": ["Elise_Tera1.webp", "Elise_Tera2.webp", "Elise_Tera3.webp"],
+      "Emily": ["Emily_4THGENZine.webp", "Emily_Globular.webp", "Emily_Sign.webp"],
+      "Jaeden": ["Jaeden_FameSucks.webp", "Jaeden_FameSucks1.webp", "Jaeden_FameSucks2.webp"],
+      "Jamie": ["Jamie_HemDuyen.webp", "Jamie_Kynexus.webp"],
+      "Jenna": ["Jenna_Aer.webp", "Jenna_Privacy Matters.webp", "Jenna_Veil.webp"],
+      "Jess": ["Jess_Aqya.webp", "Jess_CFTSOC.webp", "Jess_Untitled.webp"],
+      "Kami": ["Kami_FOOF1.webp", "Kami_FOOF2.webp", "Kami_FOOF3.webp"],
+      "Kye": ["Kye_HeadphonesAd.webp", "Kye_IncensePackaging.webp", "Kye_Untitled.webp"],
+      "Martim": ["Martim_5PP.webp", "Martim_B33ChairPoster.webp", "Martim_Reflections.webp"],
+      "Maseray": ["Maseray_IgnisStudios.webp", "Maseray_LordandSaviour.webp", "Maseray_ThedesignersArchive.webp"],
+      "Nikol": ["Nikol_Aquari.webp", "Nikol_CREATEPoster.webp", "Nikol_WWTPLUposter.webp"],
+      "Noora": ["Noora_Lipstick.webp", "Noora_PFI.webp", "Noora_RP.webp"],
+      "Nora": ["Nora_Overstack.webp", "Nora_PhobiaFiles.webp", "Nora_ShakenNotStirred.webp", "Nora_ShakenNotStirred2.webp", "Nora_SmultringerPhotography.webp", "Nora_SmultringerPhotography2.webp"]
+    };
+    // __MANIFEST_END__
+
+    const STUDENTS = Object.keys(MANIFEST);
+    if (STUDENTS.length === 0) {
+      // No assets yet — leave page idle (centre stays empty).
+      return;
+    }
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mobileMQ = window.matchMedia('(max-width: 768px)');
+
+    const HEADSHOT_INTERVAL_MS = reducedMotion ? 6000 : 3000;
+    const MAX_ACTIVE = 3;
+    const FRONT_CHANCE = 0.35;
+    const FRONT_CHANCE_MOBILE_MULT = 1.5;
+    const SPAWN_INTERVAL_MS = 180;
+
+    const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+    // Warm cache for every headshot and every project file.
+    STUDENTS.forEach(name => {
+      (new Image()).src = enc(`/Student Work/Headshots/${name}.webp`);
+      (MANIFEST[name] || []).forEach(file => {
+        (new Image()).src = enc(`/Student Work/Projects/${file}`);
+      });
+    });
+
+    /* ───── Headshot slideshow ───── */
+
+    const headshotLink = document.getElementById('headshotLink');
+    const imgs = [
+      document.getElementById('headshotA'),
+      document.getElementById('headshotB'),
+    ];
+    let activeIdx = 0;            // which img element currently has .active
+    let currentStudent = null;    // drives the background spawn pool
+    let projectQueue = [];        // shuffled remaining projects for current student
+    const recentStudents = [];
+    const brokenStudents = new Set();
+
+    function shuffled(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function pickStudent() {
+      const eligible = STUDENTS.filter(n => !brokenStudents.has(n));
+      if (eligible.length === 0) return null;
+      const pool = eligible.filter(n => !recentStudents.includes(n));
+      const list = pool.length ? pool : eligible;
+      const name = list[Math.floor(Math.random() * list.length)];
+      recentStudents.push(name);
+      const window_ = Math.min(8, eligible.length - 1);
+      while (recentStudents.length > window_) recentStudents.shift();
+      return name;
+    }
+
+    function swapHeadshot() {
+      const name = pickStudent();
+      if (!name) return;
+
+      const nextIdx = 1 - activeIdx;
+      const nextImg = imgs[nextIdx];
+      const currentImg = imgs[activeIdx];
+
+      const onload = () => {
+        nextImg.classList.add('active');
+        currentImg.classList.remove('active');
+        headshotLink.href = `/students/${name.toLowerCase()}/`;
+        headshotLink.setAttribute('aria-label', `Open ${name}'s portfolio`);
+        currentStudent = name;
+        projectQueue = shuffled(MANIFEST[name] || []);
+        activeIdx = nextIdx;
+        for (const el of placed) el.remove();
+        placed.clear();
+      };
+
+      const onerror = () => {
+        brokenStudents.add(name);
+        nextImg.onload = nextImg.onerror = null;
+        // Try again immediately (within this same tick).
+        swapHeadshot();
+      };
+
+      nextImg.onload = onload;
+      nextImg.onerror = onerror;
+      nextImg.alt = `${name} — student portrait`;
+      nextImg.src = enc(`/Student Work/Headshots/${name}.webp`);
+    }
+
+    swapHeadshot();
+    setInterval(swapHeadshot, HEADSHOT_INTERVAL_MS);
+
+    /* ───── Background spawn loop (filtered to currentStudent's projects) ───── */
+
+    if (reducedMotion) return;
+
+    const active = new Set();
+    const placed = new Set();
+
+    function spawn() {
+      if (!currentStudent) return;
+      if (projectQueue.length === 0) return;
+      if (active.size >= MAX_ACTIVE) return;
+      if (active.size > 0 && Math.random() < 0.4) return;
+
+      const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
+      const zIndex = Math.random() < frontChance ? 3 : 1;
+
+      const file = projectQueue.pop();
+
+      const img = document.createElement('img');
+      img.className = 'student-img';
+      img.src = enc(`/Student Work/Projects/${file}`);
+      img.alt = '';
+      img.style.zIndex = zIndex;
+      img.style.visibility = 'hidden';
+
+      const place = () => {
+        active.delete(img);
+        const W = window.innerWidth, H = window.innerHeight;
+        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)));
+        const w = img.naturalHeight > 0
+          ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
+          : renderedH;
+        const hs = headshotLink.getBoundingClientRect();
+        const hsMidY = hs.top + hs.height / 2;
+        const hsArea = hs.width * hs.height;
+
+        const ok = (x, y) => {
+          // At least 70% of the image must be within the viewport
+          const visW = Math.max(0, Math.min(x + w, W) - Math.max(x, 0));
+          const visH = Math.max(0, Math.min(y + renderedH, H) - Math.max(y, 0));
+          if (visW * visH < 0.7 * w * renderedH) return false;
+          // Must not overlap the top half of the headshot
+          if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
+          // Must not cover more than 30% of the headshot
+          const ow = Math.max(0, Math.min(x + w, hs.right) - Math.max(x, hs.left));
+          const oh = Math.max(0, Math.min(y + renderedH, hs.bottom) - Math.max(y, hs.top));
+          return ow * oh <= 0.3 * hsArea;
+        };
+
+        // Sample from a range that allows up to 30% of the image off-screen on any edge
+        const xMin = -Math.round(w * 0.3), xMax = W - Math.round(w * 0.7);
+        const yMin = -Math.round(renderedH * 0.3), yMax = H - Math.round(renderedH * 0.7);
+
+        let x, y, tries = 0;
+        do {
+          x = Math.round(xMin + Math.random() * (xMax - xMin));
+          y = Math.round(yMin + Math.random() * (yMax - yMin));
+          tries++;
+        } while (!ok(x, y) && tries < 20);
+
+        img.style.left = x + 'px';
+        img.style.top = y + 'px';
+        img.style.visibility = 'visible';
+        placed.add(img);
+      };
+      img.addEventListener('load', place, { once: true });
+      img.addEventListener('error', () => {
+        img.remove();
+        active.delete(img);
+      }, { once: true });
+
+      document.body.appendChild(img);
+      active.add(img);
+    }
+
+    requestAnimationFrame(() => {
+      spawn();
+      setInterval(spawn, SPAWN_INTERVAL_MS);
+    });
+
+    let resizeT;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(() => {
+        for (const el of active) el.remove();
+        active.clear();
+        for (const el of placed) el.remove();
+        placed.clear();
+      }, 120);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        for (const el of active) el.remove();
+        active.clear();
+        for (const el of placed) el.remove();
+        placed.clear();
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
