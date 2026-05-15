@@ -64,6 +64,11 @@ async function handleFiles(request, env, url) {
     return loginPage('Incorrect password');
   }
 
+  // Redirect bare /files → /files/ so assets can find files/index.html
+  if (url.pathname === '/files') {
+    return Response.redirect(url.origin + '/files/', 301);
+  }
+
   const cookie = cookieValue(request.headers.get('Cookie'), COOKIE_NAME);
   if (!cookie || decodeURIComponent(cookie) !== expected) {
     return loginPage();
