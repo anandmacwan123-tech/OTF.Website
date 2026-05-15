@@ -391,7 +391,7 @@
       groups.get(project).files.push({ file, n });
     }
     for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n || a.file.localeCompare(b.file));
-    return order.map(p => ({ base: groups.get(p).displayName, files: groups.get(p).files.map(x => x.file) }));
+    return order.map(p => ({ key: p, base: groups.get(p).displayName, files: groups.get(p).files.map(x => x.file) }));
   }
 
   // Look up a description for a project group. The sheet uses positional
@@ -492,9 +492,32 @@
     stateEl.remove();
   }
 
+  // Persistent project order saved by the admin tool (projects-order.json).
+  // Populated before renderProjects runs; defaults to {} on 404/error.
+  let projectOrder = {};
+
   function renderProjects(row) {
     const files = MANIFEST[name] || [];
-    const groups = projectGroups(name, files);
+    let groups = projectGroups(name, files);
+
+    // Reorder groups by the saved order for this student. Groups whose
+    // storage key appears in the order array come first (in that order);
+    // any remaining groups keep their existing order.
+    const order = projectOrder[name];
+    if (Array.isArray(order) && order.length) {
+      const indexOf = k => {
+        const i = order.indexOf(k);
+        return i < 0 ? Infinity : i;
+      };
+      groups = groups
+        .map((g, i) => ({ g, i }))
+        .sort((a, b) => {
+          const oa = indexOf(a.g.key), ob = indexOf(b.g.key);
+          return oa - ob || a.i - b.i;
+        })
+        .map(x => x.g);
+    }
+
     const container = document.getElementById('projects');
 
     groups.forEach((group, i) => {
@@ -550,6 +573,15 @@
   // get a stale or empty version edge-cached by them).
   const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
 
+  // Fetch the saved project order (admin tool writes projects-order.json).
+  // On 404 or any error, fall back to {} so default ordering is used.
+  const orderUrl = enc('/Student Work/projects-order.json') + '?t=' + Date.now();
+  const orderPromise = fetch(orderUrl, { cache: 'no-store' })
+    .then(r => (r.ok ? r.json() : {}))
+    .then(data => { if (data && typeof data === 'object') projectOrder = data; })
+    .catch(() => { projectOrder = {}; });
+
+  orderPromise.then(() =>
   fetch(sheetUrl, { cache: 'no-store' })
     .then(r => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -587,7 +619,8 @@
       notice.style.margin = '2rem auto';
       notice.textContent = "Couldn't load profile";
       portfolioEl.appendChild(notice);
-    });
+    })
+  );
 })();
 </script>
 </body>

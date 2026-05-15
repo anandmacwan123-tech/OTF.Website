@@ -177,20 +177,27 @@
 
   /* File card */
   .file-card {
-    width: 140px; display: flex; flex-direction: column; gap: 0.5rem;
+    width: auto; min-width: 140px; max-width: 260px;
+    display: flex; flex-direction: column; gap: 0.5rem;
   }
+  .file-card.card-drop-target .thumb { outline: 2px solid var(--fg); outline-offset: -2px; }
 
   /* Thumbnail */
   .thumb {
-    width: 140px; height: 140px;
+    position: relative;
     background: rgba(0,0,0,0.04);
-    overflow: hidden; flex-shrink: 0;
+    display: inline-block; line-height: 0;
+  }
+  .thumb.loading { width: 140px; height: 140px; }
+  .thumb img { display: block; }
+  .thumb.landscape img { height: 140px; width: auto; }
+  .thumb.portrait  img { width: 140px;  height: auto; max-height: 220px; }
+  .thumb-video {
+    width: 140px; height: 140px;
+    background: rgba(0,0,0,0.08);
     display: flex; align-items: center; justify-content: center;
   }
-  .thumb img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
-  .thumb-video { background: rgba(0,0,0,0.08); }
+  .file-card[draggable="true"] .thumb { cursor: grab; }
   .video-icon {
     font-size: 1.5rem; color: var(--muted);
   }
@@ -244,6 +251,20 @@
     border-color: var(--fg); background: rgba(0,0,0,0.02);
   }
 
+  /* Add-a-headshot box */
+  .add-headshot {
+    width: 140px; height: 140px;
+    border: 1px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .add-headshot span {
+    font-size: 0.65rem; color: var(--muted);
+    line-height: 1.5; pointer-events: none;
+  }
+  .add-headshot:hover { border-color: var(--fg); background: rgba(0,0,0,0.02); }
+
   /* Modal */
   #modal {
     position: fixed; inset: 0;
@@ -283,15 +304,29 @@
   }
   .loading { animation: shimmer 1.4s ease-in-out infinite; }
 
-  /* Thumb needs relative for seq badge */
-  .thumb { position: relative; }
-
   /* Project sections */
+  .project-section.drag-over {
+    outline: 2px dashed var(--fg); outline-offset: 4px;
+  }
   .project-hdr {
     display: flex; align-items: center; gap: 0.75rem;
     margin-bottom: 0.75rem; padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border);
   }
+  .collapse-btn {
+    font: inherit; font-size: 0.6rem; font-weight: 500;
+    background: none; border: 1px solid var(--border);
+    padding: 0.15rem 0.35rem; cursor: pointer; color: var(--fg);
+    line-height: 1; flex-shrink: 0;
+  }
+  .collapse-btn:hover { background: rgba(0,0,0,0.05); }
+  .drag-handle {
+    font-size: 0.75rem; color: var(--muted);
+    cursor: grab; user-select: none; flex-shrink: 0;
+    padding: 0 0.15rem;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .project-section.collapsed .file-grid { display: none; }
   .project-title {
     font: inherit; font-size: 0.6rem; font-weight: 500;
     letter-spacing: 0.04em; text-transform: uppercase;
@@ -499,6 +534,7 @@
   const SENT_END   = '// __MANIFEST_END__';
   const LS_PAT = 'otf_library_pat';
   const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+  const ORDER_PATH = 'Student Work/projects-order.json';
 
   // ── State ──────────────────────────────────────────────────────────
   let pat            = '';
@@ -509,6 +545,11 @@
   let pendingQueue   = []; // changes awaiting commit: { path, content?, sha?, delete? }
   let sheetCache = null;
   let pendingNewProjects = []; // { student, key, displayTitle }
+  let csvStudents = []; // { slug, fullName }
+  let projectOrder = {}; // { "<slug>": ["ProjectKeyA", ...] }
+  let draggedProjectKey = null;
+  let draggedFilePath = null;
+  let draggedFileProjectKey = null;
 
   // ── DOM ────────────────────────────────────────────────────────────
   const $ = id => document.getElementById(id);
@@ -591,10 +632,34 @@
     const toFile = f => ({ name: f.name, sha: f.sha, downloadUrl: f.download_url, path: f.path });
     headshots = hs.filter(f => f.type === 'file').map(toFile);
     projects  = pr.filter(f => f.type === 'file').map(toFile);
+
+    // Load student names from the Google Sheet (non-fatal on failure)
+    try {
+      const names = await loadSheet();
+      csvStudents = names.map(fullName => ({ slug: fullName.split(' ')[0], fullName }));
+    } catch { csvStudents = []; }
+
+    // Load persistent project order (file may not exist → 404)
+    try {
+      const data = await gh('GET', `/contents/${encPath(ORDER_PATH)}?ref=${BRANCH}`);
+      projectOrder = JSON.parse(b64decode(data.content));
+    } catch { projectOrder = {}; }
+  }
+
+  function displayNameFor(slug) {
+    const m = csvStudents.find(c => c.slug === slug);
+    return m ? m.fullName : slug;
   }
 
   function studentNames() {
-    return headshots.map(h => h.name.replace(/\.[^.]+$/, '')).sort((a,b) => a.localeCompare(b));
+    const set = new Set();
+    for (const c of csvStudents) set.add(c.slug);
+    for (const h of headshots) set.add(h.name.replace(/\.[^.]+$/, ''));
+    for (const p of projects) {
+      const us = p.name.indexOf('_');
+      if (us > 0) set.add(p.name.slice(0, us));
+    }
+    return [...set].sort((a,b) => a.localeCompare(b));
   }
   function projectsFor(s) { return projects.filter(p => p.name.startsWith(s + '_')); }
   function headshotFor(s) { return headshots.find(h => h.name.replace(/\.[^.]+$/, '') === s) || null; }
@@ -635,6 +700,42 @@
     }
     for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n);
     return { headshot, unassigned, projects: groups };
+  }
+
+  // ── Persistent project ordering ────────────────────────────────────
+  function orderedProjectKeys(student, groupMap) {
+    const order = projectOrder[student] || [];
+    const present = new Set(groupMap.keys());
+    const result = [];
+    for (const k of order) {
+      if (present.has(k) && !result.includes(k)) result.push(k);
+    }
+    for (const k of groupMap.keys()) {
+      if (!result.includes(k)) result.push(k);
+    }
+    return result;
+  }
+
+  function persistProjectOrder(student, keys) {
+    projectOrder[student] = keys;
+    pendingQueue = pendingQueue.filter(c => c.path !== ORDER_PATH);
+    pendingQueue.push({
+      path: ORDER_PATH,
+      content: b64encode(JSON.stringify(projectOrder, null, 2)),
+    });
+    updateSaveBtn();
+  }
+
+  function moveProject(student, projectKey, direction) {
+    const { projects: groupMap } = groupForStudent(student);
+    const keys = orderedProjectKeys(student, groupMap);
+    const idx = keys.indexOf(projectKey);
+    if (idx < 0) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= keys.length) return;
+    [keys[idx], keys[swapIdx]] = [keys[swapIdx], keys[idx]];
+    persistProjectOrder(student, keys);
+    renderDetail();
   }
 
   function nextNFor(student, projectKey) {
@@ -967,6 +1068,39 @@
     renderDetail(); updateSaveBtn();
   }
 
+  function reorderFileInProject(projectKey, draggedPath, targetPath) {
+    if (draggedPath === targetPath) return;
+    const inProject = projects
+      .filter(f => {
+        const p = parseFilename(currentStudent, f.name);
+        return p.kind === 'project' && p.project === projectKey;
+      })
+      .sort((a, b) => {
+        const pA = parseFilename(currentStudent, a.name);
+        const pB = parseFilename(currentStudent, b.name);
+        return pA.n - pB.n;
+      });
+    const dragIdx = inProject.findIndex(f => f.path === draggedPath);
+    const targetIdx = inProject.findIndex(f => f.path === targetPath);
+    if (dragIdx < 0 || targetIdx < 0) return;
+    const dragged = inProject[dragIdx];
+    const newOrder = inProject.filter(f => f.path !== draggedPath);
+    const insertAt = newOrder.findIndex(f => f.path === targetPath);
+    newOrder.splice(insertAt, 0, dragged);
+    // Compute final names first, then apply renames.
+    const plan = [];
+    newOrder.forEach((f, i) => {
+      const p = parseFilename(currentStudent, f.name);
+      const newN = i + 1;
+      if (p.n !== newN) {
+        const newName = `${currentStudent}_${projectKey}_${newN}.webp`;
+        plan.push({ file: f, newPath: `${PR_DIR}/${newName}`, newName });
+      }
+    });
+    for (const item of plan) updateFileRename(item.file, item.newPath, item.newName);
+    renderDetail(); updateSaveBtn();
+  }
+
   function commitProjectRename(student, oldKey, newTitle) {
     const sanitized = newTitle.trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
     if (!sanitized || sanitized === oldKey) return;
@@ -984,6 +1118,9 @@
     }
     const pnp = pendingNewProjects.find(p => p.student === student && p.key === oldKey);
     if (pnp) { pnp.key = sanitized; pnp.displayTitle = sanitized; }
+    if (projectOrder[student] && projectOrder[student].includes(oldKey)) {
+      persistProjectOrder(student, projectOrder[student].map(k => k === oldKey ? sanitized : k));
+    }
     renderDetail(); updateSaveBtn();
   }
 
@@ -994,6 +1131,9 @@
     });
     for (const f of toDelete) doDelete(f);
     pendingNewProjects = pendingNewProjects.filter(p => !(p.student === student && p.key === projectKey));
+    if (projectOrder[student] && projectOrder[student].includes(projectKey)) {
+      persistProjectOrder(student, projectOrder[student].filter(k => k !== projectKey));
+    }
     renderDetail(); updateSaveBtn();
   }
 
@@ -1203,7 +1343,7 @@
     for (const name of studentNames()) {
       const btn = document.createElement('button');
       btn.className = 'student-btn' + (name === currentStudent ? ' active' : '');
-      btn.textContent = name;
+      btn.textContent = displayNameFor(name);
       btn.addEventListener('click', () => selectStudent(name));
       sidebarEl.appendChild(btn);
     }
@@ -1229,8 +1369,23 @@
     hsSec.appendChild(hsH2);
     const hsGrid = document.createElement('div');
     hsGrid.className = 'file-grid';
-    if (headshot) hsGrid.appendChild(makeCard(headshot, 'headshot', null, null));
-    hsGrid.appendChild(makeDropZone(null, true));
+    if (headshot) {
+      hsGrid.appendChild(makeCard(headshot, 'headshot', null, null));
+    } else {
+      const addBox = document.createElement('div');
+      addBox.className = 'add-headshot';
+      const lbl = document.createElement('span');
+      lbl.textContent = '+ Add a headshot';
+      addBox.appendChild(lbl);
+      addBox.addEventListener('click', () => {
+        const inp = Object.assign(document.createElement('input'), {
+          type: 'file', accept: '.webp,.jpg,.jpeg,.png',
+        });
+        inp.addEventListener('change', () => doUploadToProject(inp.files, currentStudent, true, null));
+        inp.click();
+      });
+      hsGrid.appendChild(addBox);
+    }
     hsSec.appendChild(hsGrid);
     detailEl.appendChild(hsSec);
 
@@ -1248,13 +1403,38 @@
       detailEl.appendChild(unaSec);
     }
 
-    // Project sections
-    for (const [projectKey, { displayTitle, files }] of groupMap) {
+    // Project sections (in persisted order)
+    for (const projectKey of orderedProjectKeys(currentStudent, groupMap)) {
+      const { displayTitle, files } = groupMap.get(projectKey);
       const sec = document.createElement('section');
-      sec.className = 'detail-section';
+      sec.className = 'detail-section project-section';
+      sec.dataset.projectKey = projectKey;
 
       const hdr = document.createElement('div');
       hdr.className = 'project-hdr';
+
+      // Collapse toggle
+      const collapseBtn = document.createElement('button');
+      collapseBtn.className = 'collapse-btn';
+      collapseBtn.type = 'button';
+      collapseBtn.textContent = '▾';
+      collapseBtn.title = 'Collapse / expand';
+      collapseBtn.addEventListener('click', () => {
+        const collapsed = sec.classList.toggle('collapsed');
+        collapseBtn.textContent = collapsed ? '▸' : '▾';
+      });
+
+      // Drag handle
+      const handle = document.createElement('span');
+      handle.className = 'drag-handle';
+      handle.textContent = '⠿';
+      handle.title = 'Drag to reorder project';
+      handle.setAttribute('draggable', 'true');
+      handle.addEventListener('dragstart', e => {
+        draggedProjectKey = projectKey;
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      handle.addEventListener('dragend', () => { draggedProjectKey = null; });
 
       const titleInput = document.createElement('input');
       titleInput.className = 'project-title';
@@ -1277,6 +1457,9 @@
       count.className = 'project-count';
       count.textContent = `${files.length} image${files.length !== 1 ? 's' : ''}`;
 
+      const upBtn = mkBtn('↑', () => moveProject(currentStudent, projectKey, 'up'));
+      const downBtn = mkBtn('↓', () => moveProject(currentStudent, projectKey, 'down'));
+
       const delBtn = mkBtn('× Delete Project', () =>
         showModal(
           `Delete project "${displayTitle}"?`,
@@ -1286,8 +1469,27 @@
       );
       delBtn.classList.add('act-del');
 
-      hdr.append(titleInput, count, delBtn);
+      hdr.append(collapseBtn, handle, titleInput, count, upBtn, downBtn, delBtn);
       sec.appendChild(hdr);
+
+      // Section drag-and-drop reorder
+      sec.addEventListener('dragover', e => {
+        if (draggedProjectKey == null || draggedProjectKey === projectKey) return;
+        e.preventDefault();
+        sec.classList.add('drag-over');
+      });
+      sec.addEventListener('dragleave', () => sec.classList.remove('drag-over'));
+      sec.addEventListener('drop', e => {
+        if (draggedProjectKey == null || draggedProjectKey === projectKey) return;
+        e.preventDefault();
+        sec.classList.remove('drag-over');
+        const keys = orderedProjectKeys(currentStudent, groupMap)
+          .filter(k => k !== draggedProjectKey);
+        const insertAt = keys.indexOf(projectKey);
+        keys.splice(insertAt < 0 ? keys.length : insertAt, 0, draggedProjectKey);
+        persistProjectOrder(currentStudent, keys);
+        renderDetail();
+      });
 
       const grid = document.createElement('div');
       grid.className = 'file-grid';
@@ -1321,7 +1523,18 @@
       thumb.classList.add('loading');
       thumb.appendChild(img);
       loadThumb(file)
-        .then(url => { img.src = url; thumb.classList.remove('loading'); })
+        .then(url => {
+          img.onload = () => {
+            thumb.classList.remove('loading');
+            if (img.naturalHeight > img.naturalWidth) {
+              thumb.classList.add('portrait');
+            } else {
+              thumb.classList.add('landscape');
+            }
+          };
+          img.onerror = () => { thumb.classList.remove('loading'); };
+          img.src = url;
+        })
         .catch(() => { thumb.classList.remove('loading'); });
     }
     if (seqN !== null) {
@@ -1355,6 +1568,33 @@
       acts.appendChild(mkBtn('↑', () => doMoveInProject(file, projectKey, 'up')));
       acts.appendChild(mkBtn('↓', () => doMoveInProject(file, projectKey, 'down')));
       acts.appendChild(mkBtn('Unassign', () => doUnassign(file)));
+
+      // Drag-and-drop reorder within the project
+      card.setAttribute('draggable', 'true');
+      card.dataset.filePath = file.path;
+      card.addEventListener('dragstart', e => {
+        draggedFilePath = file.path;
+        draggedFileProjectKey = projectKey;
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragend', () => {
+        draggedFilePath = null;
+        draggedFileProjectKey = null;
+      });
+      card.addEventListener('dragover', e => {
+        if (draggedFilePath == null || draggedFileProjectKey !== projectKey) return;
+        if (draggedFilePath === file.path) return;
+        e.preventDefault();
+        card.classList.add('card-drop-target');
+      });
+      card.addEventListener('dragleave', () => card.classList.remove('card-drop-target'));
+      card.addEventListener('drop', e => {
+        if (draggedFilePath == null || draggedFileProjectKey !== projectKey) return;
+        if (draggedFilePath === file.path) return;
+        e.preventDefault();
+        card.classList.remove('card-drop-target');
+        reorderFileInProject(projectKey, draggedFilePath, file.path);
+      });
     }
 
     const del = mkBtn('× Delete', () =>
