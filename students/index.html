@@ -365,23 +365,32 @@
   }
 
   // Group project filenames into projects keyed by storage name.
-  // Supports new convention: <Student>_<Project>_<N>.webp
-  // Skips Unassigned files and collapses Untitled<K> → display "Untitled".
+  // New convention: <Student>_<Project>_<N>.webp — group by <Project>, order by <N>.
+  // Legacy files (no `_<N>` tail) fall back to stripping trailing digits so
+  // pre-rename batches like FameSucks / FameSucks1 / FameSucks2 still group.
+  // Skips Unassigned, collapses Untitled<K> → "Untitled".
   function projectGroups(name, files) {
     const prefixRe = new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '_');
     const order = [];
     const groups = new Map();
     for (const file of files) {
       const stem = file.replace(/\.webp$/i, '').replace(prefixRe, '');
+      let project, n;
       const m = stem.match(/^(.+)_(\d+)$/);
-      const project = m ? m[1] : stem;
-      const n = m ? +m[2] : 0;
+      if (m) {
+        project = m[1];
+        n = +m[2];
+      } else {
+        const numMatch = stem.match(/(\d+)(?:-\d+)?$/);
+        n = numMatch ? +numMatch[1] : 0;
+        project = stem.replace(/\d+(?:-\d+)?$/, '') || stem;
+      }
       if (project === 'Unassigned') continue;
-      const displayName = /^Untitled\d+$/.test(project) ? 'Untitled' : project;
+      const displayName = /^Untitled\d*$/.test(project) ? 'Untitled' : project;
       if (!groups.has(project)) { groups.set(project, { displayName, files: [] }); order.push(project); }
       groups.get(project).files.push({ file, n });
     }
-    for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n);
+    for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n || a.file.localeCompare(b.file));
     return order.map(p => ({ base: groups.get(p).displayName, files: groups.get(p).files.map(x => x.file) }));
   }
 
