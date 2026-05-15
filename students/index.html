@@ -64,11 +64,20 @@
   }
 
   .hero {
-    max-width: var(--col-image);
-    margin: 0 auto 5rem;
+    margin: 0 0 7rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: end;
+  }
+
+  .hero-left { display: flex; justify-content: flex-start; }
+
+  .hero-right {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1.5rem;
+    max-width: var(--col-text);
   }
 
   .hero-media {
@@ -99,8 +108,6 @@
   }
 
   .bio {
-    max-width: var(--col-text);
-    margin: 0 auto 7rem;
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
@@ -108,26 +115,70 @@
 
   .bio p + p { margin-top: 1rem; }
 
+  .socials {
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    flex-wrap: wrap;
+  }
+  .socials a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+  .socials a:hover { opacity: 0.55; }
+
   .projects {
     display: flex;
     flex-direction: column;
     gap: 7rem;
-    max-width: var(--col-image);
-    margin: 0 auto;
+    margin: 0;
   }
 
-  .project { display: flex; flex-direction: column; gap: 1.5rem; }
+  .project { display: flex; flex-direction: column; gap: 1.25rem; }
 
-  .project .images { display: flex; flex-direction: column; gap: 1rem; }
+  .project-title {
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 
-  .project img { display: block; width: 100%; height: auto; }
+  .project .images {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Extend beyond body padding so scrollable strip reaches viewport edge */
+    margin: 0 -5vw;
+    padding: 0 5vw 0.5rem;
+    scrollbar-width: thin;
+  }
+
+  .project .images img {
+    height: clamp(280px, 50vh, 480px);
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+  }
 
   .project-desc {
     max-width: var(--col-text);
-    margin: 0.5rem auto 0;
+    margin: 0;
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; align-items: start; }
+    .hero-right { max-width: none; }
   }
 
   .nav {
@@ -172,12 +223,17 @@
 
   <main class="portfolio" id="portfolio" hidden>
     <header class="hero">
-      <div class="hero-media">
-        <img class="hero-headshot" id="heroHeadshot" alt="">
-        <p class="hero-practices" id="heroPractices"></p>
+      <div class="hero-left">
+        <div class="hero-media">
+          <img class="hero-headshot" id="heroHeadshot" alt="">
+          <p class="hero-practices" id="heroPractices"></p>
+        </div>
+      </div>
+      <div class="hero-right">
+        <section class="bio" id="bio"></section>
+        <nav class="socials" id="socials" aria-label="Student links"></nav>
       </div>
     </header>
-    <section class="bio" id="bio"></section>
     <section class="projects" id="projects"></section>
   </main>
 
@@ -395,6 +451,26 @@
       bioEl.remove();
     }
 
+    const socialsEl = document.getElementById('socials');
+    const socialLinks = [
+      { label: 'PORTFOLIO', url: field(row, 'Portfolio', 'Portfolio URL', 'Website') },
+      { label: 'INSTAGRAM', url: field(row, 'Instagram', 'Instagram URL') },
+      { label: 'LINKEDIN',  url: field(row, 'LinkedIn', 'Linkedin', 'LinkedIn URL') },
+    ];
+    let hasSocial = false;
+    for (const { label, url } of socialLinks) {
+      if (!url) continue;
+      hasSocial = true;
+      const href = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+      const a = document.createElement('a');
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = `[${label}]`;
+      socialsEl.appendChild(a);
+    }
+    if (!hasSocial) socialsEl.remove();
+
     document.title = `${name} — OTF`;
     const setMeta = (sel, value) => {
       const el = document.querySelector(sel);
@@ -418,6 +494,11 @@
 
       const article = document.createElement('article');
       article.className = 'project';
+
+      const titleEl = document.createElement('h2');
+      titleEl.className = 'project-title';
+      titleEl.textContent = group.base;
+      article.appendChild(titleEl);
 
       if (group.files.length) {
         const imagesDiv = document.createElement('div');
