@@ -612,22 +612,9 @@
       return r.text();
     })
     .then(text => {
-      console.log('[OTF] Raw CSV (first 800 chars):\n' + text.slice(0, 800));
       const rows = parseCSV(text);
       const objs = toObjects(rows);
-      console.log(`[OTF] CSV parsed: ${rows.length} raw rows, ${objs.length} data objects`);
-      console.log('[OTF] Raw row 0 (cells:', rows[0]?.length, '):', rows[0]);
-      if (rows.length > 1) console.log('[OTF] Raw row 1 (cells:', rows[1]?.length, '):', rows[1]);
-      if (rows.length > 2) console.log('[OTF] Raw row 2 (cells:', rows[2]?.length, '):', rows[2]);
-      if (rows.length) console.log('[OTF] Header row used:', objs.length ? Object.keys(objs[0]) : rows[0]);
-      if (objs.length) console.log('[OTF] First data row:', objs[0]);
       const row = matchRow(objs, name);
-      if (!row) {
-        console.warn(`[OTF] No sheet row matched "${name}". Names found in sheet:`,
-          objs.map(o => field(o, 'Name')).filter(Boolean));
-      } else {
-        console.log(`[OTF] Matched row for "${name}":`, row);
-      }
       renderBasic(row);
       renderProjects(row);
     })
