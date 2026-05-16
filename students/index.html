@@ -208,7 +208,7 @@
 
   /* ─── Mobile ─── */
   @media (max-width: 768px) {
-    .nav a { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
+    .nav a { font-size: 0.9rem; }
   }
 
   .nav {
@@ -227,13 +227,22 @@
     color: #000;
     text-decoration: none;
     font-weight: 500;
-    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    font-size: 0.6rem;
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     transition: opacity 0.2s ease;
   }
   .nav a:hover { opacity: 0.55; }
+
+  /* Prev/next student arrows — pinned to the nav bar edges. */
+  .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .nav-prev { left: 4vw; }
+  .nav-next { right: 4vw; }
 
   .sr-only {
     position: absolute;
@@ -271,10 +280,12 @@
   </main>
 
   <nav class="nav" aria-label="Primary">
+    <a class="nav-arrow nav-prev" id="prevStudent" href="#" aria-label="Previous student">[←]</a>
     <a href="/showcase/">[SHOWCASE]</a>
     <a href="/visit/">[VISIT]</a>
     <a href="/info/">[INFO]</a>
     <a href="/index/">[INDEX]</a>
+    <a class="nav-arrow nav-next" id="nextStudent" href="#" aria-label="Next student">[→]</a>
   </nav>
 
 <script>
@@ -332,6 +343,18 @@
   if (!slug) { fail('Student not found'); return; }
   const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
   if (!name) { fail('Student not found'); return; }
+
+  // Prev/next student arrows — alphabetical order, wrapping at the ends.
+  (() => {
+    const keys = Object.keys(MANIFEST);
+    const i = keys.indexOf(name);
+    const prev = keys[(i - 1 + keys.length) % keys.length];
+    const next = keys[(i + 1) % keys.length];
+    const prevEl = document.getElementById('prevStudent');
+    const nextEl = document.getElementById('nextStudent');
+    if (prevEl) prevEl.href = `/students/${prev.toLowerCase()}/`;
+    if (nextEl) nextEl.href = `/students/${next.toLowerCase()}/`;
+  })();
 
   // CSV/TSV parser — quoted fields, doubled-quote escape, CRLF/LF newlines.
   // Auto-detects delimiter by sampling the first 5 lines.
