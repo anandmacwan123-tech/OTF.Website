@@ -71,18 +71,21 @@
     align-items: end;
   }
 
-  .hero-left {
+  .hero-left { display: flex; justify-content: flex-start; }
+
+  .hero-headshot-wrap {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.25rem;
   }
 
-  /* Display labels — student name (headshot) and project titles. Rendered
-     in HTML rather than baked into the image. */
+  /* Display labels — student name (headshot) and project titles. A colored
+     container with the title text, rendered in HTML rather than baked into
+     the image. Sits flush on top of the image, top-left aligned. */
   .label {
     display: inline-flex;
-    padding: 10px 0;
+    align-self: flex-start;
+    padding: 10px 2px;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -93,8 +96,8 @@
     letter-spacing: -4.32px;
     text-transform: uppercase;
   }
-  .label-headshot { color: #FC1233; }
-  .label-project  { color: #000; }
+  .label-headshot { background: #FC1233; color: #000; }
+  .label-project  { background: #000;    color: #fff; }
 
   .hero-right {
     display: flex;
@@ -162,7 +165,7 @@
     margin: 0;
   }
 
-  .project { display: flex; flex-direction: column; gap: 1.25rem; }
+  .project { display: flex; flex-direction: column; }
 
   .project .images {
     display: flex;
@@ -185,7 +188,7 @@
 
   .project-desc {
     max-width: var(--col-text);
-    margin: 0;
+    margin: 1.25rem 0 0;
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
@@ -240,10 +243,12 @@
     <header class="hero">
       <div class="hero-left">
         <div class="hero-media">
-          <img class="hero-headshot" id="heroHeadshot" alt="">
+          <div class="hero-headshot-wrap">
+            <div class="label label-headshot" id="heroName"></div>
+            <img class="hero-headshot" id="heroHeadshot" alt="">
+          </div>
           <p class="hero-practices" id="heroPractices"></p>
         </div>
-        <div class="label label-headshot" id="heroName"></div>
       </div>
       <div class="hero-right">
         <section class="bio" id="bio"></section>
