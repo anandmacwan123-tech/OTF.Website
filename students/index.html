@@ -93,7 +93,7 @@
     align-items: center;
     gap: 10px;
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 700;
     line-height: normal;
     letter-spacing: -0.12em;
@@ -207,6 +207,11 @@
     .hero-headshot { width: 100%; height: auto; }
     /* Project images scaled down to 0.6x. */
     .project .images img { height: clamp(168px, 30vh, 288px); }
+  }
+
+  /* Labels are 24px on desktop; keep the mobile size unchanged. */
+  @media (max-width: 768px) {
+    .label { font-size: 16px; }
   }
 
   .nav {

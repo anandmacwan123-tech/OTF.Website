@@ -142,7 +142,7 @@
   .headshot-grid {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: clamp(0.5rem, 1vw, 1rem);
   }
 
@@ -155,7 +155,7 @@
     justify-content: center;
     gap: 10px;
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    font-size: 11.52px;
+    font-size: 24px;
     font-weight: 700;
     line-height: normal;
     letter-spacing: -0.12em;
@@ -190,6 +190,12 @@
   @media (max-width: 560px) {
     .student-list a,
     .student-list .row { gap: 1rem; }
+  }
+
+  /* Desktop uses 5-per-row + 24px labels; preserve the mobile layout. */
+  @media (max-width: 768px) {
+    .headshot-grid { grid-template-columns: repeat(2, 1fr); }
+    .label { font-size: 11.52px; }
   }
 
   /* ─── NAV ─── */
