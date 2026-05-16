@@ -251,6 +251,30 @@
     border-color: var(--fg); background: rgba(0,0,0,0.02);
   }
 
+  /* Video-link block */
+  .video-zone {
+    width: 220px;
+    border: 1px dashed var(--border);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .video-zone-label {
+    font-size: 0.65rem; color: var(--muted); line-height: 1.4;
+  }
+  .video-zone-input {
+    font: inherit; font-size: 0.7rem;
+    width: 100%; padding: 0.4rem 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--bg); color: var(--fg);
+    outline: none;
+  }
+  .video-zone-input:focus { border-color: var(--fg); }
+  .video-zone-err {
+    font-size: 0.6rem; color: var(--red); min-height: 0.85rem;
+  }
+
   /* Add-a-headshot box */
   .add-headshot {
     width: 140px; height: 140px;
@@ -1722,18 +1746,39 @@
 
   function makeVideoZone(projectKey) {
     const zone = document.createElement('div');
-    zone.className = 'drop-zone video-zone';
+    zone.className = 'video-zone';
+
     const lbl = document.createElement('span');
-    lbl.textContent = '+ Paste a video link (YouTube / Vimeo)';
-    zone.appendChild(lbl);
-    zone.addEventListener('click', () => {
-      const url = prompt('Paste a YouTube or Vimeo link:');
-      if (url == null) return;
-      const trimmed = url.trim();
-      if (!trimmed) return;
-      if (!parseVideoUrl(trimmed)) { alert('Not a valid YouTube or Vimeo link.'); return; }
+    lbl.className = 'video-zone-label';
+    lbl.textContent = 'Add a video (YouTube / Vimeo)';
+
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.className = 'video-zone-input';
+    input.placeholder = 'Paste a video link…';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'act-btn';
+    addBtn.textContent = '+ Add video';
+
+    const err = document.createElement('span');
+    err.className = 'video-zone-err';
+
+    const submit = () => {
+      const trimmed = input.value.trim();
+      if (!trimmed) { input.focus(); return; }
+      if (!parseVideoUrl(trimmed)) { err.textContent = 'Not a YouTube or Vimeo link.'; return; }
+      err.textContent = '';
+      input.value = '';
       doAddVideo(currentStudent, projectKey, trimmed);
+    };
+    addBtn.addEventListener('click', submit);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submit(); }
     });
+
+    zone.append(lbl, input, addBtn, err);
     return zone;
   }
 
