@@ -142,7 +142,8 @@
   .headshot-grid {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    /* minmax(0, 1fr) so a long nowrap label can't stretch its column. */
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: clamp(0.5rem, 1vw, 1rem);
   }
 
