@@ -71,7 +71,30 @@
     align-items: end;
   }
 
-  .hero-left { display: flex; justify-content: flex-start; }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  /* Display labels — student name (headshot) and project titles. Rendered
+     in HTML rather than baked into the image. */
+  .label {
+    display: inline-flex;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -4.32px;
+    text-transform: uppercase;
+  }
+  .label-headshot { color: #ff0000; }
+  .label-project  { color: #000; }
 
   .hero-right {
     display: flex;
@@ -140,14 +163,6 @@
   }
 
   .project { display: flex; flex-direction: column; gap: 1.25rem; }
-
-  .project-title {
-    font-weight: 500;
-    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
-    line-height: 1.25;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
 
   .project .images {
     display: flex;
@@ -228,6 +243,7 @@
           <img class="hero-headshot" id="heroHeadshot" alt="">
           <p class="hero-practices" id="heroPractices"></p>
         </div>
+        <div class="label label-headshot" id="heroName"></div>
       </div>
       <div class="hero-right">
         <section class="bio" id="bio"></section>
@@ -433,6 +449,9 @@
     hs.alt = `${name} — portrait`;
     hs.onerror = () => { hs.remove(); };
 
+    // Headshot label — student's full name from the sheet's "Name" column.
+    document.getElementById('heroName').textContent = field(row, 'Name') || name;
+
     const practices = row
       ? [field(row, 'Practice1'), field(row, 'Practice2'), field(row, 'Practice3')]
           .filter(p => p && p.length)
@@ -528,7 +547,7 @@
       article.className = 'project';
 
       const titleEl = document.createElement('h2');
-      titleEl.className = 'project-title';
+      titleEl.className = 'label label-project';
       titleEl.textContent = group.base;
       article.appendChild(titleEl);
 
