@@ -39,6 +39,9 @@
     color: #000;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -108,7 +111,7 @@
   .headshot-link {
     display: inline-block;
     position: relative;
-    height: clamp(280px, 55vh, 620px);
+    height: clamp(336px, 66vh, 744px);
     line-height: 0;
   }
 
@@ -145,11 +148,10 @@
     color: #000;
     text-decoration: none;
     font-weight: 500;
-    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    font-size: 1rem;
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    display: inline-block;
     transition: opacity 0.2s ease;
   }
 
@@ -170,6 +172,13 @@
   @media (prefers-reduced-motion: reduce) {
     .headshot { transition: none; }
   }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 768px) {
+    .student-img { height: clamp(168px, 33vh, 372px); }
+    .headshot-link,
+    .headshot { height: clamp(202px, 39.6vh, 446px); }
+  }
 </style>
 </head>
 <body>
@@ -187,7 +196,7 @@
   </div>
 
   <nav class="nav" aria-label="Primary">
-    <a href="/visit/">[VISIT]</a>
+    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">[VISIT]</a>
     <a href="/info/">[INFO]</a>
     <a href="/index/">[INDEX]</a>
   </nav>
@@ -264,6 +273,12 @@
           const raw = (parts[2] || '').replace(/^"|"$/g, '').trim();
           if (raw) fullNames.set(raw.split(/\s+/)[0], raw);
         }
+        // Names load after the first headshot(s) appear — refresh the
+        // visible label so it shows the full name rather than the first.
+        const labelEl = document.getElementById('headshotLabel');
+        if (labelEl && currentStudent && fullNames.has(currentStudent)) {
+          labelEl.textContent = fullNames.get(currentStudent);
+        }
       })
       .catch(() => {});
 
@@ -285,7 +300,8 @@
     let activeIdx = 0;            // which img element currently has .active
     let currentStudent = null;    // drives the background spawn pool
     let projectQueue = [];        // shuffled remaining projects for current student
-    const recentStudents = [];
+    let studentBag = [];          // shuffle bag — every student shown once per cycle
+    let lastStudent = null;
     const brokenStudents = new Set();
 
     function shuffled(arr) {
@@ -297,16 +313,27 @@
       return a;
     }
 
-    function pickStudent() {
+    // Shuffle-bag picker: every student appears exactly once before anyone
+    // repeats. When the bag empties it is reshuffled for a fresh cycle, and
+    // the seam is nudged so the same student never shows twice back-to-back
+    // across a cycle boundary.
+    function refillBag() {
       const eligible = STUDENTS.filter(n => !brokenStudents.has(n));
-      if (eligible.length === 0) return null;
-      const pool = eligible.filter(n => !recentStudents.includes(n));
-      const list = pool.length ? pool : eligible;
-      const name = list[Math.floor(Math.random() * list.length)];
-      recentStudents.push(name);
-      const window_ = Math.min(8, eligible.length - 1);
-      while (recentStudents.length > window_) recentStudents.shift();
-      return name;
+      const bag = shuffled(eligible);
+      if (bag.length > 1 && bag[bag.length - 1] === lastStudent) {
+        [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+      }
+      studentBag = bag;
+    }
+
+    function pickStudent() {
+      for (let guard = 0; guard <= STUDENTS.length; guard++) {
+        if (studentBag.length === 0) refillBag();
+        if (studentBag.length === 0) return null;
+        const name = studentBag.pop();
+        if (!brokenStudents.has(name)) { lastStudent = name; return name; }
+      }
+      return null;
     }
 
     function swapHeadshot() {
@@ -374,7 +401,8 @@
       if (active.size > 0 && Math.random() < 0.4) return;
 
       const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
-      const zIndex = Math.random() < frontChance ? 3 : 1;
+      // On mobile, project images always sit behind the central headshot.
+      const zIndex = mobileMQ.matches ? 1 : (Math.random() < frontChance ? 3 : 1);
 
       const file = projectQueue.pop();
 
@@ -396,7 +424,7 @@
       const place = () => {
         active.delete(wrap);
         const W = window.innerWidth, H = window.innerHeight;
-        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)));
+        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)) * (mobileMQ.matches ? 0.6 : 1));
         const w = img.naturalHeight > 0
           ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
           : renderedH;
@@ -405,10 +433,10 @@
         const hsArea = hs.width * hs.height;
 
         const ok = (x, y) => {
-          // At least 70% of the image must be within the viewport
+          // At least 80% of the image's area must be within the viewport
           const visW = Math.max(0, Math.min(x + w, W) - Math.max(x, 0));
           const visH = Math.max(0, Math.min(y + renderedH, H) - Math.max(y, 0));
-          if (visW * visH < 0.7 * w * renderedH) return false;
+          if (visW * visH < 0.8 * w * renderedH) return false;
           // Must not overlap the top half of the headshot
           if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
           // Must not cover more than 30% of the headshot
@@ -417,19 +445,39 @@
           return ow * oh <= 0.3 * hsArea;
         };
 
-        // Sample from a range that allows up to 30% of the image off-screen on any edge
-        const xMin = -Math.round(w * 0.3), xMax = W - Math.round(w * 0.7);
-        const yMin = -Math.round(renderedH * 0.3), yMax = H - Math.round(renderedH * 0.7);
+        // Sample from a range that allows up to 20% of the image off-screen on any edge
+        const xMin = -Math.round(w * 0.2), xMax = W - Math.round(w * 0.8);
+        const yMin = -Math.round(renderedH * 0.2), yMax = H - Math.round(renderedH * 0.8);
 
-        let x, y, tries = 0;
-        do {
-          x = Math.round(xMin + Math.random() * (xMax - xMin));
-          y = Math.round(yMin + Math.random() * (yMax - yMin));
-          tries++;
-        } while (!ok(x, y) && tries < 20);
+        // Spread new images away from those already on screen — best-candidate
+        // sampling: try many random spots, keep the one furthest from its
+        // neighbours, with a noise factor so the spread stays loose and chaotic
+        // rather than perfectly even.
+        const centers = [];
+        for (const el of placed) {
+          const r = el.getBoundingClientRect();
+          centers.push([r.left + r.width / 2, r.top + r.height / 2]);
+        }
 
-        wrap.style.left = x + 'px';
-        wrap.style.top = y + 'px';
+        let best = null, bestScore = -1;
+        for (let tries = 0; tries < 40; tries++) {
+          const px = Math.round(xMin + Math.random() * (xMax - xMin));
+          const py = Math.round(yMin + Math.random() * (yMax - yMin));
+          if (!ok(px, py)) continue;
+          const mx = px + w / 2, my = py + renderedH / 2;
+          let nearest = Infinity;
+          for (const [ox, oy] of centers) {
+            nearest = Math.min(nearest, Math.hypot(mx - ox, my - oy));
+          }
+          const dist = nearest === Infinity ? 1e6 : nearest;
+          const score = dist * (0.75 + Math.random() * 0.5);
+          if (score > bestScore) { bestScore = score; best = { x: px, y: py }; }
+        }
+        // Guarantee: only display images that land at least 80% in frame.
+        if (!best) { wrap.remove(); return; }
+
+        wrap.style.left = best.x + 'px';
+        wrap.style.top = best.y + 'px';
         wrap.style.visibility = 'visible';
         placed.add(wrap);
       };
