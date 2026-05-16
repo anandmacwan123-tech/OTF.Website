@@ -170,6 +170,14 @@
   @media (prefers-reduced-motion: reduce) {
     .headshot { transition: none; }
   }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 768px) {
+    .student-img { height: clamp(168px, 33vh, 372px); }
+    .headshot-link,
+    .headshot { height: clamp(168px, 33vh, 372px); }
+    .nav a { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
+  }
 </style>
 </head>
 <body>
@@ -248,6 +256,12 @@
           const parts = line.split(',');
           const raw = (parts[2] || '').replace(/^"|"$/g, '').trim();
           if (raw) fullNames.set(raw.split(/\s+/)[0], raw);
+        }
+        // Names load after the first headshot(s) appear — refresh the
+        // visible label so it shows the full name rather than the first.
+        const labelEl = document.getElementById('headshotLabel');
+        if (labelEl && currentStudent && fullNames.has(currentStudent)) {
+          labelEl.textContent = fullNames.get(currentStudent);
         }
       })
       .catch(() => {});
@@ -359,7 +373,8 @@
       if (active.size > 0 && Math.random() < 0.4) return;
 
       const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
-      const zIndex = Math.random() < frontChance ? 3 : 1;
+      // On mobile, project images always sit behind the central headshot.
+      const zIndex = mobileMQ.matches ? 1 : (Math.random() < frontChance ? 3 : 1);
 
       const file = projectQueue.pop();
 
@@ -381,7 +396,7 @@
       const place = () => {
         active.delete(wrap);
         const W = window.innerWidth, H = window.innerHeight;
-        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)));
+        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)) * (mobileMQ.matches ? 0.6 : 1));
         const w = img.naturalHeight > 0
           ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
           : renderedH;

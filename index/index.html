@@ -188,9 +188,17 @@
   }
 
   @media (max-width: 560px) {
-    .headshot-grid { grid-template-columns: repeat(3, 1fr); }
+    /* 5 columns instead of 3 renders each headshot at 0.6x. */
+    .headshot-grid { grid-template-columns: repeat(5, 1fr); }
     .student-list a,
     .student-list .row { gap: 1rem; }
+  }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 768px) {
+    .nav a,
+    .nav button,
+    .nav .view-label { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
   }
 
   /* ─── NAV ─── */
