@@ -96,14 +96,37 @@
   }
 
   .student-img {
-    position: fixed;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none;
     display: block;
     width: auto;
     height: clamp(240px, 42vh, 510px);
+    -webkit-user-drag: none;
   }
+
+  .float-wrap {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    pointer-events: none;
+    user-select: none;
+    visibility: hidden;
+  }
+
+  .label {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0 2px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -0.12em;
+    text-transform: uppercase;
+  }
+  .label-headshot { background: #FC1233; color: #000; }
 
   .media-wrap {
     display: flex;
@@ -213,6 +236,21 @@
     const mobileMQ = window.matchMedia('(max-width: 768px)');
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+    // Load full names from the sheet so labels show e.g. "Anand Macwan".
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+    const fullNames = new Map();
+    fetch(SHEET_URL + '&t=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.ok ? r.text() : '')
+      .then(text => {
+        for (const line of text.split(/\r?\n/)) {
+          const parts = line.split(',');
+          const raw = (parts[2] || '').replace(/^"|"$/g, '').trim();
+          if (raw) fullNames.set(raw.split(/\s+/)[0], raw);
+        }
+      })
+      .catch(() => {});
+
     const active = new Set();
     const recentNames = [];
 
@@ -238,17 +276,24 @@
       if (active.size > 0 && Math.random() < 0.4) return;
 
       const h = imgHeight();
-      // 35% chance on desktop, 1.5× that on mobile (~52.5%)
       const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
       const zIndex = Math.random() < frontChance ? 3 : 1;
+      const name = pickName();
+
+      const wrap = document.createElement('div');
+      wrap.className = 'float-wrap';
+      wrap.style.zIndex = zIndex;
+
+      const lbl = document.createElement('div');
+      lbl.className = 'label label-headshot';
+      lbl.textContent = fullNames.get(name) || name;
+      wrap.appendChild(lbl);
 
       const img = document.createElement('img');
       img.className = 'student-img';
-      img.src = enc(`Student Work/${pickName()}.webp`);
+      img.src = enc(`Student Work/${name}.webp`);
       img.alt = '';
-      img.style.zIndex = zIndex;
-      // Hide until we know the real width — avoids clipping wide images
-      img.style.visibility = 'hidden';
+      wrap.appendChild(img);
 
       const place = () => {
         const W = window.innerWidth, H = window.innerHeight;
@@ -256,18 +301,18 @@
         const margin = 8;
         const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
         const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin * 2));
-        img.style.left = x + 'px';
-        img.style.top = y + 'px';
-        img.style.visibility = 'visible';
+        wrap.style.left = x + 'px';
+        wrap.style.top = y + 'px';
+        wrap.style.visibility = 'visible';
       };
       img.addEventListener('load', place, { once: true });
 
-      document.body.appendChild(img);
-      active.add(img);
+      document.body.appendChild(wrap);
+      active.add(wrap);
 
       setTimeout(() => {
-        img.remove();
-        active.delete(img);
+        wrap.remove();
+        active.delete(wrap);
       }, LIFETIME_MS);
     }
 

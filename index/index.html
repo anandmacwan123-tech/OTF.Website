@@ -143,15 +143,34 @@
     gap: clamp(0.5rem, 1vw, 1rem);
   }
 
+  /* Label above each headshot */
+  .label {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0 2px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -0.12em;
+    text-transform: uppercase;
+  }
+  .label-headshot { background: #FC1233; color: #000; }
+
   .headshot-grid li {
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .headshot-grid a {
     display: block;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
     transition: opacity 0.2s ease;
   }
 
@@ -426,6 +445,10 @@
     for (const e of entries) {
       if (!e.headshot) continue;
       const li = document.createElement('li');
+      const lbl = document.createElement('div');
+      lbl.className = 'label label-headshot';
+      lbl.textContent = e.displayName;
+      li.appendChild(lbl);
       const a = document.createElement('a');
       a.href = e.href;
       a.setAttribute('aria-label', `Open ${e.displayName}'s portfolio`);
