@@ -327,14 +327,14 @@
         activeIdx = nextIdx;
         for (const el of placed) el.remove();
         placed.clear();
-        // Position the name label at the top-left of the now-visible headshot.
+        // Position the name label flush above the top-left of the headshot.
         const labelEl = document.getElementById('headshotLabel');
         if (labelEl) requestAnimationFrame(() => {
-          const r = nextImg.getBoundingClientRect();
-          labelEl.style.left = r.left + 'px';
-          labelEl.style.top = r.top + 'px';
           labelEl.textContent = fullNames.get(name) || name;
           labelEl.style.visibility = 'visible';
+          const r = nextImg.getBoundingClientRect();
+          labelEl.style.left = r.left + 'px';
+          labelEl.style.top = (r.top - labelEl.offsetHeight) + 'px';
         });
       };
 
@@ -460,7 +460,7 @@
         if (labelEl && currentStudent) requestAnimationFrame(() => {
           const r = imgs[activeIdx].getBoundingClientRect();
           labelEl.style.left = r.left + 'px';
-          labelEl.style.top = r.top + 'px';
+          labelEl.style.top = (r.top - labelEl.offsetHeight) + 'px';
         });
       }, 120);
     });
