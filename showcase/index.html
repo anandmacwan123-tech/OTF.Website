@@ -449,17 +449,35 @@
         const xMin = -Math.round(w * 0.2), xMax = W - Math.round(w * 0.8);
         const yMin = -Math.round(renderedH * 0.2), yMax = H - Math.round(renderedH * 0.8);
 
-        let x = 0, y = 0, found = false;
+        // Spread new images away from those already on screen — best-candidate
+        // sampling: try many random spots, keep the one furthest from its
+        // neighbours, with a noise factor so the spread stays loose and chaotic
+        // rather than perfectly even.
+        const centers = [];
+        for (const el of placed) {
+          const r = el.getBoundingClientRect();
+          centers.push([r.left + r.width / 2, r.top + r.height / 2]);
+        }
+
+        let best = null, bestScore = -1;
         for (let tries = 0; tries < 40; tries++) {
-          x = Math.round(xMin + Math.random() * (xMax - xMin));
-          y = Math.round(yMin + Math.random() * (yMax - yMin));
-          if (ok(x, y)) { found = true; break; }
+          const px = Math.round(xMin + Math.random() * (xMax - xMin));
+          const py = Math.round(yMin + Math.random() * (yMax - yMin));
+          if (!ok(px, py)) continue;
+          const mx = px + w / 2, my = py + renderedH / 2;
+          let nearest = Infinity;
+          for (const [ox, oy] of centers) {
+            nearest = Math.min(nearest, Math.hypot(mx - ox, my - oy));
+          }
+          const dist = nearest === Infinity ? 1e6 : nearest;
+          const score = dist * (0.75 + Math.random() * 0.5);
+          if (score > bestScore) { bestScore = score; best = { x: px, y: py }; }
         }
         // Guarantee: only display images that land at least 80% in frame.
-        if (!found) { wrap.remove(); return; }
+        if (!best) { wrap.remove(); return; }
 
-        wrap.style.left = x + 'px';
-        wrap.style.top = y + 'px';
+        wrap.style.left = best.x + 'px';
+        wrap.style.top = best.y + 'px';
         wrap.style.visibility = 'visible';
         placed.add(wrap);
       };
