@@ -197,8 +197,7 @@
   /* ─── Mobile ─── */
   @media (max-width: 768px) {
     .nav a,
-    .nav button,
-    .nav .view-label { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
+    .nav button { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
   }
 
   /* ─── NAV ─── */
@@ -207,50 +206,58 @@
     bottom: 0;
     left: 0;
     right: 0;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
     z-index: 10;
     padding: 1rem 4vw;
     background: var(--bg);
   }
 
-  .nav-left { justify-self: start; }
-  .nav-center {
-    justify-self: center;
-    display: flex;
-    align-items: center;
-    gap: clamp(0.75rem, 2vw, 1.25rem);
-  }
-
-  .nav a,
-  .nav button,
-  .nav .view-label {
-    background: none;
-    border: 0;
-    padding: 0;
+  .nav a {
     color: #000;
-    font-family: inherit;
     text-decoration: none;
     font-weight: 500;
     font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    cursor: pointer;
     transition: opacity 0.2s ease;
   }
 
-  .nav a:hover,
-  .nav button:hover { opacity: 0.55; }
+  .nav a:hover { opacity: 0.55; }
 
-  .nav .view-label {
-    opacity: 0.5;
-    cursor: default;
+  /* List / Faces segmented toggle — a square pill matching the nav text. */
+  .view-toggle {
+    display: inline-flex;
+    border: 1px solid #000;
+    border-radius: 3px;
+    overflow: hidden;
   }
 
-  .nav button[aria-pressed="false"] { opacity: 0.5; }
-  .nav button[aria-pressed="false"]:hover { opacity: 0.8; }
+  .view-toggle button {
+    background: none;
+    border: 0;
+    margin: 0;
+    padding: 0.4em 0.8em;
+    color: #000;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .view-toggle button + button { border-left: 1px solid #000; }
+
+  .view-toggle button[aria-pressed="true"] {
+    background: #000;
+    color: #fff;
+  }
 
   .sr-only {
     position: absolute;
@@ -284,13 +291,13 @@
   </main>
 
   <nav class="nav" aria-label="Primary">
-    <div class="nav-left">
-      <a href="/showcase/">[BACK]</a>
-    </div>
-    <div class="nav-center">
-      <span class="view-label" aria-hidden="true">VIEW</span>
-      <button type="button" id="listBtn" aria-pressed="true">[LIST]</button>
-      <button type="button" id="facesBtn" aria-pressed="false">[FACES]</button>
+    <a href="/showcase/">[SHOWCASE]</a>
+    <a href="/visit/">[VISIT]</a>
+    <a href="/info/">[INFO]</a>
+    <a href="/index/">[INDEX]</a>
+    <div class="view-toggle" role="group" aria-label="View">
+      <button type="button" id="listBtn" aria-pressed="true">List</button>
+      <button type="button" id="facesBtn" aria-pressed="false">Faces</button>
     </div>
   </nav>
 
