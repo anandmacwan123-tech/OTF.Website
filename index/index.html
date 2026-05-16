@@ -197,7 +197,7 @@
   /* ─── Mobile ─── */
   @media (max-width: 768px) {
     .nav a,
-    .nav button { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
+    .view-toggle button { font-size: clamp(0.7125rem, 0.825vw + 0.4125rem, 0.9rem); }
   }
 
   /* ─── NAV ─── */
@@ -228,12 +228,16 @@
 
   .nav a:hover { opacity: 0.55; }
 
-  /* List / Faces segmented toggle — a square pill matching the nav text. */
+  /* List / Faces segmented toggle — a square pill, centred above the nav. */
   .view-toggle {
+    position: fixed;
+    bottom: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
     display: inline-flex;
     border: 1px solid #000;
-    border-radius: 3px;
-    overflow: hidden;
+    background: var(--bg);
   }
 
   .view-toggle button {
@@ -290,15 +294,16 @@
     </section>
   </main>
 
+  <div class="view-toggle" role="group" aria-label="View">
+    <button type="button" id="listBtn" aria-pressed="true">List</button>
+    <button type="button" id="facesBtn" aria-pressed="false">Faces</button>
+  </div>
+
   <nav class="nav" aria-label="Primary">
     <a href="/showcase/">[SHOWCASE]</a>
     <a href="/visit/">[VISIT]</a>
     <a href="/info/">[INFO]</a>
     <a href="/index/">[INDEX]</a>
-    <div class="view-toggle" role="group" aria-label="View">
-      <button type="button" id="listBtn" aria-pressed="true">List</button>
-      <button type="button" id="facesBtn" aria-pressed="false">Faces</button>
-    </div>
   </nav>
 
 <script>
