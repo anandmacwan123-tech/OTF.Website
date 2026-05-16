@@ -20,10 +20,11 @@ const PAGES = [
 ];
 
 const IMAGE_EXT = /\.webp$/i;
+const PROJECT_EXT = /\.(webp|url)$/i;   // .url holds a YouTube/Vimeo video link
 
-function listFiles(dir, label) {
+function listFiles(dir, label, ext) {
   try {
-    return readdirSync(dir).filter(f => IMAGE_EXT.test(f));
+    return readdirSync(dir).filter(f => ext.test(f));
   } catch (err) {
     if (err.code === 'ENOENT') {
       console.warn(`⚠  ${label} directory not found at ${dir}`);
@@ -33,8 +34,8 @@ function listFiles(dir, label) {
   }
 }
 
-const headshotFiles = listFiles(HEADSHOTS_DIR, 'Headshots');
-const projectFiles = listFiles(PROJECTS_DIR, 'Projects');
+const headshotFiles = listFiles(HEADSHOTS_DIR, 'Headshots', IMAGE_EXT);
+const projectFiles = listFiles(PROJECTS_DIR, 'Projects', PROJECT_EXT);
 
 const students = headshotFiles
   .map(f => f.replace(IMAGE_EXT, ''))
