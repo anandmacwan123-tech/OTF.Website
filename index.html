@@ -213,6 +213,7 @@
     const mobileMQ = window.matchMedia('(max-width: 768px)');
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
     const active = new Set();
     const recentNames = [];
 
@@ -238,7 +239,6 @@
       if (active.size > 0 && Math.random() < 0.4) return;
 
       const h = imgHeight();
-      // 35% chance on desktop, 1.5× that on mobile (~52.5%)
       const frontChance = mobileMQ.matches ? FRONT_CHANCE * FRONT_CHANCE_MOBILE_MULT : FRONT_CHANCE;
       const zIndex = Math.random() < frontChance ? 3 : 1;
 
@@ -247,7 +247,6 @@
       img.src = enc(`Student Work/${pickName()}.webp`);
       img.alt = '';
       img.style.zIndex = zIndex;
-      // Hide until we know the real width — avoids clipping wide images
       img.style.visibility = 'hidden';
 
       const place = () => {

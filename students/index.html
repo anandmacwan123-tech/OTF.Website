@@ -64,11 +64,46 @@
   }
 
   .hero {
-    max-width: var(--col-image);
-    margin: 0 auto 5rem;
+    margin: 0 0 7rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: end;
+  }
+
+  .hero-left { display: flex; justify-content: flex-start; }
+
+  .hero-headshot-wrap {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Display labels — student name (headshot) and project titles. A colored
+     container with the title text, rendered in HTML rather than baked into
+     the image. Sits flush on top of the image, top-left aligned. */
+  .label {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0 2px;
+    justify-content: center;
     align-items: center;
+    gap: 10px;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -0.12em;
+    text-transform: uppercase;
+  }
+  .label-headshot { background: #FC1233; color: #000; }
+  .label-project  { background: #000;    color: #fff; }
+
+  .hero-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: var(--col-text);
   }
 
   .hero-media {
@@ -99,8 +134,6 @@
   }
 
   .bio {
-    max-width: var(--col-text);
-    margin: 0 auto 7rem;
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
@@ -108,26 +141,62 @@
 
   .bio p + p { margin-top: 1rem; }
 
+  .socials {
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    flex-wrap: wrap;
+  }
+  .socials a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+  }
+  .socials a:hover { opacity: 0.55; }
+
   .projects {
     display: flex;
     flex-direction: column;
     gap: 7rem;
-    max-width: var(--col-image);
-    margin: 0 auto;
+    margin: 0;
   }
 
-  .project { display: flex; flex-direction: column; gap: 1.5rem; }
+  .project { display: flex; flex-direction: column; }
 
-  .project .images { display: flex; flex-direction: column; gap: 1rem; }
+  .project .images {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Extend beyond body padding so scrollable strip reaches viewport edge */
+    margin: 0 -5vw;
+    padding: 0 5vw 0.5rem;
+    scrollbar-width: thin;
+  }
 
-  .project img { display: block; width: 100%; height: auto; }
+  .project .images img {
+    height: clamp(280px, 50vh, 480px);
+    width: auto;
+    display: block;
+    flex-shrink: 0;
+  }
 
   .project-desc {
     max-width: var(--col-text);
-    margin: 0.5rem auto 0;
+    margin: 1.25rem 0 0;
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; align-items: start; }
+    .hero-right { max-width: none; }
   }
 
   .nav {
@@ -172,12 +241,20 @@
 
   <main class="portfolio" id="portfolio" hidden>
     <header class="hero">
-      <div class="hero-media">
-        <img class="hero-headshot" id="heroHeadshot" alt="">
-        <p class="hero-practices" id="heroPractices"></p>
+      <div class="hero-left">
+        <div class="hero-media">
+          <div class="hero-headshot-wrap">
+            <div class="label label-headshot" id="heroName"></div>
+            <img class="hero-headshot" id="heroHeadshot" alt="">
+          </div>
+          <p class="hero-practices" id="heroPractices"></p>
+        </div>
+      </div>
+      <div class="hero-right">
+        <section class="bio" id="bio"></section>
+        <nav class="socials" id="socials" aria-label="Student links"></nav>
       </div>
     </header>
-    <section class="bio" id="bio"></section>
     <section class="projects" id="projects"></section>
   </main>
 
@@ -323,20 +400,34 @@
       });
   }
 
-  // Group project filenames into projects keyed by base name.
+  // Group project filenames into projects keyed by storage name.
+  // New convention: <Student>_<Project>_<N>.webp — group by <Project>, order by <N>.
+  // Legacy files (no `_<N>` tail) fall back to stripping trailing digits so
+  // pre-rename batches like FameSucks / FameSucks1 / FameSucks2 still group.
+  // Skips Unassigned, collapses Untitled<K> → "Untitled".
   function projectGroups(name, files) {
     const prefixRe = new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '_');
-    const stripDigits = /(\d+(-\d+)?|-\d+)$/;
     const order = [];
     const groups = new Map();
     for (const file of files) {
       const stem = file.replace(/\.webp$/i, '').replace(prefixRe, '');
-      const base = stem.replace(stripDigits, '') || stem;
-      if (!groups.has(base)) { groups.set(base, []); order.push(base); }
-      groups.get(base).push(file);
+      let project, n;
+      const m = stem.match(/^(.+)_(\d+)$/);
+      if (m) {
+        project = m[1];
+        n = +m[2];
+      } else {
+        const numMatch = stem.match(/(\d+)(?:-\d+)?$/);
+        n = numMatch ? +numMatch[1] : 0;
+        project = stem.replace(/\d+(?:-\d+)?$/, '') || stem;
+      }
+      if (project === 'Unassigned') continue;
+      const displayName = /^Untitled\d*$/.test(project) ? 'Untitled' : project;
+      if (!groups.has(project)) { groups.set(project, { displayName, files: [] }); order.push(project); }
+      groups.get(project).files.push({ file, n });
     }
-    for (const arr of groups.values()) arr.sort((a, b) => a.localeCompare(b));
-    return order.map(base => ({ base, files: groups.get(base) }));
+    for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n || a.file.localeCompare(b.file));
+    return order.map(p => ({ key: p, base: groups.get(p).displayName, files: groups.get(p).files.map(x => x.file) }));
   }
 
   // Look up a description for a project group. The sheet uses positional
@@ -378,6 +469,9 @@
     hs.alt = `${name} — portrait`;
     hs.onerror = () => { hs.remove(); };
 
+    // Headshot label — student's full name from the sheet's "Name" column.
+    document.getElementById('heroName').textContent = field(row, 'Name') || name;
+
     const practices = row
       ? [field(row, 'Practice1'), field(row, 'Practice2'), field(row, 'Practice3')]
           .filter(p => p && p.length)
@@ -405,6 +499,26 @@
       bioEl.remove();
     }
 
+    const socialsEl = document.getElementById('socials');
+    const socialLinks = [
+      { label: 'PORTFOLIO', url: field(row, 'Portfolio', 'Portfolio URL', 'Website') },
+      { label: 'INSTAGRAM', url: field(row, 'Instagram', 'Instagram URL') },
+      { label: 'LINKEDIN',  url: field(row, 'LinkedIn', 'Linkedin', 'LinkedIn URL') },
+    ];
+    let hasSocial = false;
+    for (const { label, url } of socialLinks) {
+      if (!url) continue;
+      hasSocial = true;
+      const href = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+      const a = document.createElement('a');
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = `[${label}]`;
+      socialsEl.appendChild(a);
+    }
+    if (!hasSocial) socialsEl.remove();
+
     document.title = `${name} — OTF`;
     const setMeta = (sel, value) => {
       const el = document.querySelector(sel);
@@ -417,9 +531,32 @@
     stateEl.remove();
   }
 
+  // Persistent project order saved by the admin tool (projects-order.json).
+  // Populated before renderProjects runs; defaults to {} on 404/error.
+  let projectOrder = {};
+
   function renderProjects(row) {
     const files = MANIFEST[name] || [];
-    const groups = projectGroups(name, files);
+    let groups = projectGroups(name, files);
+
+    // Reorder groups by the saved order for this student. Groups whose
+    // storage key appears in the order array come first (in that order);
+    // any remaining groups keep their existing order.
+    const order = projectOrder[name];
+    if (Array.isArray(order) && order.length) {
+      const indexOf = k => {
+        const i = order.indexOf(k);
+        return i < 0 ? Infinity : i;
+      };
+      groups = groups
+        .map((g, i) => ({ g, i }))
+        .sort((a, b) => {
+          const oa = indexOf(a.g.key), ob = indexOf(b.g.key);
+          return oa - ob || a.i - b.i;
+        })
+        .map(x => x.g);
+    }
+
     const container = document.getElementById('projects');
 
     groups.forEach((group, i) => {
@@ -428,6 +565,11 @@
 
       const article = document.createElement('article');
       article.className = 'project';
+
+      const titleEl = document.createElement('h2');
+      titleEl.className = 'label label-project';
+      titleEl.textContent = group.base;
+      article.appendChild(titleEl);
 
       if (group.files.length) {
         const imagesDiv = document.createElement('div');
@@ -470,28 +612,24 @@
   // get a stale or empty version edge-cached by them).
   const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
 
+  // Fetch the saved project order (admin tool writes projects-order.json).
+  // On 404 or any error, fall back to {} so default ordering is used.
+  const orderUrl = enc('/Student Work/projects-order.json') + '?t=' + Date.now();
+  const orderPromise = fetch(orderUrl, { cache: 'no-store' })
+    .then(r => (r.ok ? r.json() : {}))
+    .then(data => { if (data && typeof data === 'object') projectOrder = data; })
+    .catch(() => { projectOrder = {}; });
+
+  orderPromise.then(() =>
   fetch(sheetUrl, { cache: 'no-store' })
     .then(r => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
     })
     .then(text => {
-      console.log('[OTF] Raw CSV (first 800 chars):\n' + text.slice(0, 800));
       const rows = parseCSV(text);
       const objs = toObjects(rows);
-      console.log(`[OTF] CSV parsed: ${rows.length} raw rows, ${objs.length} data objects`);
-      console.log('[OTF] Raw row 0 (cells:', rows[0]?.length, '):', rows[0]);
-      if (rows.length > 1) console.log('[OTF] Raw row 1 (cells:', rows[1]?.length, '):', rows[1]);
-      if (rows.length > 2) console.log('[OTF] Raw row 2 (cells:', rows[2]?.length, '):', rows[2]);
-      if (rows.length) console.log('[OTF] Header row used:', objs.length ? Object.keys(objs[0]) : rows[0]);
-      if (objs.length) console.log('[OTF] First data row:', objs[0]);
       const row = matchRow(objs, name);
-      if (!row) {
-        console.warn(`[OTF] No sheet row matched "${name}". Names found in sheet:`,
-          objs.map(o => field(o, 'Name')).filter(Boolean));
-      } else {
-        console.log(`[OTF] Matched row for "${name}":`, row);
-      }
       renderBasic(row);
       renderProjects(row);
     })
@@ -507,7 +645,8 @@
       notice.style.margin = '2rem auto';
       notice.textContent = "Couldn't load profile";
       portfolioEl.appendChild(notice);
-    });
+    })
+  );
 })();
 </script>
 </body>

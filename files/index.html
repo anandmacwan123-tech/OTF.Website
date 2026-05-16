@@ -177,20 +177,27 @@
 
   /* File card */
   .file-card {
-    width: 140px; display: flex; flex-direction: column; gap: 0.5rem;
+    width: auto; min-width: 140px; max-width: 260px;
+    display: flex; flex-direction: column; gap: 0.5rem;
   }
+  .file-card.card-drop-target .thumb { outline: 2px solid var(--fg); outline-offset: -2px; }
 
   /* Thumbnail */
   .thumb {
-    width: 140px; height: 140px;
+    position: relative;
     background: rgba(0,0,0,0.04);
-    overflow: hidden; flex-shrink: 0;
+    display: inline-block; line-height: 0;
+  }
+  .thumb.loading { width: 140px; height: 140px; }
+  .thumb img { display: block; }
+  .thumb.landscape img { height: 140px; width: auto; }
+  .thumb.portrait  img { width: 140px;  height: auto; max-height: 220px; }
+  .thumb-video {
+    width: 140px; height: 140px;
+    background: rgba(0,0,0,0.08);
     display: flex; align-items: center; justify-content: center;
   }
-  .thumb img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
-  .thumb-video { background: rgba(0,0,0,0.08); }
+  .file-card[draggable="true"] .thumb { cursor: grab; }
   .video-icon {
     font-size: 1.5rem; color: var(--muted);
   }
@@ -244,6 +251,20 @@
     border-color: var(--fg); background: rgba(0,0,0,0.02);
   }
 
+  /* Add-a-headshot box */
+  .add-headshot {
+    width: 140px; height: 140px;
+    border: 1px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .add-headshot span {
+    font-size: 0.65rem; color: var(--muted);
+    line-height: 1.5; pointer-events: none;
+  }
+  .add-headshot:hover { border-color: var(--fg); background: rgba(0,0,0,0.02); }
+
   /* Modal */
   #modal {
     position: fixed; inset: 0;
@@ -282,6 +303,94 @@
     0% { opacity: 0.4; } 50% { opacity: 0.7; } 100% { opacity: 0.4; }
   }
   .loading { animation: shimmer 1.4s ease-in-out infinite; }
+
+  /* Project sections */
+  .project-section.drag-over {
+    outline: 2px dashed var(--fg); outline-offset: 4px;
+  }
+  .project-hdr {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 0.75rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .collapse-btn {
+    font: inherit; font-size: 0.6rem; font-weight: 500;
+    background: none; border: 1px solid var(--border);
+    padding: 0.15rem 0.35rem; cursor: pointer; color: var(--fg);
+    line-height: 1; flex-shrink: 0;
+  }
+  .collapse-btn:hover { background: rgba(0,0,0,0.05); }
+  .drag-handle {
+    font-size: 0.75rem; color: var(--muted);
+    cursor: grab; user-select: none; flex-shrink: 0;
+    padding: 0 0.15rem;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .project-section.collapsed .file-grid { display: none; }
+  .project-title {
+    font: inherit; font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: none; border: none; border-bottom: 1px solid transparent;
+    outline: none; cursor: text; padding: 0 0 1px; color: var(--fg); min-width: 2rem;
+  }
+  .project-title:hover, .project-title:focus { border-bottom-color: var(--border); }
+  .project-count { font-size: 0.55rem; color: var(--muted); flex: 1; }
+  .seq-num {
+    position: absolute; top: 4px; left: 4px;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 0.5rem; font-weight: 600; padding: 1px 4px; pointer-events: none;
+  }
+  .new-project-btn {
+    font: inherit; font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: none; border: 1px dashed var(--border);
+    padding: 0.45rem 1rem; cursor: pointer; color: var(--muted);
+    margin-top: 0.5rem; display: inline-block;
+  }
+  .new-project-btn:hover { border-color: var(--fg); color: var(--fg); }
+  .assign-sel {
+    font: inherit; font-size: 0.55rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: none; border: 1px solid var(--border);
+    padding: 0.25rem 0.4rem; cursor: pointer; color: var(--fg); max-width: 120px;
+  }
+
+  /* Mass upload modal */
+  #uploadModal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center; z-index: 210;
+  }
+  #uploadModal[hidden] { display: none; }
+  .upl-box {
+    background: var(--bg); width: min(560px, 92vw);
+    max-height: 82vh; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .upl-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 1.5rem 0.9rem; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .upl-head h2 { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .upl-drop {
+    margin: 1rem 1.5rem 0; border: 1px dashed var(--border); padding: 1.5rem;
+    text-align: center; cursor: pointer; flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .upl-drop:hover, .upl-drop.drag-over { border-color: var(--fg); background: rgba(0,0,0,0.02); }
+  .upl-drop p { font-size: 0.75rem; color: var(--muted); line-height: 1.6; pointer-events: none; }
+  .upl-status { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.04em; padding: 0.7rem 1.5rem 0; flex-shrink: 0; min-height: 1.5rem; }
+  .upl-rows { flex: 1; overflow-y: auto; padding: 0 1.5rem; }
+  .upl-row {
+    display: flex; align-items: baseline; gap: 0.5rem;
+    padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.7rem;
+  }
+  .upl-src { color: var(--muted); flex: 0 0 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .upl-arrow { color: var(--muted); flex-shrink: 0; }
+  .upl-dest { flex: 1; }
+  .upl-warn { color: var(--red); }
+  .upl-foot {
+    padding: 0.9rem 1.5rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 0.75rem; flex-shrink: 0;
+  }
 
   /* ── Task bar (bottom-right) ──────────────────────────────────────── */
   #taskBar {
@@ -358,6 +467,7 @@
     <h1>OTF Library</h1>
     <div class="header-right">
       <span id="status"></span>
+      <button class="discard-btn" id="uploadBtn">Upload</button>
       <button class="discard-btn" id="discardBtn" hidden>Discard</button>
       <button class="save-btn" id="saveBtn" hidden>Save</button>
       <button class="sign-out-btn" id="signOut">Sign out</button>
@@ -388,6 +498,25 @@
   </div>
 </div>
 
+<!-- Mass upload modal -->
+<div id="uploadModal" hidden>
+  <div class="upl-box">
+    <div class="upl-head">
+      <h2>Mass Upload</h2>
+      <button class="sign-out-btn" id="uploadClose">✕</button>
+    </div>
+    <div class="upl-drop" id="uplDrop">
+      <p>Drop files here, or <label for="uplPicker" style="cursor:pointer;text-decoration:underline">Pick files</label><br>Accepts JPG / PNG / WebP</p>
+      <input type="file" id="uplPicker" multiple accept=".jpg,.jpeg,.png,.webp" style="display:none">
+    </div>
+    <div class="upl-status" id="uplStatus"></div>
+    <div class="upl-rows" id="uplRows"></div>
+    <div class="upl-foot">
+      <button class="modal-cancel" id="uploadDone">Done</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (() => {
   // ── Constants ──────────────────────────────────────────────────────
@@ -404,6 +533,21 @@
   const SENT_START = '// __MANIFEST_START__';
   const SENT_END   = '// __MANIFEST_END__';
   const LS_PAT = 'otf_library_pat';
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+  const STUDENT_LIST = [
+    'Anand Macwan', 'Becky Smith', 'Charles Latagan', 'Darcy Young',
+    'Divine Ojiaku', 'Jaeden Small', 'Jamie Donnelly', 'Jenna Winckless',
+    'Jess Shrimpton', 'Kaila Webb', 'Kami Vasquez Quiceno', 'Kye Goff',
+    'Martim Freitas Pereira', 'Maseray Maiya Sesay', 'Nikol Aleksandrova',
+    'Noora Ghodrati', 'Nora Ashani', 'Nuria Vargas Santana', 'Olya Grishina',
+    'Oscar Vigdal', 'Rebecca Whippy', 'Sam Fletcher', 'Sara Jurkowska',
+    'Sasha Brown', 'Sebastian McLean', 'Shalom Milton-Gorvie', 'Surayya Ahmadzada',
+    'Taleb Cherif', 'Tallulah Stott', 'Vanessa Franko', 'Will Vint',
+    'Emily Amankwaah', 'Carolina Almeida Ferreira', 'Arnete Kuncyte',
+    'Oli Parker', 'Valentina Labriola', 'Elise Havis',
+    'David Iheanacho', 'Adam Adam', 'Callum Redmond',
+  ];
+  const ORDER_PATH = 'Student Work/projects-order.json';
 
   // ── State ──────────────────────────────────────────────────────────
   let pat            = '';
@@ -412,6 +556,13 @@
   let currentStudent = null;
   const thumbCache   = new Map(); // sha → objectURL
   let pendingQueue   = []; // changes awaiting commit: { path, content?, sha?, delete? }
+  let sheetCache = null;
+  let pendingNewProjects = []; // { student, key, displayTitle }
+  let csvStudents = []; // { slug, fullName }
+  let projectOrder = {}; // { "<slug>": ["ProjectKeyA", ...] }
+  let draggedProjectKey = null;
+  let draggedFilePath = null;
+  let draggedFileProjectKey = null;
 
   // ── DOM ────────────────────────────────────────────────────────────
   const $ = id => document.getElementById(id);
@@ -424,6 +575,7 @@
   const patInput     = $('patInput');
   const patError     = $('patError');
   const modalEl      = $('modal');
+  const uploadModalEl = $('uploadModal');
 
   function setStatus(msg) { statusEl.textContent = msg; }
 
@@ -493,13 +645,153 @@
     const toFile = f => ({ name: f.name, sha: f.sha, downloadUrl: f.download_url, path: f.path });
     headshots = hs.filter(f => f.type === 'file').map(toFile);
     projects  = pr.filter(f => f.type === 'file').map(toFile);
+
+    csvStudents = STUDENT_LIST.map(fullName => ({ slug: fullName.split(' ')[0], fullName }));
+
+    // Load persistent project order (file may not exist → 404)
+    try {
+      const data = await gh('GET', `/contents/${encPath(ORDER_PATH)}?ref=${BRANCH}`);
+      projectOrder = JSON.parse(b64decode(data.content));
+    } catch { projectOrder = {}; }
+  }
+
+  function displayNameFor(slug) {
+    const m = csvStudents.find(c => c.slug === slug);
+    return m ? m.fullName : slug;
   }
 
   function studentNames() {
-    return headshots.map(h => h.name.replace(/\.[^.]+$/, '')).sort((a,b) => a.localeCompare(b));
+    const set = new Set();
+    for (const c of csvStudents) set.add(c.slug);
+    for (const h of headshots) set.add(h.name.replace(/\.[^.]+$/, ''));
+    for (const p of projects) {
+      const us = p.name.indexOf('_');
+      if (us > 0) set.add(p.name.slice(0, us));
+    }
+    return [...set].sort((a,b) => a.localeCompare(b));
   }
   function projectsFor(s) { return projects.filter(p => p.name.startsWith(s + '_')); }
   function headshotFor(s) { return headshots.find(h => h.name.replace(/\.[^.]+$/, '') === s) || null; }
+
+  function parseFilename(student, filename) {
+    const stem = filename.replace(/\.webp$/i, '');
+    const prefix = student + '_';
+    if (!stem.startsWith(prefix)) return { kind: 'unknown' };
+    const rest = stem.slice(prefix.length);
+    const m = rest.match(/^(.+)_(\d+)$/);
+    if (m) {
+      const project = m[1];
+      const n = parseInt(m[2], 10);
+      if (project === 'Unassigned') return { kind: 'unassigned-new', n };
+      const displayProject = /^Untitled\d+$/.test(project) ? 'Untitled' : project;
+      return { kind: 'project', project, displayProject, n };
+    }
+    return { kind: 'unassigned-legacy', raw: rest };
+  }
+
+  function groupForStudent(student) {
+    const headshot = headshots.find(h => h.name.replace(/\.[^.]+$/, '') === student) || null;
+    const groups = new Map();
+    const unassigned = [];
+    for (const f of projects) {
+      if (!f.name.startsWith(student + '_')) continue;
+      const p = parseFilename(student, f.name);
+      if (p.kind === 'project') {
+        if (!groups.has(p.project)) groups.set(p.project, { displayTitle: p.displayProject, files: [] });
+        groups.get(p.project).files.push({ ...f, n: p.n });
+      } else {
+        unassigned.push(f);
+      }
+    }
+    for (const pnp of pendingNewProjects) {
+      if (pnp.student !== student) continue;
+      if (!groups.has(pnp.key)) groups.set(pnp.key, { displayTitle: pnp.displayTitle, files: [] });
+    }
+    for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n);
+    return { headshot, unassigned, projects: groups };
+  }
+
+  // ── Persistent project ordering ────────────────────────────────────
+  function orderedProjectKeys(student, groupMap) {
+    const order = projectOrder[student] || [];
+    const present = new Set(groupMap.keys());
+    const result = [];
+    for (const k of order) {
+      if (present.has(k) && !result.includes(k)) result.push(k);
+    }
+    for (const k of groupMap.keys()) {
+      if (!result.includes(k)) result.push(k);
+    }
+    return result;
+  }
+
+  function persistProjectOrder(student, keys) {
+    projectOrder[student] = keys;
+    pendingQueue = pendingQueue.filter(c => c.path !== ORDER_PATH);
+    pendingQueue.push({
+      path: ORDER_PATH,
+      content: b64encode(JSON.stringify(projectOrder, null, 2)),
+    });
+    updateSaveBtn();
+  }
+
+  function moveProject(student, projectKey, direction) {
+    const { projects: groupMap } = groupForStudent(student);
+    const keys = orderedProjectKeys(student, groupMap);
+    const idx = keys.indexOf(projectKey);
+    if (idx < 0) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= keys.length) return;
+    [keys[idx], keys[swapIdx]] = [keys[swapIdx], keys[idx]];
+    persistProjectOrder(student, keys);
+    renderDetail();
+  }
+
+  function nextNFor(student, projectKey) {
+    const existing = [];
+    for (const f of projects) {
+      if (!f.name.startsWith(`${student}_${projectKey}_`)) continue;
+      const m = f.name.match(/_(\d+)\.webp$/i);
+      if (m) existing.push(parseInt(m[1], 10));
+    }
+    for (const c of pendingQueue) {
+      if (!c.delete && c.path && c.path.startsWith(`${PR_DIR}/${student}_${projectKey}_`)) {
+        const m = c.path.match(/_(\d+)\.webp$/i);
+        if (m) existing.push(parseInt(m[1], 10));
+      }
+    }
+    return existing.length ? Math.max(...existing) + 1 : 1;
+  }
+
+  function allocateUntitledK(student) {
+    const used = new Set();
+    for (const f of projects) {
+      if (!f.name.startsWith(student + '_')) continue;
+      const m = f.name.match(new RegExp(`^${student.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}_Untitled(\\d+)_`));
+      if (m) used.add(parseInt(m[1], 10));
+    }
+    for (const pnp of pendingNewProjects) {
+      if (pnp.student !== student) continue;
+      const m = pnp.key.match(/^Untitled(\d+)$/);
+      if (m) used.add(parseInt(m[1], 10));
+    }
+    let k = 1;
+    while (used.has(k)) k++;
+    return k;
+  }
+
+  async function withLimit(tasks, limit = 6) {
+    const results = new Array(tasks.length);
+    let i = 0;
+    async function worker() {
+      while (i < tasks.length) {
+        const idx = i++;
+        results[idx] = await tasks[idx]();
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));
+    return results;
+  }
 
   // ── Manifest (ported from scripts/generate-manifest.mjs) ──────────
   function computeManifest(hsNames, prNames) {
@@ -582,9 +874,9 @@
     const parentCommit = await gh('GET', `/git/commits/${headSha}`);
     const baseTree = parentCommit.tree.sha;
 
-    // 3. Create blobs for new file content
-    const newBlobs = await Promise.all(
-      changes.filter(c => c.content).map(async c => ({
+    // 3. Create blobs for new file content (rate-limit concurrency)
+    const newBlobs = await withLimit(
+      changes.filter(c => c.content).map(c => async () => ({
         path: c.path,
         sha: await ghBlob(c.content),
       }))
@@ -674,7 +966,7 @@
     });
   }
 
-  async function doUpload(fileList, student, isHeadshot) {
+  async function doUploadToProject(fileList, student, isHeadshot, projectKey) {
     const total = fileList.length;
     let idx = 0;
     for (const file of fileList) {
@@ -688,7 +980,7 @@
       const counter = total > 1 ? `${idx}/${total} · ` : '';
       let workFile = file;
       try {
-        if (needsConvert) {
+        if (needsConvert && isImg) {
           showTask(`${counter}Converting`, file.name);
           workFile = await convertToWebP(file);
         }
@@ -699,16 +991,22 @@
 
         if (isHeadshot) {
           const path = `${HS_DIR}/${student}.webp`;
-          const entry = { name: workFile.name, sha: null, path, localUrl, isPending: true };
+          const entry = { name: `${student}.webp`, sha: null, path, localUrl, isPending: true };
           const i = headshots.findIndex(h => h.path === path);
           if (i >= 0) { if (headshots[i].localUrl) URL.revokeObjectURL(headshots[i].localUrl); headshots[i] = entry; }
           else headshots.push(entry);
           pendingQueue = pendingQueue.filter(c => c.path !== path);
           pendingQueue.push({ path, content: b64 });
+        } else if (projectKey) {
+          const n = nextNFor(student, projectKey);
+          const newName = `${student}_${projectKey}_${n}.webp`;
+          const path = `${PR_DIR}/${newName}`;
+          projects.push({ name: newName, sha: null, path, localUrl, isPending: true });
+          pendingQueue = pendingQueue.filter(c => c.path !== path);
+          pendingQueue.push({ path, content: b64 });
         } else {
-          const ext = workFile.name.toLowerCase().match(/\.[^.]+$/)?.[0] || '';
-          const suffix = workFile.name.slice(0, -ext.length).replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
-          const newName = `${student}_${suffix}${ext}`;
+          const n = nextNFor(student, 'Unassigned');
+          const newName = `${student}_Unassigned_${n}.webp`;
           const path = `${PR_DIR}/${newName}`;
           projects.push({ name: newName, sha: null, path, localUrl, isPending: true });
           pendingQueue = pendingQueue.filter(c => c.path !== path);
@@ -724,16 +1022,9 @@
     }
   }
 
-  function doRename(file, newSuffix) {
-    const ext = file.name.match(/\.[^.]+$/)?.[0] || '';
-    const newName = `${currentStudent}_${newSuffix}${ext}`;
-    const newPath = `${PR_DIR}/${newName}`;
-    if (newName === file.name) return;
-
+  function updateFileRename(file, newPath, newName) {
     const i = projects.findIndex(p => p.path === file.path);
     if (i >= 0) projects[i] = { ...projects[i], name: newName, path: newPath, isPending: true };
-
-    // If this was a staged upload, just update its path in the queue
     const stagedAdd = pendingQueue.find(c => c.path === file.path && c.content);
     if (stagedAdd) {
       stagedAdd.path = newPath;
@@ -742,8 +1033,250 @@
       pendingQueue.push({ path: file.path, delete: true });
       pendingQueue.push({ path: newPath, sha: file.sha });
     }
+  }
 
+  function doAssignToProject(file, toProjectKey) {
+    const n = nextNFor(currentStudent, toProjectKey);
+    const newName = `${currentStudent}_${toProjectKey}_${n}.webp`;
+    const newPath = `${PR_DIR}/${newName}`;
+    updateFileRename(file, newPath, newName);
     renderDetail(); updateSaveBtn();
+  }
+
+  function doUnassign(file) {
+    const n = nextNFor(currentStudent, 'Unassigned');
+    const newName = `${currentStudent}_Unassigned_${n}.webp`;
+    const newPath = `${PR_DIR}/${newName}`;
+    updateFileRename(file, newPath, newName);
+    renderDetail(); updateSaveBtn();
+  }
+
+  function doMoveInProject(file, projectKey, direction) {
+    const inProject = projects
+      .filter(f => {
+        const p = parseFilename(currentStudent, f.name);
+        return p.kind === 'project' && p.project === projectKey;
+      })
+      .sort((a, b) => {
+        const pA = parseFilename(currentStudent, a.name);
+        const pB = parseFilename(currentStudent, b.name);
+        return pA.n - pB.n;
+      });
+    const idx = inProject.findIndex(f => f.path === file.path);
+    if (idx < 0) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= inProject.length) return;
+    const fileA = inProject[idx];
+    const fileB = inProject[swapIdx];
+    const pA = parseFilename(currentStudent, fileA.name);
+    const pB = parseFilename(currentStudent, fileB.name);
+    const newNameA = `${currentStudent}_${projectKey}_${pB.n}.webp`;
+    const newNameB = `${currentStudent}_${projectKey}_${pA.n}.webp`;
+    updateFileRename(fileA, `${PR_DIR}/${newNameA}`, newNameA);
+    updateFileRename(fileB, `${PR_DIR}/${newNameB}`, newNameB);
+    renderDetail(); updateSaveBtn();
+  }
+
+  function reorderFileInProject(projectKey, draggedPath, targetPath) {
+    if (draggedPath === targetPath) return;
+    const inProject = projects
+      .filter(f => {
+        const p = parseFilename(currentStudent, f.name);
+        return p.kind === 'project' && p.project === projectKey;
+      })
+      .sort((a, b) => {
+        const pA = parseFilename(currentStudent, a.name);
+        const pB = parseFilename(currentStudent, b.name);
+        return pA.n - pB.n;
+      });
+    const dragIdx = inProject.findIndex(f => f.path === draggedPath);
+    const targetIdx = inProject.findIndex(f => f.path === targetPath);
+    if (dragIdx < 0 || targetIdx < 0) return;
+    const dragged = inProject[dragIdx];
+    const newOrder = inProject.filter(f => f.path !== draggedPath);
+    const insertAt = newOrder.findIndex(f => f.path === targetPath);
+    newOrder.splice(insertAt, 0, dragged);
+    // Compute final names first, then apply renames.
+    const plan = [];
+    newOrder.forEach((f, i) => {
+      const p = parseFilename(currentStudent, f.name);
+      const newN = i + 1;
+      if (p.n !== newN) {
+        const newName = `${currentStudent}_${projectKey}_${newN}.webp`;
+        plan.push({ file: f, newPath: `${PR_DIR}/${newName}`, newName });
+      }
+    });
+    for (const item of plan) updateFileRename(item.file, item.newPath, item.newName);
+    renderDetail(); updateSaveBtn();
+  }
+
+  function commitProjectRename(student, oldKey, newTitle) {
+    const sanitized = newTitle.trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
+    if (!sanitized || sanitized === oldKey) return;
+    if (/^(.+)_(\d+)$/.test(sanitized)) { alert('Project name cannot end with underscore followed by digits.'); return; }
+    const { projects: groupMap } = groupForStudent(student);
+    if (groupMap.has(sanitized)) { alert(`A project named "${sanitized}" already exists.`); return; }
+    const toRename = projects.filter(f => {
+      const p = parseFilename(student, f.name);
+      return p.kind === 'project' && p.project === oldKey;
+    });
+    for (const f of toRename) {
+      const p = parseFilename(student, f.name);
+      const newName = `${student}_${sanitized}_${p.n}.webp`;
+      updateFileRename(f, `${PR_DIR}/${newName}`, newName);
+    }
+    const pnp = pendingNewProjects.find(p => p.student === student && p.key === oldKey);
+    if (pnp) { pnp.key = sanitized; pnp.displayTitle = sanitized; }
+    if (projectOrder[student] && projectOrder[student].includes(oldKey)) {
+      persistProjectOrder(student, projectOrder[student].map(k => k === oldKey ? sanitized : k));
+    }
+    renderDetail(); updateSaveBtn();
+  }
+
+  function doDeleteProject(student, projectKey) {
+    const toDelete = projects.filter(f => {
+      const p = parseFilename(student, f.name);
+      return p.kind === 'project' && p.project === projectKey;
+    });
+    for (const f of toDelete) doDelete(f);
+    pendingNewProjects = pendingNewProjects.filter(p => !(p.student === student && p.key === projectKey));
+    if (projectOrder[student] && projectOrder[student].includes(projectKey)) {
+      persistProjectOrder(student, projectOrder[student].filter(k => k !== projectKey));
+    }
+    renderDetail(); updateSaveBtn();
+  }
+
+  function doNewProject(student) {
+    const k = allocateUntitledK(student);
+    const key = `Untitled${k}`;
+    pendingNewProjects.push({ student, key, displayTitle: 'Untitled' });
+    renderDetail();
+  }
+
+  function parseCSV(csv) {
+    const lines = csv.split('\n').filter(l => l.trim());
+    return lines.slice(1).map(line => {
+      const cols = [];
+      let cur = '', inQ = false;
+      for (const ch of line) {
+        if (ch === '"') inQ = !inQ;
+        else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else cur += ch;
+      }
+      cols.push(cur.trim());
+      return cols;
+    });
+  }
+
+  async function loadSheet() {
+    if (sheetCache) return sheetCache;
+    const resp = await fetch(SHEET_URL);
+    if (!resp.ok) throw new Error('Sheet fetch failed');
+    const csv = await resp.text();
+    const rows = parseCSV(csv);
+    sheetCache = rows.map(r => r[2]).filter(Boolean);
+    return sheetCache;
+  }
+
+  function slugToFullName(slug, names) {
+    const lower = slug.toLowerCase();
+    return names.find(n => n && n.split(' ')[0].toLowerCase() === lower) || null;
+  }
+
+  function appendRow(container, src, dest, warn) {
+    const row = document.createElement('div');
+    row.className = 'upl-row';
+    const srcEl = document.createElement('span');
+    srcEl.className = 'upl-src';
+    srcEl.textContent = src;
+    const arrow = document.createElement('span');
+    arrow.className = 'upl-arrow';
+    arrow.textContent = '→';
+    const destEl = document.createElement('span');
+    destEl.className = warn ? 'upl-dest upl-warn' : 'upl-dest';
+    destEl.textContent = dest;
+    row.append(srcEl, arrow, destEl);
+    container.appendChild(row);
+  }
+
+  function showUploadModal() {
+    $('uplRows').innerHTML = '';
+    $('uplStatus').textContent = '';
+    $('uploadModal').removeAttribute('hidden');
+  }
+  function hideUploadModal() { $('uploadModal').setAttribute('hidden', ''); }
+
+  async function processMassUpload(fileList) {
+    const files = Array.from(fileList);
+    const rowsEl = $('uplRows');
+    const statusEl2 = $('uplStatus');
+    rowsEl.innerHTML = '';
+    statusEl2.textContent = `Processing 0/${files.length}…`;
+
+    let names = null;
+    try { names = await loadSheet(); } catch { /* fallback */ }
+
+    const batchNextN = new Map();
+
+    const processOne = async (file, idx) => {
+      statusEl2.textContent = `Processing ${idx + 1}/${files.length}…`;
+      const lower = file.name.toLowerCase();
+      const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
+      if (!isImg) { appendRow(rowsEl, file.name, '⚠ unsupported file type', true); return; }
+
+      let workFile = file;
+      try {
+        if (/\.(jpg|jpeg|png)$/.test(lower)) workFile = await convertToWebP(file);
+      } catch(e) {
+        appendRow(rowsEl, file.name, `⚠ conversion failed: ${e.message}`, true);
+        return;
+      }
+
+      const stem = workFile.name.replace(/\.webp$/i, '');
+      const underIdx = stem.indexOf('_');
+      const slug = underIdx > 0 ? stem.slice(0, underIdx) : stem;
+      const studentMatch = studentNames().find(s => s.toLowerCase() === slug.toLowerCase());
+      if (!studentMatch) {
+        appendRow(rowsEl, file.name, `⚠ no matching student (${slug})`, true);
+        return;
+      }
+
+      const displayName = (names && slugToFullName(slug, names)) || studentMatch;
+
+      if (underIdx < 0) {
+        // Headshot
+        const b64 = await fileToBase64(workFile);
+        const localUrl = URL.createObjectURL(workFile);
+        const path = `${HS_DIR}/${studentMatch}.webp`;
+        const entry = { name: `${studentMatch}.webp`, sha: null, path, localUrl, isPending: true };
+        const i = headshots.findIndex(h => h.path === path);
+        if (i >= 0) { if (headshots[i].localUrl) URL.revokeObjectURL(headshots[i].localUrl); headshots[i] = entry; }
+        else headshots.push(entry);
+        pendingQueue = pendingQueue.filter(c => c.path !== path);
+        pendingQueue.push({ path, content: b64 });
+        appendRow(rowsEl, file.name, `${displayName}'s Headshot`);
+      } else {
+        let projectKey = stem.slice(underIdx + 1).replace(/_\d+$/, '') || stem.slice(underIdx + 1);
+        if (!projectKey) projectKey = 'Unassigned';
+        const batchKey = `${studentMatch}|${projectKey}`;
+        if (!batchNextN.has(batchKey)) batchNextN.set(batchKey, nextNFor(studentMatch, projectKey));
+        const n = batchNextN.get(batchKey);
+        batchNextN.set(batchKey, n + 1);
+        const newName = `${studentMatch}_${projectKey}_${n}.webp`;
+        const path = `${PR_DIR}/${newName}`;
+        const b64 = await fileToBase64(workFile);
+        const localUrl = URL.createObjectURL(workFile);
+        projects.push({ name: newName, sha: null, path, localUrl, isPending: true });
+        pendingQueue = pendingQueue.filter(c => c.path !== path);
+        pendingQueue.push({ path, content: b64 });
+        appendRow(rowsEl, file.name, `${displayName} · ${projectKey}`);
+      }
+      updateSaveBtn();
+    };
+
+    await withLimit(files.map((f, i) => () => processOne(f, i)), 4);
+    statusEl2.textContent = `Done — ${files.length} file${files.length !== 1 ? 's' : ''} processed`;
+    renderSidebar(); renderDetail(); updateSaveBtn();
   }
 
   function doDelete(file) {
@@ -783,6 +1316,7 @@
     try {
       await atomicCommit(pendingQueue, 'batch update');
       pendingQueue = [];
+      pendingNewProjects = [];
       finishTask('Saved ✓', '');
       await refresh();
     } catch(e) {
@@ -795,6 +1329,7 @@
       if (f.localUrl) URL.revokeObjectURL(f.localUrl);
     }
     pendingQueue = [];
+    pendingNewProjects = [];
     await refresh();
   }
 
@@ -817,7 +1352,7 @@
     for (const name of studentNames()) {
       const btn = document.createElement('button');
       btn.className = 'student-btn' + (name === currentStudent ? ' active' : '');
-      btn.textContent = name;
+      btn.textContent = displayNameFor(name);
       btn.addEventListener('click', () => selectStudent(name));
       sidebarEl.appendChild(btn);
     }
@@ -832,31 +1367,159 @@
   function renderDetail() {
     detailEl.innerHTML = '';
     if (!currentStudent) { detailEl.innerHTML = '<p class="hint">Select a student</p>'; return; }
-    const hs = headshotFor(currentStudent);
-    const projs = projectsFor(currentStudent);
-    detailEl.appendChild(makeSection('Headshot', hs ? [hs] : [], true));
-    detailEl.appendChild(makeSection('Projects', projs, false));
+
+    const { headshot, unassigned, projects: groupMap } = groupForStudent(currentStudent);
+
+    // Headshot section
+    const hsSec = document.createElement('section');
+    hsSec.className = 'detail-section';
+    const hsH2 = document.createElement('h2');
+    hsH2.textContent = 'Headshot';
+    hsSec.appendChild(hsH2);
+    const hsGrid = document.createElement('div');
+    hsGrid.className = 'file-grid';
+    if (headshot) {
+      hsGrid.appendChild(makeCard(headshot, 'headshot', null, null));
+    } else {
+      const addBox = document.createElement('div');
+      addBox.className = 'add-headshot';
+      const lbl = document.createElement('span');
+      lbl.textContent = '+ Add a headshot';
+      addBox.appendChild(lbl);
+      addBox.addEventListener('click', () => {
+        const inp = Object.assign(document.createElement('input'), {
+          type: 'file', accept: '.webp,.jpg,.jpeg,.png',
+        });
+        inp.addEventListener('change', () => doUploadToProject(inp.files, currentStudent, true, null));
+        inp.click();
+      });
+      hsGrid.appendChild(addBox);
+    }
+    hsSec.appendChild(hsGrid);
+    detailEl.appendChild(hsSec);
+
+    // Unassigned section (only shown when there are unassigned files)
+    if (unassigned.length > 0) {
+      const unaSec = document.createElement('section');
+      unaSec.className = 'detail-section';
+      const unaH2 = document.createElement('h2');
+      unaH2.textContent = `Unassigned (${unassigned.length})`;
+      unaSec.appendChild(unaH2);
+      const unaGrid = document.createElement('div');
+      unaGrid.className = 'file-grid';
+      unassigned.forEach(f => unaGrid.appendChild(makeCard(f, 'unassigned', null, null)));
+      unaSec.appendChild(unaGrid);
+      detailEl.appendChild(unaSec);
+    }
+
+    // Project sections (in persisted order)
+    for (const projectKey of orderedProjectKeys(currentStudent, groupMap)) {
+      const { displayTitle, files } = groupMap.get(projectKey);
+      const sec = document.createElement('section');
+      sec.className = 'detail-section project-section';
+      sec.dataset.projectKey = projectKey;
+
+      const hdr = document.createElement('div');
+      hdr.className = 'project-hdr';
+
+      // Collapse toggle
+      const collapseBtn = document.createElement('button');
+      collapseBtn.className = 'collapse-btn';
+      collapseBtn.type = 'button';
+      collapseBtn.textContent = '▾';
+      collapseBtn.title = 'Collapse / expand';
+      collapseBtn.addEventListener('click', () => {
+        const collapsed = sec.classList.toggle('collapsed');
+        collapseBtn.textContent = collapsed ? '▸' : '▾';
+      });
+
+      // Drag handle
+      const handle = document.createElement('span');
+      handle.className = 'drag-handle';
+      handle.textContent = '⠿';
+      handle.title = 'Drag to reorder project';
+      handle.setAttribute('draggable', 'true');
+      handle.addEventListener('dragstart', e => {
+        draggedProjectKey = projectKey;
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      handle.addEventListener('dragend', () => { draggedProjectKey = null; });
+
+      const titleInput = document.createElement('input');
+      titleInput.className = 'project-title';
+      titleInput.type = 'text';
+      titleInput.value = displayTitle;
+      titleInput.title = 'Click to rename project';
+      let prevTitle = displayTitle;
+      titleInput.addEventListener('focus', () => { prevTitle = titleInput.value; });
+      titleInput.addEventListener('blur', () => {
+        const v = titleInput.value.trim();
+        if (v && v !== prevTitle) commitProjectRename(currentStudent, projectKey, v);
+        else titleInput.value = prevTitle;
+      });
+      titleInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') titleInput.blur();
+        if (e.key === 'Escape') { titleInput.value = prevTitle; titleInput.blur(); }
+      });
+
+      const count = document.createElement('span');
+      count.className = 'project-count';
+      count.textContent = `${files.length} image${files.length !== 1 ? 's' : ''}`;
+
+      const upBtn = mkBtn('↑', () => moveProject(currentStudent, projectKey, 'up'));
+      const downBtn = mkBtn('↓', () => moveProject(currentStudent, projectKey, 'down'));
+
+      const delBtn = mkBtn('× Delete Project', () =>
+        showModal(
+          `Delete project "${displayTitle}"?`,
+          `This will permanently delete all ${files.length} image${files.length !== 1 ? 's' : ''} in this project.`,
+          () => doDeleteProject(currentStudent, projectKey)
+        )
+      );
+      delBtn.classList.add('act-del');
+
+      hdr.append(collapseBtn, handle, titleInput, count, upBtn, downBtn, delBtn);
+      sec.appendChild(hdr);
+
+      // Section drag-and-drop reorder
+      sec.addEventListener('dragover', e => {
+        if (draggedProjectKey == null || draggedProjectKey === projectKey) return;
+        e.preventDefault();
+        sec.classList.add('drag-over');
+      });
+      sec.addEventListener('dragleave', () => sec.classList.remove('drag-over'));
+      sec.addEventListener('drop', e => {
+        if (draggedProjectKey == null || draggedProjectKey === projectKey) return;
+        e.preventDefault();
+        sec.classList.remove('drag-over');
+        const keys = orderedProjectKeys(currentStudent, groupMap)
+          .filter(k => k !== draggedProjectKey);
+        const insertAt = keys.indexOf(projectKey);
+        keys.splice(insertAt < 0 ? keys.length : insertAt, 0, draggedProjectKey);
+        persistProjectOrder(currentStudent, keys);
+        renderDetail();
+      });
+
+      const grid = document.createElement('div');
+      grid.className = 'file-grid';
+      files.forEach((f, idx) => grid.appendChild(makeCard(f, 'project', projectKey, idx + 1)));
+      grid.appendChild(makeDropZone(projectKey, false));
+      sec.appendChild(grid);
+      detailEl.appendChild(sec);
+    }
+
+    // + New project button
+    const newProjBtn = document.createElement('button');
+    newProjBtn.className = 'new-project-btn';
+    newProjBtn.textContent = '+ New Project';
+    newProjBtn.addEventListener('click', () => doNewProject(currentStudent));
+    detailEl.appendChild(newProjBtn);
   }
 
-  function makeSection(title, files, isHeadshot) {
-    const sec = document.createElement('section');
-    sec.className = 'detail-section';
-    const h = document.createElement('h2');
-    h.textContent = title;
-    sec.appendChild(h);
-    const grid = document.createElement('div');
-    grid.className = 'file-grid';
-    files.forEach(f => grid.appendChild(makeCard(f, isHeadshot)));
-    if (!isHeadshot) grid.appendChild(makeDropZone());
-    sec.appendChild(grid);
-    return sec;
-  }
-
-  function makeCard(file, isHeadshot) {
+  function makeCard(file, context, projectKey, seqN) {
     const card = document.createElement('div');
     card.className = 'file-card' + (file.isPending ? ' pending' : '');
 
-    // Thumb
     const thumb = document.createElement('div');
     thumb.className = 'thumb';
     const lower = file.name.toLowerCase();
@@ -869,32 +1532,78 @@
       thumb.classList.add('loading');
       thumb.appendChild(img);
       loadThumb(file)
-        .then(url => { img.src = url; thumb.classList.remove('loading'); })
+        .then(url => {
+          img.onload = () => {
+            thumb.classList.remove('loading');
+            if (img.naturalHeight > img.naturalWidth) {
+              thumb.classList.add('portrait');
+            } else {
+              thumb.classList.add('landscape');
+            }
+          };
+          img.onerror = () => { thumb.classList.remove('loading'); };
+          img.src = url;
+        })
         .catch(() => { thumb.classList.remove('loading'); });
+    }
+    if (seqN !== null) {
+      const badge = document.createElement('span');
+      badge.className = 'seq-num';
+      badge.textContent = seqN;
+      thumb.appendChild(badge);
     }
     card.appendChild(thumb);
 
-    // Filename
     const fn = document.createElement('span');
     fn.className = 'filename';
     fn.textContent = file.name;
     card.appendChild(fn);
 
-    // Actions
     const acts = document.createElement('div');
     acts.className = 'actions';
 
-    if (isHeadshot) {
+    if (context === 'headshot') {
       const replBtn = mkBtn('⟲ Replace', () => {
         const inp = Object.assign(document.createElement('input'), {
           type: 'file', accept: '.webp,.jpg,.jpeg,.png',
         });
-        inp.addEventListener('change', () => doUpload(inp.files, currentStudent, true));
+        inp.addEventListener('change', () => doUploadToProject(inp.files, currentStudent, true, null));
         inp.click();
       });
       acts.appendChild(replBtn);
-    } else {
-      acts.appendChild(mkBtn('✎ Rename', () => startRename(file, fn)));
+    } else if (context === 'unassigned') {
+      acts.appendChild(makeAssignSelect(file));
+    } else if (context === 'project') {
+      acts.appendChild(mkBtn('↑', () => doMoveInProject(file, projectKey, 'up')));
+      acts.appendChild(mkBtn('↓', () => doMoveInProject(file, projectKey, 'down')));
+      acts.appendChild(mkBtn('Unassign', () => doUnassign(file)));
+
+      // Drag-and-drop reorder within the project
+      card.setAttribute('draggable', 'true');
+      card.dataset.filePath = file.path;
+      card.addEventListener('dragstart', e => {
+        draggedFilePath = file.path;
+        draggedFileProjectKey = projectKey;
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('dragend', () => {
+        draggedFilePath = null;
+        draggedFileProjectKey = null;
+      });
+      card.addEventListener('dragover', e => {
+        if (draggedFilePath == null || draggedFileProjectKey !== projectKey) return;
+        if (draggedFilePath === file.path) return;
+        e.preventDefault();
+        card.classList.add('card-drop-target');
+      });
+      card.addEventListener('dragleave', () => card.classList.remove('card-drop-target'));
+      card.addEventListener('drop', e => {
+        if (draggedFilePath == null || draggedFileProjectKey !== projectKey) return;
+        if (draggedFilePath === file.path) return;
+        e.preventDefault();
+        card.classList.remove('card-drop-target');
+        reorderFileInProject(projectKey, draggedFilePath, file.path);
+      });
     }
 
     const del = mkBtn('× Delete', () =>
@@ -906,6 +1615,39 @@
     return card;
   }
 
+  function makeAssignSelect(file) {
+    const { projects: groupMap } = groupForStudent(currentStudent);
+    const sel = document.createElement('select');
+    sel.className = 'assign-sel';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Assign to…';
+    sel.appendChild(placeholder);
+    for (const [key, { displayTitle }] of groupMap) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = displayTitle;
+      sel.appendChild(opt);
+    }
+    const newOpt = document.createElement('option');
+    newOpt.value = '__new__';
+    newOpt.textContent = 'New project…';
+    sel.appendChild(newOpt);
+    sel.addEventListener('change', () => {
+      const val = sel.value;
+      if (!val) return;
+      if (val === '__new__') {
+        const k = allocateUntitledK(currentStudent);
+        const key = `Untitled${k}`;
+        pendingNewProjects.push({ student: currentStudent, key, displayTitle: 'Untitled' });
+        doAssignToProject(file, key);
+      } else {
+        doAssignToProject(file, val);
+      }
+    });
+    return sel;
+  }
+
   function mkBtn(label, onClick) {
     const b = document.createElement('button');
     b.className = 'act-btn';
@@ -914,43 +1656,7 @@
     return b;
   }
 
-  function startRename(file, fnEl) {
-    const ext = file.name.match(/\.[^.]+$/)?.[0] || '';
-    const prefix = currentStudent + '_';
-    const currentSuffix = file.name.slice(prefix.length, file.name.length - ext.length);
-
-    const wrap = document.createElement('div');
-    wrap.className = 'rename-wrap';
-    const pre = document.createElement('span');
-    pre.className = 'rename-prefix';
-    pre.textContent = prefix;
-    const inp = document.createElement('input');
-    inp.className = 'rename-input';
-    inp.type = 'text';
-    inp.value = currentSuffix;
-    wrap.append(pre, inp);
-    fnEl.replaceWith(wrap);
-
-    const card = wrap.closest('.file-card');
-    const acts = card.querySelector('.actions');
-    const okBtn = mkBtn('✓', commit);
-    const noBtn = mkBtn('✕', cancel);
-    acts.prepend(noBtn, okBtn);
-
-    function cancel() { wrap.replaceWith(fnEl); okBtn.remove(); noBtn.remove(); }
-    function commit() {
-      const newSuffix = inp.value.trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
-      cancel();
-      if (newSuffix) doRename(file, newSuffix);
-    }
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') commit();
-      if (e.key === 'Escape') cancel();
-    });
-    inp.focus(); inp.select();
-  }
-
-  function makeDropZone() {
+  function makeDropZone(projectKey, isHeadshot) {
     const zone = document.createElement('div');
     zone.className = 'drop-zone';
     const lbl = document.createElement('span');
@@ -958,19 +1664,19 @@
     zone.appendChild(lbl);
 
     const inp = Object.assign(document.createElement('input'), {
-      type: 'file', multiple: true,
-      accept: '.jpg,.jpeg,.png,.webp,.mp4,.webm',
+      type: 'file', multiple: !isHeadshot,
+      accept: '.jpg,.jpeg,.png,.webp' + (isHeadshot ? '' : ',.mp4,.webm'),
       style: 'display:none',
     });
     zone.appendChild(inp);
 
     zone.addEventListener('click', e => { if (e.target !== inp) inp.click(); });
-    inp.addEventListener('change', () => doUpload(inp.files, currentStudent, false));
+    inp.addEventListener('change', () => doUploadToProject(inp.files, currentStudent, isHeadshot, projectKey));
     zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
     zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
     zone.addEventListener('drop', e => {
       e.preventDefault(); zone.classList.remove('drag-over');
-      doUpload(e.dataTransfer.files, currentStudent, false);
+      doUploadToProject(e.dataTransfer.files, currentStudent, isHeadshot, projectKey);
     });
     return zone;
   }
@@ -1023,6 +1729,20 @@
 
   $('saveBtn').addEventListener('click', doSave);
   $('discardBtn').addEventListener('click', doDiscard);
+
+  $('uploadBtn').addEventListener('click', showUploadModal);
+  $('uploadClose').addEventListener('click', hideUploadModal);
+  $('uploadDone').addEventListener('click', hideUploadModal);
+
+  const uplDropEl = $('uplDrop');
+  const uplPickerEl = $('uplPicker');
+  uplPickerEl.addEventListener('change', () => processMassUpload(uplPickerEl.files));
+  uplDropEl.addEventListener('dragover', e => { e.preventDefault(); uplDropEl.classList.add('drag-over'); });
+  uplDropEl.addEventListener('dragleave', () => uplDropEl.classList.remove('drag-over'));
+  uplDropEl.addEventListener('drop', e => {
+    e.preventDefault(); uplDropEl.classList.remove('drag-over');
+    processMassUpload(e.dataTransfer.files);
+  });
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);

@@ -54,13 +54,46 @@
   }
 
   .student-img {
-    position: fixed;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none;
     display: block;
     width: auto;
     height: clamp(280px, 55vh, 620px);
+    -webkit-user-drag: none;
+  }
+
+  /* Wrapper for each floating project image — label stacked above, both fixed */
+  .float-wrap {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    pointer-events: none;
+    user-select: none;
+    visibility: hidden;
+  }
+
+  .label {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0 2px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -0.12em;
+    text-transform: uppercase;
+  }
+  .label-headshot { background: #FC1233; color: #000; }
+  .label-project  { background: #000;    color: #fff; }
+
+  /* Central headshot name label — JS-positioned to match the image's left edge */
+  #headshotLabel {
+    position: fixed;
+    z-index: 5;
+    pointer-events: none;
+    visibility: hidden;
   }
 
   .media-wrap {
@@ -159,6 +192,8 @@
     <a href="/index/">[INDEX]</a>
   </nav>
 
+  <div class="label label-headshot" id="headshotLabel" aria-hidden="true"></div>
+
   <script>
   (() => {
     // __MANIFEST_START__
@@ -217,6 +252,20 @@
     const SPAWN_INTERVAL_MS = 180;
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+    // Load full names from the sheet so headshot labels show e.g. "Anand Macwan".
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+    const fullNames = new Map(); // firstName → full name
+    fetch(SHEET_URL + '&t=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.ok ? r.text() : '')
+      .then(text => {
+        for (const line of text.split(/\r?\n/)) {
+          const parts = line.split(',');
+          const raw = (parts[2] || '').replace(/^"|"$/g, '').trim();
+          if (raw) fullNames.set(raw.split(/\s+/)[0], raw);
+        }
+      })
+      .catch(() => {});
 
     // Warm cache for every headshot and every project file.
     STUDENTS.forEach(name => {
@@ -278,6 +327,15 @@
         activeIdx = nextIdx;
         for (const el of placed) el.remove();
         placed.clear();
+        // Position the name label at the top-left of the now-visible headshot.
+        const labelEl = document.getElementById('headshotLabel');
+        if (labelEl) requestAnimationFrame(() => {
+          const r = nextImg.getBoundingClientRect();
+          labelEl.style.left = r.left + 'px';
+          labelEl.style.top = r.top + 'px';
+          labelEl.textContent = fullNames.get(name) || name;
+          labelEl.style.visibility = 'visible';
+        });
       };
 
       const onerror = () => {
@@ -303,6 +361,12 @@
     const active = new Set();
     const placed = new Set();
 
+    function projectLabelFor(student, file) {
+      const stem = file.replace(/\.webp$/i, '').replace(new RegExp('^' + student + '_'), '');
+      const m = stem.match(/^(.+)_\d+$/);
+      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ');
+    }
+
     function spawn() {
       if (!currentStudent) return;
       if (projectQueue.length === 0) return;
@@ -314,15 +378,23 @@
 
       const file = projectQueue.pop();
 
+      const wrap = document.createElement('div');
+      wrap.className = 'float-wrap';
+      wrap.style.zIndex = zIndex;
+
+      const lbl = document.createElement('div');
+      lbl.className = 'label label-project';
+      lbl.textContent = projectLabelFor(currentStudent, file);
+      wrap.appendChild(lbl);
+
       const img = document.createElement('img');
       img.className = 'student-img';
       img.src = enc(`/Student Work/Projects/${file}`);
       img.alt = '';
-      img.style.zIndex = zIndex;
-      img.style.visibility = 'hidden';
+      wrap.appendChild(img);
 
       const place = () => {
-        active.delete(img);
+        active.delete(wrap);
         const W = window.innerWidth, H = window.innerHeight;
         const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)));
         const w = img.naturalHeight > 0
@@ -356,19 +428,19 @@
           tries++;
         } while (!ok(x, y) && tries < 20);
 
-        img.style.left = x + 'px';
-        img.style.top = y + 'px';
-        img.style.visibility = 'visible';
-        placed.add(img);
+        wrap.style.left = x + 'px';
+        wrap.style.top = y + 'px';
+        wrap.style.visibility = 'visible';
+        placed.add(wrap);
       };
       img.addEventListener('load', place, { once: true });
       img.addEventListener('error', () => {
-        img.remove();
-        active.delete(img);
+        wrap.remove();
+        active.delete(wrap);
       }, { once: true });
 
-      document.body.appendChild(img);
-      active.add(img);
+      document.body.appendChild(wrap);
+      active.add(wrap);
     }
 
     requestAnimationFrame(() => {
@@ -384,6 +456,12 @@
         active.clear();
         for (const el of placed) el.remove();
         placed.clear();
+        const labelEl = document.getElementById('headshotLabel');
+        if (labelEl && currentStudent) requestAnimationFrame(() => {
+          const r = imgs[activeIdx].getBoundingClientRect();
+          labelEl.style.left = r.left + 'px';
+          labelEl.style.top = r.top + 'px';
+        });
       }, 120);
     });
 
