@@ -139,7 +139,7 @@
   .headshot-grid {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: clamp(0.5rem, 1vw, 1rem);
   }
 
@@ -183,13 +183,7 @@
     display: block;
   }
 
-  @media (max-width: 900px) {
-    .headshot-grid { grid-template-columns: repeat(4, 1fr); }
-  }
-
   @media (max-width: 560px) {
-    /* 5 columns instead of 3 renders each headshot at 0.6x. */
-    .headshot-grid { grid-template-columns: repeat(5, 1fr); }
     .student-list a,
     .student-list .row { gap: 1rem; }
   }

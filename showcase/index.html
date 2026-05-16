@@ -299,7 +299,8 @@
     let activeIdx = 0;            // which img element currently has .active
     let currentStudent = null;    // drives the background spawn pool
     let projectQueue = [];        // shuffled remaining projects for current student
-    const recentStudents = [];
+    let studentBag = [];          // shuffle bag — every student shown once per cycle
+    let lastStudent = null;
     const brokenStudents = new Set();
 
     function shuffled(arr) {
@@ -311,16 +312,27 @@
       return a;
     }
 
-    function pickStudent() {
+    // Shuffle-bag picker: every student appears exactly once before anyone
+    // repeats. When the bag empties it is reshuffled for a fresh cycle, and
+    // the seam is nudged so the same student never shows twice back-to-back
+    // across a cycle boundary.
+    function refillBag() {
       const eligible = STUDENTS.filter(n => !brokenStudents.has(n));
-      if (eligible.length === 0) return null;
-      const pool = eligible.filter(n => !recentStudents.includes(n));
-      const list = pool.length ? pool : eligible;
-      const name = list[Math.floor(Math.random() * list.length)];
-      recentStudents.push(name);
-      const window_ = Math.min(8, eligible.length - 1);
-      while (recentStudents.length > window_) recentStudents.shift();
-      return name;
+      const bag = shuffled(eligible);
+      if (bag.length > 1 && bag[bag.length - 1] === lastStudent) {
+        [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+      }
+      studentBag = bag;
+    }
+
+    function pickStudent() {
+      for (let guard = 0; guard <= STUDENTS.length; guard++) {
+        if (studentBag.length === 0) refillBag();
+        if (studentBag.length === 0) return null;
+        const name = studentBag.pop();
+        if (!brokenStudents.has(name)) { lastStudent = name; return name; }
+      }
+      return null;
     }
 
     function swapHeadshot() {
