@@ -433,10 +433,10 @@
         const hsArea = hs.width * hs.height;
 
         const ok = (x, y) => {
-          // At least 70% of the image must be within the viewport
+          // At least 80% of the image's area must be within the viewport
           const visW = Math.max(0, Math.min(x + w, W) - Math.max(x, 0));
           const visH = Math.max(0, Math.min(y + renderedH, H) - Math.max(y, 0));
-          if (visW * visH < 0.7 * w * renderedH) return false;
+          if (visW * visH < 0.8 * w * renderedH) return false;
           // Must not overlap the top half of the headshot
           if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
           // Must not cover more than 30% of the headshot
@@ -445,16 +445,18 @@
           return ow * oh <= 0.3 * hsArea;
         };
 
-        // Sample from a range that allows up to 30% of the image off-screen on any edge
-        const xMin = -Math.round(w * 0.3), xMax = W - Math.round(w * 0.7);
-        const yMin = -Math.round(renderedH * 0.3), yMax = H - Math.round(renderedH * 0.7);
+        // Sample from a range that allows up to 20% of the image off-screen on any edge
+        const xMin = -Math.round(w * 0.2), xMax = W - Math.round(w * 0.8);
+        const yMin = -Math.round(renderedH * 0.2), yMax = H - Math.round(renderedH * 0.8);
 
-        let x, y, tries = 0;
-        do {
+        let x = 0, y = 0, found = false;
+        for (let tries = 0; tries < 40; tries++) {
           x = Math.round(xMin + Math.random() * (xMax - xMin));
           y = Math.round(yMin + Math.random() * (yMax - yMin));
-          tries++;
-        } while (!ok(x, y) && tries < 20);
+          if (ok(x, y)) { found = true; break; }
+        }
+        // Guarantee: only display images that land at least 80% in frame.
+        if (!found) { wrap.remove(); return; }
 
         wrap.style.left = x + 'px';
         wrap.style.top = y + 'px';
