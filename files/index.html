@@ -1070,20 +1070,66 @@
     taskHideTimer = setTimeout(() => taskBarEl.setAttribute('hidden', ''), isError ? 4500 : 1800);
   }
 
-  // ── Image → WebP conversion (browser canvas, handles JPEG + PNG) ──
-  function convertToWebP(file, quality = 0.92) {
+  // ── Image compression + WebP conversion ───────────────────────────
+  // Downscales an image to ~1.2× the largest height it is ever displayed
+  // at on the site (headshots vs project images), then encodes to WebP.
+  // Large downscales are done by repeated halving so fine detail is not
+  // lost to aliasing. Aspect ratio is preserved (no distortion); a WebP
+  // already within size is passed through untouched to avoid re-encoding.
+  const COMPRESS_FACTOR = 1.2;
+  const WEBP_QUALITY = 0.92;
+  // Largest height (CSS px) each image type reaches on the public site.
+  const MAX_DISPLAY_H = { headshot: 744, project: 620 };
+  const TARGET_H = {
+    headshot: Math.round(MAX_DISPLAY_H.headshot * COMPRESS_FACTOR),
+    project:  Math.round(MAX_DISPLAY_H.project  * COMPRESS_FACTOR),
+  };
+
+  function compressImage(file, maxHeight, quality = WEBP_QUALITY) {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext('2d').drawImage(img, 0, 0);
-        canvas.toBlob(blob => {
+        const sw = img.naturalWidth, sh = img.naturalHeight;
+        const needsResize = sh > maxHeight;
+        // An already-WebP file within size is left as-is — re-encoding
+        // would only add generational quality loss.
+        if (/\.webp$/i.test(file.name) && !needsResize) {
           URL.revokeObjectURL(url);
-          if (!blob) return reject(new Error('WebP encoding failed'));
-          const newName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+          resolve(file);
+          return;
+        }
+        const scale = needsResize ? maxHeight / sh : 1;
+        const tw = Math.max(1, Math.round(sw * scale));
+        const th = Math.max(1, Math.round(sh * scale));
+        // Step down by halving until within 2× of the target — a single
+        // large-ratio drawImage aliases fine detail; halving does not.
+        let cur = document.createElement('canvas');
+        cur.width = sw; cur.height = sh;
+        cur.getContext('2d').drawImage(img, 0, 0);
+        let cw = sw, ch = sh;
+        while (cw >= tw * 2 && ch >= th * 2) {
+          const nw = Math.max(tw, cw >> 1), nh = Math.max(th, ch >> 1);
+          const step = document.createElement('canvas');
+          step.width = nw; step.height = nh;
+          const sctx = step.getContext('2d');
+          sctx.imageSmoothingEnabled = true;
+          sctx.imageSmoothingQuality = 'high';
+          sctx.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
+          cur.width = cur.height = 0;  // free the previous canvas immediately
+          cur = step; cw = nw; ch = nh;
+        }
+        const out = document.createElement('canvas');
+        out.width = tw; out.height = th;
+        const octx = out.getContext('2d');
+        octx.imageSmoothingEnabled = true;
+        octx.imageSmoothingQuality = 'high';
+        octx.drawImage(cur, 0, 0, cw, ch, 0, 0, tw, th);
+        cur.width = cur.height = 0;
+        out.toBlob(blob => {
+          URL.revokeObjectURL(url);
+          if (!blob) { reject(new Error('WebP encoding failed')); return; }
+          const newName = file.name.replace(/\.(jpe?g|png|webp)$/i, '.webp');
           resolve(new File([blob], newName, { type: 'image/webp' }));
         }, 'image/webp', quality);
       };
@@ -1098,17 +1144,16 @@
     for (const file of fileList) {
       idx++;
       const lower = file.name.toLowerCase();
-      const needsConvert = /\.(jpg|jpeg|png)$/.test(lower);
-      const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
+      const isImg = /\.(jpe?g|png|webp)$/.test(lower);
       const isVid = /\.(mp4|webm)$/.test(lower);
       if (!isImg && !isVid) { alert(`Unsupported file type: ${file.name}`); continue; }
 
       const counter = total > 1 ? `${idx}/${total} · ` : '';
       let workFile = file;
       try {
-        if (needsConvert && isImg) {
-          showTask(`${counter}Converting`, file.name);
-          workFile = await convertToWebP(file);
+        if (isImg) {
+          showTask(`${counter}Compressing`, file.name);
+          workFile = await compressImage(file, isHeadshot ? TARGET_H.headshot : TARGET_H.project);
         }
 
         showTask(`${counter}Reading`, workFile.name);
@@ -1339,14 +1384,18 @@
     const processOne = async (file, idx) => {
       statusEl2.textContent = `Processing ${idx + 1}/${files.length}…`;
       const lower = file.name.toLowerCase();
-      const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
+      const isImg = /\.(jpe?g|png|webp)$/.test(lower);
       if (!isImg) { appendRow(rowsEl, file.name, '⚠ unsupported file type', true); return; }
+
+      // Headshot vs project — decided by the underscore in the original name.
+      const origStem = file.name.replace(/\.(jpe?g|png|webp)$/i, '');
+      const isHeadshot = origStem.indexOf('_') < 0;
 
       let workFile = file;
       try {
-        if (/\.(jpg|jpeg|png)$/.test(lower)) workFile = await convertToWebP(file);
+        workFile = await compressImage(file, isHeadshot ? TARGET_H.headshot : TARGET_H.project);
       } catch(e) {
-        appendRow(rowsEl, file.name, `⚠ conversion failed: ${e.message}`, true);
+        appendRow(rowsEl, file.name, `⚠ compression failed: ${e.message}`, true);
         return;
       }
 
