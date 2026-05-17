@@ -535,6 +535,7 @@
       <span id="status"></span>
       <button class="discard-btn" id="subBtn">Submissions</button>
       <button class="discard-btn" id="uploadBtn">Upload</button>
+      <button class="discard-btn" id="compressBtn">Compress</button>
       <button class="discard-btn" id="discardBtn" hidden>Discard</button>
       <button class="save-btn" id="saveBtn" hidden>Save</button>
       <button class="sign-out-btn" id="signOut">Sign out</button>
@@ -1446,6 +1447,52 @@
     renderSidebar(); renderDetail(); updateSaveBtn();
   }
 
+  // Re-compress every committed image already in the library: fetch each
+  // blob, run it through the same compressor, and stage any that shrink.
+  // Nothing is committed until the user hits Save.
+  async function compressLibrary() {
+    const staged = new Set(pendingQueue.map(c => c.path));
+    const items = [...headshots, ...projects].filter(
+      f => f.sha && !/\.url$/i.test(f.name) && !staged.has(f.path)
+    );
+    showTask('Compressing library…', items.length ? `0/${items.length}` : '');
+    if (!items.length) { finishTask('Nothing to compress', ''); return; }
+
+    let done = 0, changed = 0, failed = 0;
+    const tasks = items.map(file => async () => {
+      try {
+        const maxH = file.path.startsWith(HS_DIR + '/') ? TARGET_H.headshot : TARGET_H.project;
+        const data = await gh('GET', `/git/blobs/${file.sha}`);
+        const bytes = Uint8Array.from(atob(data.content.replace(/\n/g, '')), c => c.charCodeAt(0));
+        const inputFile = new File([bytes], file.name, { type: 'image/webp' });
+        const out = await compressImage(inputFile, maxH);
+        if (out !== inputFile) {
+          const b64 = await fileToBase64(out);
+          if (file.localUrl) URL.revokeObjectURL(file.localUrl);
+          file.localUrl = URL.createObjectURL(out);
+          file.isPending = true;
+          pendingQueue = pendingQueue.filter(c => c.path !== file.path);
+          pendingQueue.push({ path: file.path, content: b64 });
+          changed++;
+        }
+      } catch (e) {
+        failed++;
+      } finally {
+        done++;
+        showTask('Compressing library…', `${done}/${items.length}`);
+      }
+    });
+
+    await withLimit(tasks, 4);
+    renderSidebar(); renderDetail(); updateSaveBtn();
+    finishTask(
+      failed ? 'Compressed with errors' : 'Compression staged ✓',
+      `${changed} resized · ${items.length - changed - failed} already optimal` +
+        (failed ? ` · ${failed} failed` : ''),
+      failed > 0
+    );
+  }
+
   function doDelete(file) {
     if (file.localUrl) URL.revokeObjectURL(file.localUrl);
     headshots = headshots.filter(h => h.path !== file.path);
@@ -1501,11 +1548,12 @@
   // ── Modal ──────────────────────────────────────────────────────────
   const modalTitleEl = modalEl.querySelector('.modal-title');
   const modalBodyEl = modalEl.querySelector('.modal-body');
-  function showModal(title, body, onConfirm) {
+  function showModal(title, body, onConfirm, confirmLabel) {
     modalTitleEl.textContent = title;
     modalBodyEl.textContent = body;
     const btn = modalEl.querySelector('.modal-confirm');
     const fresh = btn.cloneNode(true);
+    fresh.textContent = confirmLabel || 'Delete';
     btn.replaceWith(fresh);
     fresh.addEventListener('click', () => { hideModal(); onConfirm(); });
     modalEl.removeAttribute('hidden');
@@ -2263,6 +2311,12 @@
   discardBtnEl.addEventListener('click', doDiscard);
 
   $('uploadBtn').addEventListener('click', showUploadModal);
+  $('compressBtn').addEventListener('click', () => showModal(
+    'Compress the whole library?',
+    'Every stored image is checked; oversized ones are re-encoded smaller. Changes are staged — review and Save afterwards.',
+    compressLibrary,
+    'Compress'
+  ));
   $('uploadClose').addEventListener('click', hideUploadModal);
   $('uploadDone').addEventListener('click', hideUploadModal);
 
