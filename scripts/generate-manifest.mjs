@@ -46,6 +46,13 @@ if (students.length === 0) {
 }
 
 // Group project files by the prefix before the first underscore.
+// Pre-index students for O(1) exact and case-insensitive lookups.
+const studentExact = new Set(students);
+const studentCi = new Map();
+for (const s of students) {
+  const lc = s.toLowerCase();
+  if (!studentCi.has(lc)) studentCi.set(lc, s);
+}
 const grouped = {};
 for (const file of projectFiles) {
   const underscore = file.indexOf('_');
@@ -55,8 +62,8 @@ for (const file of projectFiles) {
   }
   const prefix = file.slice(0, underscore);
   // Find headshot match, allowing case-insensitive comparison but warning on mismatches.
-  const exact = students.find(s => s === prefix);
-  const ci = students.find(s => s.toLowerCase() === prefix.toLowerCase());
+  const exact = studentExact.has(prefix) ? prefix : undefined;
+  const ci = studentCi.get(prefix.toLowerCase());
   if (!exact && ci) {
     console.warn(`⚠  Casing mismatch: project "${file}" prefix "${prefix}" — using headshot "${ci}".`);
   }
@@ -99,13 +106,14 @@ function renderManifest(obj) {
 const block = renderManifest(manifest);
 const re = /(\/\/ __MANIFEST_START__)[\s\S]*?(\/\/ __MANIFEST_END__)/;
 
+const replacement = `$1\n    ${block}\n    $2`;
 for (const page of PAGES) {
   const text = readFileSync(page, 'utf8');
   if (!re.test(text)) {
     console.error(`✘  Could not find __MANIFEST_START__ / __MANIFEST_END__ sentinels in ${page}`);
     process.exit(1);
   }
-  const updated = text.replace(re, `$1\n    ${block}\n    $2`);
+  const updated = text.replace(re, replacement);
   writeFileSync(page, updated);
 }
 
