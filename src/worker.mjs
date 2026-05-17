@@ -1,4 +1,5 @@
 const COOKIE_NAME = 'files_auth';
+const STUDENT_PATH_RE = /^\/students\/[^/]+\/?$/;
 
 function cookieValue(cookieHeader, name) {
   if (!cookieHeader) return null;
@@ -207,7 +208,7 @@ export default {
       return env.ASSETS.fetch(new URL('/edit/', url.origin));
     }
 
-    if (/^\/students\/[^/]+\/?$/.test(url.pathname)) {
+    if (STUDENT_PATH_RE.test(url.pathname)) {
       return env.ASSETS.fetch(new URL('/students/', url.origin));
     }
 
