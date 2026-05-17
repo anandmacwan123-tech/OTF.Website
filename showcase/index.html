@@ -276,9 +276,8 @@
         }
         // Names load after the first headshot(s) appear — refresh the
         // visible label so it shows the full name rather than the first.
-        const labelEl = document.getElementById('headshotLabel');
-        if (labelEl && currentStudent && fullNames.has(currentStudent)) {
-          labelEl.textContent = fullNames.get(currentStudent);
+        if (headshotLabel && currentStudent && fullNames.has(currentStudent)) {
+          headshotLabel.textContent = fullNames.get(currentStudent);
         }
       })
       .catch(() => {});
@@ -294,6 +293,7 @@
     /* ───── Headshot slideshow ───── */
 
     const headshotLink = document.getElementById('headshotLink');
+    const headshotLabel = document.getElementById('headshotLabel');
     const imgs = [
       document.getElementById('headshotA'),
       document.getElementById('headshotB'),
@@ -356,13 +356,12 @@
         for (const el of placed) el.remove();
         placed.clear();
         // Position the name label flush above the top-left of the headshot.
-        const labelEl = document.getElementById('headshotLabel');
-        if (labelEl) requestAnimationFrame(() => {
-          labelEl.textContent = fullNames.get(name) || name;
-          labelEl.style.visibility = 'visible';
+        if (headshotLabel) requestAnimationFrame(() => {
+          headshotLabel.textContent = fullNames.get(name) || name;
+          headshotLabel.style.visibility = 'visible';
           const r = nextImg.getBoundingClientRect();
-          labelEl.style.left = r.left + 'px';
-          labelEl.style.top = (r.top - labelEl.offsetHeight) + 'px';
+          headshotLabel.style.left = r.left + 'px';
+          headshotLabel.style.top = (r.top - headshotLabel.offsetHeight) + 'px';
         });
       };
 
@@ -432,23 +431,27 @@
         const hs = headshotLink.getBoundingClientRect();
         const hsMidY = hs.top + hs.height / 2;
         const hsArea = hs.width * hs.height;
+        const minVisibleArea = 0.8 * w * renderedH;
+        const maxHsOverlap = 0.3 * hsArea;
 
         const ok = (x, y) => {
           // At least 80% of the image's area must be within the viewport
           const visW = Math.max(0, Math.min(x + w, W) - Math.max(x, 0));
           const visH = Math.max(0, Math.min(y + renderedH, H) - Math.max(y, 0));
-          if (visW * visH < 0.8 * w * renderedH) return false;
+          if (visW * visH < minVisibleArea) return false;
           // Must not overlap the top half of the headshot
           if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
           // Must not cover more than 30% of the headshot
           const ow = Math.max(0, Math.min(x + w, hs.right) - Math.max(x, hs.left));
           const oh = Math.max(0, Math.min(y + renderedH, hs.bottom) - Math.max(y, hs.top));
-          return ow * oh <= 0.3 * hsArea;
+          return ow * oh <= maxHsOverlap;
         };
 
         // Sample from a range that allows up to 20% of the image off-screen on any edge
         const xMin = -Math.round(w * 0.2), xMax = W - Math.round(w * 0.8);
         const yMin = -Math.round(renderedH * 0.2), yMax = H - Math.round(renderedH * 0.8);
+        const xRange = xMax - xMin, yRange = yMax - yMin;
+        const halfW = w / 2, halfH = renderedH / 2;
 
         // Spread new images away from those already on screen — best-candidate
         // sampling: try many random spots, keep the one furthest from its
@@ -462,10 +465,10 @@
 
         let best = null, bestScore = -1;
         for (let tries = 0; tries < 40; tries++) {
-          const px = Math.round(xMin + Math.random() * (xMax - xMin));
-          const py = Math.round(yMin + Math.random() * (yMax - yMin));
+          const px = Math.round(xMin + Math.random() * xRange);
+          const py = Math.round(yMin + Math.random() * yRange);
           if (!ok(px, py)) continue;
-          const mx = px + w / 2, my = py + renderedH / 2;
+          const mx = px + halfW, my = py + halfH;
           let nearest = Infinity;
           for (const [ox, oy] of centers) {
             nearest = Math.min(nearest, Math.hypot(mx - ox, my - oy));
@@ -505,11 +508,10 @@
         active.clear();
         for (const el of placed) el.remove();
         placed.clear();
-        const labelEl = document.getElementById('headshotLabel');
-        if (labelEl && currentStudent) requestAnimationFrame(() => {
+        if (headshotLabel && currentStudent) requestAnimationFrame(() => {
           const r = imgs[activeIdx].getBoundingClientRect();
-          labelEl.style.left = r.left + 'px';
-          labelEl.style.top = (r.top - labelEl.offsetHeight) + 'px';
+          headshotLabel.style.left = r.left + 'px';
+          headshotLabel.style.top = (r.top - headshotLabel.offsetHeight) + 'px';
         });
       }, 120);
     });
