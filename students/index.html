@@ -189,6 +189,55 @@
     flex-shrink: 0;
   }
 
+  /* Project video — embeds in the image strip, with custom controls. */
+  .project-video {
+    position: relative;
+    height: clamp(280px, 50vh, 480px);
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+    background: #000;
+    overflow: hidden;
+  }
+  .project-video iframe,
+  .project-video .pv-mount {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .project-video:fullscreen { height: 100%; width: 100%; aspect-ratio: auto; }
+  .pv-btn {
+    position: absolute;
+    bottom: 0;
+    z-index: 2;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65));
+  }
+  .pv-btn svg { width: 16px; height: 16px; display: block; fill: currentColor; }
+  .pv-play { left: 0; }
+  .pv-fs { right: 0; }
+  .pv-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    z-index: 1;
+    background: rgba(252, 18, 51, 0.3);
+  }
+  .pv-bar-fill { height: 100%; width: 0; background: #FC1233; }
+
   .project-desc {
     max-width: var(--col-text);
     margin: 1.25rem 0 0;
@@ -206,7 +255,8 @@
     /* Headshot fills the column so body padding is equal on both sides. */
     .hero-headshot { width: 100%; height: auto; }
     /* Project images scaled down to 0.6x. */
-    .project .images img { height: clamp(168px, 30vh, 288px); }
+    .project .images img,
+    .project-video { height: clamp(168px, 30vh, 288px); }
   }
 
   /* Labels are 24px on desktop; keep the mobile size unchanged. */
@@ -447,7 +497,7 @@
     const order = [];
     const groups = new Map();
     for (const file of files) {
-      const stem = file.replace(/\.webp$/i, '').replace(prefixRe, '');
+      const stem = file.replace(/\.(webp|url)$/i, '').replace(prefixRe, '');
       let project, n;
       const m = stem.match(/^(.+)_(\d+)$/);
       if (m) {
@@ -568,6 +618,145 @@
     stateEl.remove();
   }
 
+  // ── Video embeds (YouTube / Vimeo with custom controls) ─────────────
+  function videoMeta(url) {
+    let m;
+    if ((m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/)))
+      return { provider: 'youtube', id: m[1] };
+    if ((m = url.match(/vimeo\.com\/(?:video\/|channels\/[\w]+\/|groups\/[^/]+\/videos\/)?(\d+)/)))
+      return { provider: 'vimeo', id: m[1] };
+    return null;
+  }
+
+  let ytApiPromise, vimeoApiPromise;
+  function loadYouTubeApi() {
+    if (ytApiPromise) return ytApiPromise;
+    ytApiPromise = new Promise(resolve => {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve(window.YT); };
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(s);
+    });
+    return ytApiPromise;
+  }
+  function loadVimeoApi() {
+    if (vimeoApiPromise) return vimeoApiPromise;
+    vimeoApiPromise = new Promise(resolve => {
+      const s = document.createElement('script');
+      s.src = 'https://player.vimeo.com/api/player.js';
+      s.onload = () => resolve(window.Vimeo);
+      document.head.appendChild(s);
+    });
+    return vimeoApiPromise;
+  }
+
+  const PV_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  const PV_PAUSE = '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+  const PV_FS = '<svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>';
+
+  // Build a .project-video element with custom controls for a stored link.
+  function makeVideoEmbed(filename) {
+    const wrap = document.createElement('div');
+    wrap.className = 'project-video';
+
+    const playBtn = document.createElement('button');
+    playBtn.type = 'button';
+    playBtn.className = 'pv-btn pv-play';
+    playBtn.setAttribute('aria-label', 'Play');
+    playBtn.innerHTML = PV_PLAY;
+
+    const fsBtn = document.createElement('button');
+    fsBtn.type = 'button';
+    fsBtn.className = 'pv-btn pv-fs';
+    fsBtn.setAttribute('aria-label', 'Fullscreen');
+    fsBtn.innerHTML = PV_FS;
+    fsBtn.addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (wrap.requestFullscreen) wrap.requestFullscreen();
+    });
+
+    const bar = document.createElement('div');
+    bar.className = 'pv-bar';
+    const fill = document.createElement('div');
+    fill.className = 'pv-bar-fill';
+    bar.appendChild(fill);
+
+    wrap.append(playBtn, fsBtn, bar);
+
+    const ui = {
+      playBtn,
+      setPlaying(p) {
+        playBtn.innerHTML = p ? PV_PAUSE : PV_PLAY;
+        playBtn.setAttribute('aria-label', p ? 'Pause' : 'Play');
+      },
+      setProgress(cur, dur) {
+        fill.style.width = (dur > 0 ? Math.min(100, cur / dur * 100) : 0) + '%';
+      },
+    };
+
+    fetch(enc('/Student Work/Projects/' + filename), { cache: 'no-store' })
+      .then(r => r.ok ? r.text() : Promise.reject(new Error('missing')))
+      .then(text => {
+        const meta = videoMeta(text.trim());
+        if (!meta) throw new Error('unrecognised link');
+        if (meta.provider === 'youtube') mountYouTube(wrap, meta.id, ui);
+        else mountVimeo(wrap, meta.id, ui);
+      })
+      .catch(() => { wrap.remove(); });
+
+    return wrap;
+  }
+
+  function mountYouTube(wrap, id, ui) {
+    const mount = document.createElement('div');
+    mount.className = 'pv-mount';
+    wrap.insertBefore(mount, wrap.firstChild);
+    loadYouTubeApi().then(YT => {
+      let tick = null;
+      const player = new YT.Player(mount, {
+        videoId: id,
+        playerVars: { controls: 0, modestbranding: 1, rel: 0, playsinline: 1,
+                      disablekb: 1, fs: 0, iv_load_policy: 3 },
+        events: {
+          onStateChange: e => {
+            const playing = e.data === YT.PlayerState.PLAYING;
+            ui.setPlaying(playing);
+            clearInterval(tick);
+            if (playing) {
+              tick = setInterval(() => {
+                ui.setProgress(player.getCurrentTime() || 0, player.getDuration() || 0);
+              }, 200);
+            }
+          },
+        },
+      });
+      ui.playBtn.addEventListener('click', () => {
+        if (player.getPlayerState && player.getPlayerState() === YT.PlayerState.PLAYING)
+          player.pauseVideo();
+        else player.playVideo();
+      });
+    });
+  }
+
+  function mountVimeo(wrap, id, ui) {
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://player.vimeo.com/video/' + id +
+      '?controls=0&title=0&byline=0&portrait=0&playsinline=1&dnt=1';
+    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+    wrap.insertBefore(iframe, wrap.firstChild);
+    loadVimeoApi().then(Vimeo => {
+      const player = new Vimeo.Player(iframe);
+      player.on('play', () => ui.setPlaying(true));
+      player.on('pause', () => ui.setPlaying(false));
+      player.on('ended', () => ui.setPlaying(false));
+      player.on('timeupdate', d => ui.setProgress(d.seconds, d.duration));
+      ui.playBtn.addEventListener('click', () => {
+        player.getPaused().then(paused => paused ? player.play() : player.pause());
+      });
+    });
+  }
+
   // Persistent project order saved by the admin tool (projects-order.json).
   // Populated before renderProjects runs; defaults to {} on 404/error.
   let projectOrder = {};
@@ -612,6 +801,10 @@
         const imagesDiv = document.createElement('div');
         imagesDiv.className = 'images';
         for (const file of group.files) {
+          if (/\.url$/i.test(file)) {
+            imagesDiv.appendChild(makeVideoEmbed(file));
+            continue;
+          }
           const img = document.createElement('img');
           img.src = enc(`/Student Work/Projects/${file}`);
           img.alt = '';
