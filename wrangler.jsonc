@@ -9,6 +9,6 @@
     "not_found_handling": "404-page"
   },
   "kv_namespaces": [
-    { "binding": "SUBMISSIONS", "id": "PASTE_NAMESPACE_ID_HERE" }
+    { "binding": "SUBMISSIONS", "id": "2b783e92b7fb486f91a498e1d35ef284" }
   ]
 }
