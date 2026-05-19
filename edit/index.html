@@ -169,6 +169,33 @@
   }
   .banner[hidden] { display: none; }
 
+  /* Lookup form */
+  #lookup { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+  #lookup[hidden] { display: none; }
+  .lookup-inner { width: 100%; max-width: 400px; }
+  .lookup-field { position: relative; margin-top: 1.5rem; }
+  .lookup-field input { font-size: 1.1rem; padding: 0.75rem 0.9rem; }
+  .suggestions {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--bg); border: 1px solid var(--fg); border-top: 0;
+    list-style: none; max-height: 220px; overflow-y: auto; z-index: 10;
+  }
+  .suggestions[hidden] { display: none; }
+  .suggestions li {
+    padding: 0.55rem 0.9rem; cursor: pointer; font-size: 0.9rem; line-height: 1.3;
+  }
+  .suggestions li:hover, .suggestions li.active { background: rgba(0,0,0,0.06); }
+  .lookup-submit {
+    margin-top: 1rem; width: 100%;
+    font: inherit; font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    background: var(--fg); color: var(--bg);
+    border: 0; padding: 0.95rem 1rem; cursor: pointer;
+  }
+  .lookup-submit:hover { opacity: 0.8; }
+  .lookup-msg { font-size: 0.8rem; margin-top: 0.6rem; min-height: 1.2rem; }
+  .lookup-msg.err { color: var(--red); }
+
   @media (min-width: 560px) {
     body { padding: 3.5rem 2rem 6rem; }
   }
@@ -176,6 +203,19 @@
 </head>
 <body>
   <p class="state" id="state">Loading…</p>
+
+  <div id="lookup" hidden>
+    <div class="lookup-inner">
+      <p class="eyebrow">OTF — Student portfolio</p>
+      <h1>Edit your page</h1>
+      <div class="lookup-field">
+        <input type="text" id="lookupInput" placeholder="Your name…" autocomplete="off" spellcheck="false">
+        <ul class="suggestions" id="suggestions" hidden></ul>
+      </div>
+      <button type="button" class="lookup-submit" id="lookupSubmit">Go →</button>
+      <p class="lookup-msg" id="lookupMsg"></p>
+    </div>
+  </div>
 
   <div class="wrap form" id="form" hidden>
     <p class="eyebrow">OTF — Student portfolio</p>
@@ -283,11 +323,122 @@
 
   function fail(text) { stateEl.textContent = text; stateEl.hidden = false; formEl.hidden = true; }
 
+  // ── Name lookup (shown at /edit/ with no student slug) ──────────────
+  function showLookup() {
+    stateEl.hidden = true;
+    document.getElementById('lookup').hidden = false;
+
+    // Build slug → display map; optionally enrich with full names from sheet.
+    const nameMap = new Map(); // key.toLowerCase() → { key, display }
+    for (const key of Object.keys(MANIFEST)) {
+      nameMap.set(key.toLowerCase(), { key, display: key });
+    }
+    const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+    fetch(sheetUrl, { cache: 'no-store' })
+      .then(r => r.ok ? r.text() : Promise.reject())
+      .then(text => {
+        // Minimal CSV parser — just need Name column.
+        const lines = text.split(/\r?\n/);
+        for (const line of lines) {
+          const parts = line.split(',');
+          const cell = parts[2] ? parts[2].replace(/^"|"$/g, '').trim() : '';
+          if (!cell || cell.toLowerCase() === 'name') continue;
+          const first = cell.split(/\s+/)[0].toLowerCase();
+          if (nameMap.has(first)) nameMap.get(first).display = cell;
+        }
+      })
+      .catch(() => {});
+
+    const input = document.getElementById('lookupInput');
+    const sugg  = document.getElementById('suggestions');
+    const msg   = document.getElementById('lookupMsg');
+    let activeIdx = -1;
+    let matches = [];
+
+    function navigate(key) {
+      window.location.href = '/students/' + encodeURIComponent(key.toLowerCase()) + '/edit';
+    }
+
+    function bestMatch(q) {
+      q = q.toLowerCase().trim();
+      // Exact slug
+      for (const [slug, info] of nameMap) if (slug === q) return info.key;
+      // Full name exact
+      for (const [, info] of nameMap) if (info.display.toLowerCase() === q) return info.key;
+      // First word of full name
+      for (const [, info] of nameMap) if (info.display.toLowerCase().split(/\s+/)[0] === q) return info.key;
+      // Slug starts with
+      for (const [slug, info] of nameMap) if (slug.startsWith(q)) return info.key;
+      // Full name starts with
+      for (const [, info] of nameMap) if (info.display.toLowerCase().startsWith(q)) return info.key;
+      // Slug contains
+      for (const [slug, info] of nameMap) if (slug.includes(q)) return info.key;
+      return null;
+    }
+
+    function buildList(q) {
+      q = q.toLowerCase().trim();
+      if (q.length < 2) { sugg.hidden = true; matches = []; return; }
+      matches = [];
+      for (const [slug, info] of nameMap) {
+        if (slug.includes(q) || info.display.toLowerCase().includes(q)) matches.push(info);
+      }
+      if (!matches.length) { sugg.hidden = true; return; }
+      sugg.innerHTML = '';
+      activeIdx = -1;
+      for (const info of matches) {
+        const li = document.createElement('li');
+        li.textContent = info.display;
+        li.addEventListener('mousedown', e => { e.preventDefault(); navigate(info.key); });
+        sugg.appendChild(li);
+      }
+      sugg.hidden = false;
+    }
+
+    input.addEventListener('input', () => { msg.textContent = ''; buildList(input.value); });
+
+    input.addEventListener('keydown', e => {
+      const lis = [...sugg.querySelectorAll('li')];
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIdx = Math.min(activeIdx + 1, lis.length - 1);
+        lis.forEach((li, i) => li.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = Math.max(activeIdx - 1, -1);
+        lis.forEach((li, i) => li.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (activeIdx >= 0 && matches[activeIdx]) { navigate(matches[activeIdx].key); return; }
+        const key = bestMatch(input.value);
+        if (key) navigate(key);
+        else { msg.className = 'lookup-msg err'; msg.textContent = 'No matching student found.'; }
+      } else if (e.key === 'Escape') { sugg.hidden = true; }
+    });
+
+    document.addEventListener('click', e => { if (!e.target.closest('.lookup-field')) sugg.hidden = true; });
+
+    document.getElementById('lookupSubmit').addEventListener('click', () => {
+      const key = bestMatch(input.value);
+      if (key) navigate(key);
+      else { msg.className = 'lookup-msg err'; msg.textContent = 'No matching student found.'; }
+    });
+
+    input.focus();
+  }
+
   // Resolve the student slug from /students/<slug>/edit
-  const slug = decodeURIComponent(location.pathname)
+  const rawPath = decodeURIComponent(location.pathname);
+  const underStudents = /^\/students\//.test(rawPath);
+  const slug = rawPath
     .replace(/^\/students\//, '').replace(/\/edit\/?$/, '').replace(/\/$/, '').toLowerCase();
   const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
-  if (!name) { fail('Student not found'); return; }
+
+  if (!name) {
+    if (underStudents) { fail('Student not found'); return; }
+    showLookup();
+    return;
+  }
 
   // ── CSV parsing (mirrors students/index.html) ───────────────────────
   function parseCSV(text) {
