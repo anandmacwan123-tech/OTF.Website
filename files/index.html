@@ -2216,10 +2216,7 @@
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);
-    pat = ''; currentStudent = null;
-    appEl.setAttribute('hidden', '');
-    patPromptEl.removeAttribute('hidden');
-    patInput.value = '';
+    window.location.href = '/files/logout';
   });
 
   // Auto-login if stored

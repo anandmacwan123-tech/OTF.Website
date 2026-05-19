@@ -64,6 +64,16 @@ async function handleFiles(request, env, url) {
     return loginPage('Incorrect password');
   }
 
+  // Logout: clear cookie for both old Path=/files and new Path=/ then redirect.
+  if (url.pathname === '/files/logout') {
+    const secureFlag = url.protocol === 'https:' ? ' Secure;' : '';
+    const clear = `${COOKIE_NAME}=; Max-Age=0; HttpOnly;${secureFlag} SameSite=Lax`;
+    const headers = new Headers({ 'Location': '/files/' });
+    headers.append('Set-Cookie', clear + '; Path=/');
+    headers.append('Set-Cookie', clear + '; Path=/files');
+    return new Response(null, { status: 303, headers });
+  }
+
   // Redirect bare /files → /files/ so assets can find files/index.html
   if (url.pathname === '/files') {
     return Response.redirect(url.origin + '/files/', 301);
