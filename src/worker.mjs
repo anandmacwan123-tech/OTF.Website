@@ -53,13 +53,11 @@ async function handleFiles(request, env, url) {
     const password = form.get('password') || '';
     if (password === expected) {
       const secureFlag = url.protocol === 'https:' ? ' Secure;' : '';
-      return new Response(null, {
-        status: 303,
-        headers: {
-          'Location': '/files/',
-          'Set-Cookie': `${COOKIE_NAME}=${encodeURIComponent(expected)}; Path=/; Max-Age=2592000; HttpOnly;${secureFlag} SameSite=Lax`,
-        },
-      });
+      const loginHeaders = new Headers({ 'Location': '/files/' });
+      // Set new Path=/ cookie and simultaneously clear any old Path=/files cookie.
+      loginHeaders.append('Set-Cookie', `${COOKIE_NAME}=${encodeURIComponent(expected)}; Path=/; Max-Age=2592000; HttpOnly;${secureFlag} SameSite=Lax`);
+      loginHeaders.append('Set-Cookie', `${COOKIE_NAME}=; Path=/files; Max-Age=0; HttpOnly;${secureFlag} SameSite=Lax`);
+      return new Response(null, { status: 303, headers: loginHeaders });
     }
     return loginPage('Incorrect password');
   }
