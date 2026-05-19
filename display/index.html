@@ -157,7 +157,7 @@
     text-transform: uppercase;
   }
 
-  /* Slider — thin stroke base, square thumb, thicker stroke to its right. */
+  /* Slider — thin stroke base, square thumb, thicker stroke to its left. */
   .ctl-range {
     -webkit-appearance: none;
     appearance: none;
@@ -171,7 +171,7 @@
     height: 14px;
     background:
       linear-gradient(#fff, #fff) no-repeat left center / 100% 1px,
-      linear-gradient(#fff, #fff) no-repeat right center / calc(100% - var(--p, 50%)) 4px;
+      linear-gradient(#fff, #fff) no-repeat left center / var(--p, 50%) 4px;
   }
   .ctl-range::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -186,7 +186,7 @@
     height: 14px;
     background:
       linear-gradient(#fff, #fff) no-repeat left center / 100% 1px,
-      linear-gradient(#fff, #fff) no-repeat right center / calc(100% - var(--p, 50%)) 4px;
+      linear-gradient(#fff, #fff) no-repeat left center / var(--p, 50%) 4px;
   }
   .ctl-range::-moz-range-thumb {
     width: 9px;
@@ -246,7 +246,7 @@
   }
 </style>
 </head>
-<body>
+<body class="no-project-labels">
   <h1 class="sr-only">OTF — Graphic Design Degree Show display</h1>
 
   <div class="media-wrap">
@@ -269,7 +269,7 @@
       <input type="range" class="ctl-range" id="speedCtl" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed">
       <input type="number" class="ctl-num" id="speedNum" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed value">
     </div>
-    <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="true">Project labels</button>
+    <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="false">Project labels</button>
   </div>
 
   <script>
@@ -591,7 +591,7 @@
     document.addEventListener('mouseleave', () => controls.classList.remove('visible'));
 
     // Wire a slider + its numeric input as one two-way control. The slider's
-    // --p custom property drives the thicker stroke to the right of the thumb.
+    // --p custom property drives the thicker stroke to the left of the thumb.
     function bindControl(rangeId, numId, onValue) {
       const range = document.getElementById(rangeId);
       const num = document.getElementById(numId);
