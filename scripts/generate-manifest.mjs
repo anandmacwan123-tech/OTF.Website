@@ -18,6 +18,7 @@ const PAGES = [
   resolve(ROOT, 'students/index.html'),
   resolve(ROOT, 'index/index.html'),
   resolve(ROOT, 'display/index.html'),
+  resolve(ROOT, 'edit/index.html'),
 ];
 
 const IMAGE_EXT = /\.webp$/i;

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>OTF — Edit your page</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/jpeg" href="/Favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fff;
+    --fg: #000;
+    --muted: #6a6a6a;
+    --border: rgba(0,0,0,0.14);
+    --red: #FF002F;
+  }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 2rem 1.25rem 6rem;
+  }
+
+  .wrap { width: 100%; max-width: 640px; margin: 0 auto; }
+
+  .state {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+    font-size: 0.85rem; color: var(--muted); padding: 2rem; text-align: center;
+  }
+  .state[hidden], .form[hidden] { display: none; }
+
+  .eyebrow {
+    font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+  }
+  h1 {
+    font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;
+    margin: 0.35rem 0 0.5rem;
+  }
+  .lede {
+    font-size: 0.9rem; line-height: 1.5; color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  fieldset {
+    border: 0; border-top: 1px solid var(--border);
+    padding: 1.75rem 0 0; margin-top: 1.75rem;
+  }
+  fieldset:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+  legend {
+    font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+  }
+
+  label.field { display: block; margin-bottom: 1.1rem; }
+  label.field:last-child { margin-bottom: 0; }
+  .field-label {
+    display: block; font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 0.4rem;
+  }
+  .field-hint {
+    font-size: 0.72rem; color: var(--muted); line-height: 1.45;
+    margin: 0.3rem 0 0;
+  }
+
+  input[type="text"], textarea {
+    width: 100%; font: inherit; font-size: 1rem;
+    color: var(--fg); background: var(--bg);
+    border: 1px solid var(--border); padding: 0.6rem 0.7rem;
+    outline: none; border-radius: 0;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--fg); }
+  textarea { resize: vertical; min-height: 4.5rem; line-height: 1.5; }
+  textarea.bio { min-height: 9rem; }
+
+  /* Image rows */
+  .thumbs {
+    display: flex; flex-wrap: wrap; gap: 0.6rem;
+    margin: 0.3rem 0 0.6rem;
+  }
+  .thumb {
+    height: 96px; width: auto; max-width: 160px;
+    object-fit: cover; background: rgba(0,0,0,0.05);
+    display: block;
+  }
+  .thumb.new { outline: 2px solid var(--red); outline-offset: -2px; }
+  .thumb-headshot { height: 132px; }
+
+  .file-btn {
+    display: inline-block; font: inherit;
+    font-size: 0.6rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: none; border: 1px solid var(--border);
+    padding: 0.45rem 0.9rem; cursor: pointer; color: var(--fg);
+  }
+  .file-btn:hover { background: rgba(0,0,0,0.04); }
+  input[type="file"] { display: none; }
+
+  /* Project block */
+  .project {
+    border: 1px solid var(--border); padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .project-title-row {
+    display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.75rem;
+  }
+  .project-num {
+    font-size: 0.6rem; font-weight: 500; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--muted); flex-shrink: 0;
+  }
+  .project-name-static {
+    font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
+  }
+  .add-project-btn {
+    font: inherit; font-size: 0.62rem; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: none; border: 1px dashed var(--border);
+    padding: 0.65rem 1rem; cursor: pointer; color: var(--muted);
+    width: 100%;
+  }
+  .add-project-btn:hover:not(:disabled) { border-color: var(--fg); color: var(--fg); }
+  .add-project-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .submit-row {
+    margin-top: 2rem; display: flex; flex-direction: column; gap: 0.85rem;
+  }
+  button.submit {
+    font: inherit; font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    background: var(--fg); color: var(--bg);
+    border: 0; padding: 0.95rem 1rem; cursor: pointer;
+  }
+  button.submit:hover:not(:disabled) { opacity: 0.8; }
+  button.submit:disabled { opacity: 0.4; cursor: not-allowed; }
+  .msg { font-size: 0.8rem; line-height: 1.5; min-height: 1.2rem; }
+  .msg.err { color: var(--red); }
+  .msg.ok { color: #1a7f37; }
+
+  .banner {
+    background: rgba(255,0,47,0.07); border: 1px solid rgba(255,0,47,0.25);
+    padding: 0.7rem 0.85rem; font-size: 0.78rem; line-height: 1.45;
+    color: var(--fg); margin-bottom: 1.5rem;
+  }
+  .banner[hidden] { display: none; }
+
+  @media (min-width: 560px) {
+    body { padding: 3.5rem 2rem 6rem; }
+  }
+</style>
+</head>
+<body>
+  <p class="state" id="state">Loading…</p>
+
+  <div class="wrap form" id="form" hidden>
+    <p class="eyebrow">OTF — Student portfolio</p>
+    <h1 id="heading">Edit your page</h1>
+    <p class="lede">Update your bio, practices, project descriptions and images.
+      Changes are reviewed before they appear on the site.</p>
+
+    <div class="banner" id="sheetWarn" hidden>
+      Couldn't load existing details — fields may start empty. You can still fill them in.
+    </div>
+
+    <fieldset>
+      <legend>Headshot</legend>
+      <div class="thumbs" id="headshotThumbs"></div>
+      <label class="file-btn">Replace headshot
+        <input type="file" id="headshotInput" accept=".jpg,.jpeg,.png,.webp">
+      </label>
+      <p class="field-hint">Optional. A clear portrait photo — JPG, PNG or WebP.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>About you</legend>
+      <label class="field">
+        <span class="field-label">Bio</span>
+        <textarea class="bio" id="bio" placeholder="A short paragraph about you and your work…"></textarea>
+      </label>
+      <label class="field">
+        <span class="field-label">Design practice 1</span>
+        <input type="text" id="practice0" placeholder="e.g. Editorial design">
+      </label>
+      <label class="field">
+        <span class="field-label">Design practice 2</span>
+        <input type="text" id="practice1" placeholder="e.g. Typography">
+      </label>
+      <label class="field">
+        <span class="field-label">Design practice 3</span>
+        <input type="text" id="practice2" placeholder="e.g. Motion">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Projects</legend>
+      <div id="projects"></div>
+      <button type="button" class="add-project-btn" id="addProject">+ Add another project</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Submit</legend>
+      <label class="field">
+        <span class="field-label">Anything else for the OTF team? (optional)</span>
+        <textarea id="note" placeholder="Notes about your submission…"></textarea>
+      </label>
+      <label class="field">
+        <span class="field-label">Submission password</span>
+        <input type="text" id="password" autocomplete="off" placeholder="Password from the OTF team">
+        <p class="field-hint">Ask the OTF team for this if you don't have it.</p>
+      </label>
+      <div class="submit-row">
+        <button type="button" class="submit" id="submitBtn">Submit for review</button>
+        <p class="msg" id="msg"></p>
+      </div>
+    </fieldset>
+  </div>
+
+<script>
+(() => {
+  // __MANIFEST_START__
+    const MANIFEST = {
+      "Anand": ["Anand_Based_1.webp", "Anand_Evolving_1.webp", "Anand_NCI_1.webp", "Anand_RaveBadge_1.webp", "Anand_ThinkingBlock_1.webp"],
+      "Arnete": ["Arnete_Aqva_1.webp", "Arnete_Atsijungti_1.webp", "Arnete_InthePresenceofGreen_1.webp", "Arnete_Postcard Series_1.webp"],
+      "Becky": ["Becky_Kopparberg1_1.webp", "Becky_Kopparberg2_1.webp", "Becky_Kopparberg2-1_1.webp"],
+      "Carolina": ["Carolina_Aqua_1.webp", "Carolina_Packaging_1.webp", "Carolina_Zine_1.webp"],
+      "Charles": ["Charles_Agneshouse_1.webp", "Charles_KpopZine_1.webp", "Charles_TMS_1.webp"],
+      "Darcy": ["Darcy_Untitled_1.webp"],
+      "Divine": ["Divine_ABOTABOT_1.webp", "Divine_TerraCotta_1.webp", "Divine_UntitledZine_1.webp"],
+      "Elise": ["Elise_Tera1_1.webp", "Elise_Tera2_1.webp", "Elise_Tera3_1.webp"],
+      "Emily": ["Emily_4THGENZine_1.webp", "Emily_Globular_1.webp", "Emily_Sign_1.webp"],
+      "Jaeden": ["Jaeden_FameSucks_1.webp", "Jaeden_FameSucks1_1.webp", "Jaeden_FameSucks2_1.webp"],
+      "Jamie": ["Jamie_HemDuyen_1.webp", "Jamie_Kynexus_1.webp"],
+      "Jenna": ["Jenna_Aer_1.webp", "Jenna_Privacy Matters_1.webp", "Jenna_Veil_1.webp"],
+      "Jess": ["Jess_Aqya_1.webp", "Jess_CFTSOC_1.webp", "Jess_Untitled_1.webp"],
+      "Kami": ["Kami_Football-outside-of-football_1.webp", "Kami_Football-outside-of-football_2.webp", "Kami_Football-outside-of-football_3.webp"],
+      "Kye": ["Kye_HeadphonesAd_1.webp", "Kye_IncensePackaging_1.webp", "Kye_Untitled_1.webp"],
+      "Martim": ["Martim_5PP_1.webp", "Martim_B33ChairPoster_1.webp", "Martim_Reflections_1.webp"],
+      "Maseray": ["Maseray_IgnisStudios_1.webp", "Maseray_LordandSaviour_1.webp", "Maseray_ThedesignersArchive_1.webp"],
+      "Nikol": ["Nikol_Aquari_1.webp", "Nikol_CREATEPoster_1.webp", "Nikol_WWTPLUposter_1.webp"],
+      "Noora": ["Noora_Lipstick_1.webp", "Noora_PFI_1.webp", "Noora_RP_1.webp"],
+      "Nora": ["Nora_Overstack_1.webp", "Nora_PhobiaFiles_1.webp", "Nora_ShakenNotStirred_1.webp", "Nora_ShakenNotStirred2_1.webp", "Nora_SmultringerPhotography_1.webp", "Nora_SmultringerPhotography2_1.webp"],
+      "Nuria": ["Nuria_Project1_1.webp", "Nuria_Project2_1.webp", "Nuria_Project3_1.webp"],
+      "Oli": ["Oli_Project1_1.webp", "Oli_Project2_1.webp", "Oli_Project3_1.webp"],
+      "Olya": [],
+      "Oscar": ["Oscar_AER_1.webp", "Oscar_Rutt-Etra_1.webp", "Oscar_Zine_1.webp"],
+      "Rebecca": ["Rebecca_Project1_1.webp", "Rebecca_Project2_1.webp", "Rebecca_Project3_1.webp"],
+      "Sara": ["Sara_Project1_1.webp", "Sara_Project2_1.webp", "Sara_Project3_1.webp"],
+      "Sasha": ["Sasha_Project1_1.webp", "Sasha_Project2_1.webp", "Sasha_Project3_1.webp"],
+      "Sebastian": ["Sebastian_Project1_1.webp", "Sebastian_Project2_1.webp", "Sebastian_Project3_1.webp"],
+      "Shalom": ["Shalom_Project1_1.webp", "Shalom_Project2_1.webp", "Shalom_Project3_1.webp"],
+      "Surayya": ["Surayya_Project1_1.webp", "Surayya_Project2_1.webp", "Surayya_Project3_1.webp"],
+      "Taleb": ["Taleb_Project1_1.webp", "Taleb_Project2_1.webp", "Taleb_Project3_1.webp"],
+      "Tallulah": ["Tallulah_Project1_1.webp", "Tallulah_Project2_1.webp", "Tallulah_Project3_1.webp"],
+      "Valentina": ["Valentina_Project1_1.webp"],
+      "Vanessa": ["Vanessa_Project1_1.webp", "Vanessa_Project2_1.webp", "Vanessa_Project3_1.webp"],
+      "Will": ["Will_Project1_1.webp", "Will_Project2_1.webp", "Will_Project3_1.webp"]
+    };
+    // __MANIFEST_END__
+
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+  const MAX_PROJECTS = 5;
+
+  const stateEl = document.getElementById('state');
+  const formEl = document.getElementById('form');
+  const msgEl = document.getElementById('msg');
+  const enc = p => p.split('/').map(encodeURIComponent).join('/');
+
+  function fail(text) { stateEl.textContent = text; stateEl.hidden = false; formEl.hidden = true; }
+
+  // Resolve the student slug from /students/<slug>/edit
+  const slug = decodeURIComponent(location.pathname)
+    .replace(/^\/students\//, '').replace(/\/edit\/?$/, '').replace(/\/$/, '').toLowerCase();
+  const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
+  if (!name) { fail('Student not found'); return; }
+
+  // ── CSV parsing (mirrors students/index.html) ───────────────────────
+  function parseCSV(text) {
+    const sample = text.split(/\r?\n/).slice(0, 5).join('\n');
+    const delim = (sample.match(/\t/g) || []).length > (sample.match(/,/g) || []).length ? '\t' : ',';
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else if (c === '"') inQuotes = true;
+      else if (c === delim) { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); rows.push(row); row = []; field = '';
+      } else field += c;
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  const COLUMNS = [
+    '#', 'Headshot', 'Name', 'Name translated', 'Language', 'Confidence', 'Notes',
+    'Bio', 'Bio translated', 'Project images (link)',
+    'Project description 1', 'Project description 1 translated',
+    'Project description 2', 'Project description 2 translated',
+    'Project description 3', 'Project description 3 translated',
+    'Project description 4', 'Project description 4 translated',
+    'Project description 5', 'Project description 5 translated',
+  ];
+
+  function toObjects(rows) {
+    if (!rows.length) return [];
+    const hasRealHeader = rows[0].some(c => c && c.trim().toLowerCase() === 'name');
+    let headers, dataStart;
+    if (hasRealHeader) { headers = rows[0].map(h => h.trim()); dataStart = 1; }
+    else {
+      headers = COLUMNS;
+      dataStart = rows[0].every(c => !c.trim() || c.trim() === '#') ? 1 : 0;
+    }
+    return rows.slice(dataStart)
+      .filter(r => r.some(c => c && c.trim()))
+      .map(r => {
+        const o = {};
+        headers.forEach((h, i) => { o[h] = (r[i] ?? '').trim(); });
+        return o;
+      });
+  }
+
+  function field(row, ...names) {
+    if (!row) return '';
+    const keys = Object.keys(row);
+    for (const n of names) {
+      const k = keys.find(k => k.toLowerCase() === n.toLowerCase());
+      if (k && row[k]) return row[k];
+    }
+    return '';
+  }
+
+  function matchRow(objs) {
+    const target = name.toLowerCase();
+    return objs.find(o => {
+      const n = field(o, 'Name').toLowerCase().trim();
+      if (!n) return false;
+      return n === target || n.split(/\s+/)[0] === target;
+    }) || null;
+  }
+
+  // Group existing project files by storage key (mirrors students page).
+  function projectGroups(files) {
+    const prefixRe = new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '_');
+    const order = [];
+    const groups = new Map();
+    for (const file of files) {
+      const stem = file.replace(/\.(webp|url)$/i, '').replace(prefixRe, '');
+      let project, n;
+      const m = stem.match(/^(.+)_(\d+)$/);
+      if (m) { project = m[1]; n = +m[2]; }
+      else {
+        const numMatch = stem.match(/(\d+)(?:-\d+)?$/);
+        n = numMatch ? +numMatch[1] : 0;
+        project = stem.replace(/\d+(?:-\d+)?$/, '') || stem;
+      }
+      if (project === 'Unassigned') continue;
+      const displayName = /^Untitled\d*$/.test(project) ? 'Untitled' : project;
+      if (!groups.has(project)) { groups.set(project, { displayName, files: [] }); order.push(project); }
+      groups.get(project).files.push({ file, n });
+    }
+    for (const g of groups.values()) g.files.sort((a, b) => a.n - b.n);
+    return order.map(p => ({ key: p, base: groups.get(p).displayName, files: groups.get(p).files.map(x => x.file) }));
+  }
+
+  // ── Image compression → WebP ────────────────────────────────────────
+  function compressImage(file, maxH, quality) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) return reject(new Error('Empty image'));
+        if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => {
+          if (!blob) return reject(new Error('Encoding failed'));
+          resolve(blob);
+        }, 'image/webp', quality);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read image')); };
+      img.src = url;
+    });
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+  }
+
+  // ── Form state ──────────────────────────────────────────────────────
+  let newHeadshot = null;          // File or null
+  const projectBlocks = [];        // { key, isNew, titleInput, base, descInput, newFiles, numEl }
+
+  function makeProjectBlock({ key, base, files, isNew, description }) {
+    const block = document.createElement('div');
+    block.className = 'project';
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'project-title-row';
+    const numEl = document.createElement('span');
+    numEl.className = 'project-num';
+    titleRow.appendChild(numEl);
+
+    let titleInput;
+    if (isNew) {
+      titleInput = document.createElement('input');
+      titleInput.type = 'text';
+      titleInput.placeholder = 'Project title';
+      titleInput.style.flex = '1';
+      titleRow.appendChild(titleInput);
+    } else {
+      const nameEl = document.createElement('span');
+      nameEl.className = 'project-name-static';
+      nameEl.textContent = base;
+      titleRow.appendChild(nameEl);
+    }
+    block.appendChild(titleRow);
+
+    // Existing images
+    const thumbs = document.createElement('div');
+    thumbs.className = 'thumbs';
+    for (const f of (files || [])) {
+      if (/\.url$/i.test(f)) continue;
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.loading = 'lazy';
+      img.src = enc('/Student Work/Projects/' + f);
+      img.alt = '';
+      thumbs.appendChild(img);
+    }
+    block.appendChild(thumbs);
+
+    // Description
+    const descLabel = document.createElement('label');
+    descLabel.className = 'field';
+    const descSpan = document.createElement('span');
+    descSpan.className = 'field-label';
+    descSpan.textContent = 'Description';
+    const descInput = document.createElement('textarea');
+    descInput.value = description || '';
+    descInput.placeholder = 'What is this project about?';
+    descLabel.append(descSpan, descInput);
+    block.appendChild(descLabel);
+
+    // Add images
+    const newFiles = [];
+    const addLabel = document.createElement('label');
+    addLabel.className = 'file-btn';
+    addLabel.textContent = '+ Add images';
+    const addInput = document.createElement('input');
+    addInput.type = 'file';
+    addInput.accept = '.jpg,.jpeg,.png,.webp';
+    addInput.multiple = true;
+    addLabel.appendChild(addInput);
+    addInput.addEventListener('change', () => {
+      for (const file of addInput.files) {
+        newFiles.push(file);
+        const img = document.createElement('img');
+        img.className = 'thumb new';
+        img.alt = file.name;
+        img.src = URL.createObjectURL(file);
+        thumbs.appendChild(img);
+      }
+      addInput.value = '';
+    });
+    block.appendChild(addLabel);
+
+    document.getElementById('projects').appendChild(block);
+    const entry = { key, isNew, titleInput, base, descInput, newFiles, numEl };
+    projectBlocks.push(entry);
+    renumberProjects();
+    return entry;
+  }
+
+  function renumberProjects() {
+    projectBlocks.forEach((b, i) => { b.numEl.textContent = 'Project ' + (i + 1); });
+    document.getElementById('addProject').disabled = projectBlocks.length >= MAX_PROJECTS;
+  }
+
+  // ── Build + submit ──────────────────────────────────────────────────
+  async function submit() {
+    const btn = document.getElementById('submitBtn');
+    const password = document.getElementById('password').value.trim();
+    if (!password) { msgEl.className = 'msg err'; msgEl.textContent = 'Enter the submission password.'; return; }
+
+    btn.disabled = true;
+    msgEl.className = 'msg';
+    msgEl.textContent = 'Preparing images…';
+
+    try {
+      const projects = [];
+      for (const b of projectBlocks) {
+        const title = b.isNew ? (b.titleInput.value.trim()) : b.base;
+        const description = b.descInput.value.trim();
+        const images = [];
+        for (const file of b.newFiles) {
+          const blob = await compressImage(file, 760, 0.82);
+          images.push({ origName: file.name, dataB64: await blobToBase64(blob) });
+        }
+        if (b.isNew && !title && !description && !images.length) continue;
+        projects.push({ key: b.isNew ? null : b.key, title, description, images });
+      }
+
+      let headshot = null;
+      if (newHeadshot) {
+        const blob = await compressImage(newHeadshot, 900, 0.85);
+        headshot = { origName: newHeadshot.name, dataB64: await blobToBase64(blob) };
+      }
+
+      const payload = {
+        password,
+        student: name,
+        fullName: document.getElementById('heading').dataset.fullName || name,
+        bio: document.getElementById('bio').value.trim(),
+        practices: [0, 1, 2].map(i => document.getElementById('practice' + i).value.trim()),
+        projects,
+        headshot,
+        note: document.getElementById('note').value.trim(),
+      };
+
+      msgEl.textContent = 'Sending…';
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || ('Error ' + res.status));
+
+      msgEl.className = 'msg ok';
+      msgEl.textContent = 'Submitted — thank you. The OTF team will review your changes.';
+      btn.textContent = 'Submitted';
+    } catch (e) {
+      msgEl.className = 'msg err';
+      msgEl.textContent = e.message || 'Submission failed.';
+      btn.disabled = false;
+    }
+  }
+
+  // ── Init ────────────────────────────────────────────────────────────
+  document.getElementById('headshotInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    newHeadshot = file;
+    const thumbs = document.getElementById('headshotThumbs');
+    let img = thumbs.querySelector('.new');
+    if (!img) {
+      img = document.createElement('img');
+      img.className = 'thumb thumb-headshot new';
+      thumbs.appendChild(img);
+    }
+    img.src = URL.createObjectURL(file);
+  });
+
+  document.getElementById('addProject').addEventListener('click', () => {
+    if (projectBlocks.length >= MAX_PROJECTS) return;
+    makeProjectBlock({ key: null, base: '', files: [], isNew: true, description: '' });
+  });
+
+  document.getElementById('submitBtn').addEventListener('click', submit);
+
+  function build(row, overrides) {
+    document.getElementById('heading').textContent = (field(row, 'Name') || name) + ' — edit your page';
+    document.getElementById('heading').dataset.fullName = field(row, 'Name') || name;
+
+    // Headshot
+    const hsThumbs = document.getElementById('headshotThumbs');
+    const hs = document.createElement('img');
+    hs.className = 'thumb thumb-headshot';
+    hs.src = enc('/Student Work/Headshots/' + name + '.webp');
+    hs.alt = '';
+    hs.onerror = () => hs.remove();
+    hsThumbs.appendChild(hs);
+
+    // Bio + practices (override wins over sheet)
+    document.getElementById('bio').value = overrides.bio != null ? overrides.bio : field(row, 'Bio');
+    const sheetPractices = [
+      field(row, 'Practice1', 'Practice 1', 'Design practice 1'),
+      field(row, 'Practice2', 'Practice 2', 'Design practice 2'),
+      field(row, 'Practice3', 'Practice 3', 'Design practice 3'),
+    ];
+    for (let i = 0; i < 3; i++) {
+      const ov = Array.isArray(overrides.practices) ? overrides.practices[i] : null;
+      document.getElementById('practice' + i).value = ov != null ? ov : sheetPractices[i];
+    }
+
+    // Projects
+    const groups = projectGroups(MANIFEST[name] || []);
+    const ovDescs = overrides.projectDescriptions || {};
+    groups.forEach((g, i) => {
+      let desc = ovDescs[g.base];
+      if (desc == null) desc = field(row, 'Project description ' + (i + 1));
+      makeProjectBlock({ key: g.key, base: g.base, files: g.files, isNew: false, description: desc });
+    });
+    if (!groups.length) {
+      makeProjectBlock({ key: null, base: '', files: [], isNew: true, description: '' });
+    }
+
+    stateEl.hidden = true;
+    formEl.hidden = false;
+  }
+
+  // Fetch overrides + sheet, then render.
+  const overridesP = fetch('/data/overrides.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : {})
+    .then(d => (d && typeof d === 'object' ? (d[name] || {}) : {}))
+    .catch(() => ({}));
+
+  const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+  const sheetP = fetch(sheetUrl, { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(text => matchRow(toObjects(parseCSV(text))))
+    .catch(() => null);
+
+  Promise.all([sheetP, overridesP]).then(([row, overrides]) => {
+    if (!row) document.getElementById('sheetWarn').hidden = false;
+    build(row, overrides);
+  });
+})();
+</script>
+</body>
+</html>
