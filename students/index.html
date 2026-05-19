@@ -391,14 +391,15 @@
   const enc = p => p.split('/').map(encodeURIComponent).join('/');
 
   // Resolve slug to canonical student name from MANIFEST keys
+  const manifestKeys = Object.keys(MANIFEST);
   const slug = decodeURIComponent(location.pathname).replace(/^\/students\/?/, '').replace(/\/$/, '').toLowerCase();
   if (!slug) { fail('Student not found'); return; }
-  const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
+  const name = manifestKeys.find(n => n.toLowerCase() === slug);
   if (!name) { fail('Student not found'); return; }
 
   // Prev/next student arrows — alphabetical order, wrapping at the ends.
   (() => {
-    const keys = Object.keys(MANIFEST);
+    const keys = manifestKeys;
     const i = keys.indexOf(name);
     const prev = keys[(i - 1 + keys.length) % keys.length];
     const next = keys[(i + 1) % keys.length];
@@ -417,7 +418,8 @@
     const delim = tabs > commas ? '\t' : ',';
     const rows = [];
     let row = [], field = '', inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
+    const len = text.length;
+    for (let i = 0; i < len; i++) {
       const c = text[i];
       if (inQuotes) {
         if (c === '"') {
@@ -569,11 +571,13 @@
       .filter(p => p && p.length);
     const practicesEl = document.getElementById('heroPractices');
     if (practices.length) {
+      const frag = document.createDocumentFragment();
       for (const p of practices) {
         const span = document.createElement('span');
         span.textContent = p;
-        practicesEl.appendChild(span);
+        frag.appendChild(span);
       }
+      practicesEl.appendChild(frag);
     } else {
       practicesEl.remove();
     }
@@ -583,11 +587,13 @@
       ? studentOverride.bio
       : field(row, 'Bio');
     if (bioText) {
+      const frag = document.createDocumentFragment();
       for (const para of bioText.split(/\n{2,}|\r\n\r\n/)) {
         const p = document.createElement('p');
         p.textContent = para.trim();
-        if (p.textContent) bioEl.appendChild(p);
+        if (p.textContent) frag.appendChild(p);
       }
+      bioEl.appendChild(frag);
     } else {
       bioEl.remove();
     }
@@ -598,6 +604,7 @@
       { label: 'INSTAGRAM', url: field(row, 'Instagram', 'Instagram URL') },
       { label: 'LINKEDIN',  url: field(row, 'LinkedIn', 'Linkedin', 'LinkedIn URL') },
     ];
+    const socialsFrag = document.createDocumentFragment();
     let hasSocial = false;
     for (const { label, url } of socialLinks) {
       if (!url) continue;
@@ -608,9 +615,10 @@
       a.target = '_blank';
       a.rel = 'noopener';
       a.textContent = `[${label}]`;
-      socialsEl.appendChild(a);
+      socialsFrag.appendChild(a);
     }
-    if (!hasSocial) socialsEl.remove();
+    if (hasSocial) socialsEl.appendChild(socialsFrag);
+    else socialsEl.remove();
 
     document.title = `${name} — OTF`;
     const setMeta = (sel, value) => {
@@ -795,6 +803,7 @@
     }
 
     const container = document.getElementById('projects');
+    const containerFrag = document.createDocumentFragment();
 
     const ovDescs = studentOverride.projectDescriptions || {};
     groups.forEach((group, i) => {
@@ -822,6 +831,7 @@
           img.src = enc(`/Student Work/Projects/${file}`);
           img.alt = '';
           img.loading = 'lazy';
+          img.decoding = 'async';
           imagesDiv.appendChild(img);
         }
         article.appendChild(imagesDiv);
@@ -834,8 +844,10 @@
         article.appendChild(p);
       }
 
-      container.appendChild(article);
+      containerFrag.appendChild(article);
     });
+
+    container.appendChild(containerFrag);
   }
 
   // Match the slug to the sheet's Name column. Tries exact match, then a

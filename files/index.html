@@ -535,6 +535,7 @@
       <span id="status"></span>
       <button class="discard-btn" id="subBtn">Submissions</button>
       <button class="discard-btn" id="uploadBtn">Upload</button>
+      <button class="discard-btn" id="compressBtn">Compress</button>
       <button class="discard-btn" id="discardBtn" hidden>Discard</button>
       <button class="save-btn" id="saveBtn" hidden>Save</button>
       <button class="sign-out-btn" id="signOut">Sign out</button>
@@ -659,6 +660,10 @@
   const patError     = $('patError');
   const modalEl      = $('modal');
   const uploadModalEl = $('uploadModal');
+  const saveBtnEl    = $('saveBtn');
+  const discardBtnEl = $('discardBtn');
+  const uplRowsEl    = $('uplRows');
+  const uplStatusEl  = $('uplStatus');
 
   function setStatus(msg) { statusEl.textContent = msg; }
 
@@ -771,11 +776,13 @@
   }
 
   // Parse a YouTube/Vimeo URL → { provider, id } or null.
+  const YOUTUBE_RE = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/;
+  const VIMEO_RE = /vimeo\.com\/(?:video\/|channels\/[\w]+\/|groups\/[^/]+\/videos\/)?(\d+)/;
   function parseVideoUrl(url) {
     let m;
-    if ((m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/)))
+    if ((m = url.match(YOUTUBE_RE)))
       return { provider: 'youtube', id: m[1] };
-    if ((m = url.match(/vimeo\.com\/(?:video\/|channels\/[\w]+\/|groups\/[^/]+\/videos\/)?(\d+)/)))
+    if ((m = url.match(VIMEO_RE)))
       return { provider: 'vimeo', id: m[1] };
     return null;
   }
@@ -823,11 +830,12 @@
     const order = projectOrder[student] || [];
     const present = new Set(groupMap.keys());
     const result = [];
+    const seen = new Set();
     for (const k of order) {
-      if (present.has(k) && !result.includes(k)) result.push(k);
+      if (present.has(k) && !seen.has(k)) { seen.add(k); result.push(k); }
     }
     for (const k of groupMap.keys()) {
-      if (!result.includes(k)) result.push(k);
+      if (!seen.has(k)) { seen.add(k); result.push(k); }
     }
     return result;
   }
@@ -872,9 +880,11 @@
 
   function allocateUntitledK(student) {
     const used = new Set();
+    const prefix = student + '_';
+    const untitledRe = new RegExp(`^${student.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}_Untitled(\\d+)_`);
     for (const f of projects) {
-      if (!f.name.startsWith(student + '_')) continue;
-      const m = f.name.match(new RegExp(`^${student.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}_Untitled(\\d+)_`));
+      if (!f.name.startsWith(prefix)) continue;
+      const m = f.name.match(untitledRe);
       if (m) used.add(parseInt(m[1], 10));
     }
     for (const pnp of pendingNewProjects) {
@@ -903,12 +913,19 @@
   // ── Manifest (ported from scripts/generate-manifest.mjs) ──────────
   function computeManifest(hsNames, prNames) {
     const students = hsNames.map(f => f.replace(/\.webp$/i, '')).sort((a,b) => a.localeCompare(b));
+    // Pre-index students for O(1) exact / case-insensitive prefix lookups.
+    const studentExact = new Set(students);
+    const studentCi = new Map();
+    for (const s of students) {
+      const lc = s.toLowerCase();
+      if (!studentCi.has(lc)) studentCi.set(lc, s);
+    }
     const grouped = {};
     for (const file of prNames) {
       const us = file.indexOf('_');
       if (us <= 0) continue;
       const prefix = file.slice(0, us);
-      const key = students.find(s => s === prefix) ?? students.find(s => s.toLowerCase() === prefix.toLowerCase());
+      const key = (studentExact.has(prefix) ? prefix : undefined) ?? studentCi.get(prefix.toLowerCase());
       if (!key) continue;
       (grouped[key] ??= []).push(file);
     }
@@ -939,12 +956,14 @@
     return new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g, '')), c => c.charCodeAt(0)));
   }
 
+  const MANIFEST_RE = new RegExp(
+    '(' + SENT_START.replace(/\//g, '\\/') + ')([\\s\\S]*?)(' + SENT_END.replace(/\//g, '\\/') + ')'
+  );
+
   async function fetchManifestBlobs(afterHsNames, afterPrNames) {
     const manifest = computeManifest(afterHsNames, afterPrNames);
     const block = renderManifestBlock(manifest);
-    const re = new RegExp(
-      '(' + SENT_START.replace(/\//g, '\\/') + ')([\\s\\S]*?)(' + SENT_END.replace(/\//g, '\\/') + ')'
-    );
+    const re = MANIFEST_RE;
     return Promise.all(MANIFEST_PAGES.map(async pagePath => {
       const data = await gh('GET', `/contents/${encPath(pagePath)}?ref=${BRANCH}`);
       const decoded = b64decode(data.content);
@@ -993,13 +1012,14 @@
     const manifestBlobs = await fetchManifestBlobs(afterHs, afterPr);
 
     // 5. Build tree
+    const blobByPath = new Map(newBlobs.map(b => [b.path, b.sha]));
     const treeEntries = [];
     for (const c of changes) {
       if (c.delete) {
         treeEntries.push({ path: c.path, mode: '100644', type: 'blob', sha: null });
       } else {
-        const blob = newBlobs.find(b => b.path === c.path);
-        treeEntries.push({ path: c.path, mode: '100644', type: 'blob', sha: blob ? blob.sha : c.sha });
+        const blobSha = blobByPath.get(c.path);
+        treeEntries.push({ path: c.path, mode: '100644', type: 'blob', sha: blobSha != null ? blobSha : c.sha });
       }
     }
     for (const mb of manifestBlobs) {
@@ -1051,20 +1071,66 @@
     taskHideTimer = setTimeout(() => taskBarEl.setAttribute('hidden', ''), isError ? 4500 : 1800);
   }
 
-  // ── Image → WebP conversion (browser canvas, handles JPEG + PNG) ──
-  function convertToWebP(file, quality = 0.92) {
+  // ── Image compression + WebP conversion ───────────────────────────
+  // Downscales an image to ~1.2× the largest height it is ever displayed
+  // at on the site (headshots vs project images), then encodes to WebP.
+  // Large downscales are done by repeated halving so fine detail is not
+  // lost to aliasing. Aspect ratio is preserved (no distortion); a WebP
+  // already within size is passed through untouched to avoid re-encoding.
+  const COMPRESS_FACTOR = 1.2;
+  const WEBP_QUALITY = 0.92;
+  // Largest height (CSS px) each image type reaches on the public site.
+  const MAX_DISPLAY_H = { headshot: 744, project: 620 };
+  const TARGET_H = {
+    headshot: Math.round(MAX_DISPLAY_H.headshot * COMPRESS_FACTOR),
+    project:  Math.round(MAX_DISPLAY_H.project  * COMPRESS_FACTOR),
+  };
+
+  function compressImage(file, maxHeight, quality = WEBP_QUALITY) {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext('2d').drawImage(img, 0, 0);
-        canvas.toBlob(blob => {
+        const sw = img.naturalWidth, sh = img.naturalHeight;
+        const needsResize = sh > maxHeight;
+        // An already-WebP file within size is left as-is — re-encoding
+        // would only add generational quality loss.
+        if (/\.webp$/i.test(file.name) && !needsResize) {
           URL.revokeObjectURL(url);
-          if (!blob) return reject(new Error('WebP encoding failed'));
-          const newName = file.name.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+          resolve(file);
+          return;
+        }
+        const scale = needsResize ? maxHeight / sh : 1;
+        const tw = Math.max(1, Math.round(sw * scale));
+        const th = Math.max(1, Math.round(sh * scale));
+        // Step down by halving until within 2× of the target — a single
+        // large-ratio drawImage aliases fine detail; halving does not.
+        let cur = document.createElement('canvas');
+        cur.width = sw; cur.height = sh;
+        cur.getContext('2d').drawImage(img, 0, 0);
+        let cw = sw, ch = sh;
+        while (cw >= tw * 2 && ch >= th * 2) {
+          const nw = Math.max(tw, cw >> 1), nh = Math.max(th, ch >> 1);
+          const step = document.createElement('canvas');
+          step.width = nw; step.height = nh;
+          const sctx = step.getContext('2d');
+          sctx.imageSmoothingEnabled = true;
+          sctx.imageSmoothingQuality = 'high';
+          sctx.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
+          cur.width = cur.height = 0;  // free the previous canvas immediately
+          cur = step; cw = nw; ch = nh;
+        }
+        const out = document.createElement('canvas');
+        out.width = tw; out.height = th;
+        const octx = out.getContext('2d');
+        octx.imageSmoothingEnabled = true;
+        octx.imageSmoothingQuality = 'high';
+        octx.drawImage(cur, 0, 0, cw, ch, 0, 0, tw, th);
+        cur.width = cur.height = 0;
+        out.toBlob(blob => {
+          URL.revokeObjectURL(url);
+          if (!blob) { reject(new Error('WebP encoding failed')); return; }
+          const newName = file.name.replace(/\.(jpe?g|png|webp)$/i, '.webp');
           resolve(new File([blob], newName, { type: 'image/webp' }));
         }, 'image/webp', quality);
       };
@@ -1079,17 +1145,16 @@
     for (const file of fileList) {
       idx++;
       const lower = file.name.toLowerCase();
-      const needsConvert = /\.(jpg|jpeg|png)$/.test(lower);
-      const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
+      const isImg = /\.(jpe?g|png|webp)$/.test(lower);
       const isVid = /\.(mp4|webm)$/.test(lower);
       if (!isImg && !isVid) { alert(`Unsupported file type: ${file.name}`); continue; }
 
       const counter = total > 1 ? `${idx}/${total} · ` : '';
       let workFile = file;
       try {
-        if (needsConvert && isImg) {
-          showTask(`${counter}Converting`, file.name);
-          workFile = await convertToWebP(file);
+        if (isImg) {
+          showTask(`${counter}Compressing`, file.name);
+          workFile = await compressImage(file, isHeadshot ? TARGET_H.headshot : TARGET_H.project);
         }
 
         showTask(`${counter}Reading`, workFile.name);
@@ -1160,15 +1225,10 @@
 
   function doMoveInProject(file, projectKey, direction) {
     const inProject = projects
-      .filter(f => {
-        const p = parseFilename(currentStudent, f.name);
-        return p.kind === 'project' && p.project === projectKey;
-      })
-      .sort((a, b) => {
-        const pA = parseFilename(currentStudent, a.name);
-        const pB = parseFilename(currentStudent, b.name);
-        return pA.n - pB.n;
-      });
+      .map(f => ({ f, p: parseFilename(currentStudent, f.name) }))
+      .filter(({ p }) => p.kind === 'project' && p.project === projectKey)
+      .sort((a, b) => a.p.n - b.p.n)
+      .map(({ f }) => f);
     const idx = inProject.findIndex(f => f.path === file.path);
     if (idx < 0) return;
     const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
@@ -1187,15 +1247,10 @@
   function reorderFileInProject(projectKey, draggedPath, targetPath) {
     if (draggedPath === targetPath) return;
     const inProject = projects
-      .filter(f => {
-        const p = parseFilename(currentStudent, f.name);
-        return p.kind === 'project' && p.project === projectKey;
-      })
-      .sort((a, b) => {
-        const pA = parseFilename(currentStudent, a.name);
-        const pB = parseFilename(currentStudent, b.name);
-        return pA.n - pB.n;
-      });
+      .map(f => ({ f, p: parseFilename(currentStudent, f.name) }))
+      .filter(({ p }) => p.kind === 'project' && p.project === projectKey)
+      .sort((a, b) => a.p.n - b.p.n)
+      .map(({ f }) => f);
     const dragIdx = inProject.findIndex(f => f.path === draggedPath);
     const targetIdx = inProject.findIndex(f => f.path === targetPath);
     if (dragIdx < 0 || targetIdx < 0) return;
@@ -1307,16 +1362,16 @@
   }
 
   function showUploadModal() {
-    $('uplRows').innerHTML = '';
-    $('uplStatus').textContent = '';
-    $('uploadModal').removeAttribute('hidden');
+    uplRowsEl.innerHTML = '';
+    uplStatusEl.textContent = '';
+    uploadModalEl.removeAttribute('hidden');
   }
-  function hideUploadModal() { $('uploadModal').setAttribute('hidden', ''); }
+  function hideUploadModal() { uploadModalEl.setAttribute('hidden', ''); }
 
   async function processMassUpload(fileList) {
     const files = Array.from(fileList);
-    const rowsEl = $('uplRows');
-    const statusEl2 = $('uplStatus');
+    const rowsEl = uplRowsEl;
+    const statusEl2 = uplStatusEl;
     rowsEl.innerHTML = '';
     statusEl2.textContent = `Processing 0/${files.length}…`;
 
@@ -1324,25 +1379,31 @@
     try { names = await loadSheet(); } catch { /* fallback */ }
 
     const batchNextN = new Map();
+    // Loop-invariant: the student list does not change while processing the batch.
+    const allStudentNames = studentNames();
 
     const processOne = async (file, idx) => {
       statusEl2.textContent = `Processing ${idx + 1}/${files.length}…`;
       const lower = file.name.toLowerCase();
-      const isImg = /\.(jpg|jpeg|png|webp)$/.test(lower);
+      const isImg = /\.(jpe?g|png|webp)$/.test(lower);
       if (!isImg) { appendRow(rowsEl, file.name, '⚠ unsupported file type', true); return; }
+
+      // Headshot vs project — decided by the underscore in the original name.
+      const origStem = file.name.replace(/\.(jpe?g|png|webp)$/i, '');
+      const isHeadshot = origStem.indexOf('_') < 0;
 
       let workFile = file;
       try {
-        if (/\.(jpg|jpeg|png)$/.test(lower)) workFile = await convertToWebP(file);
+        workFile = await compressImage(file, isHeadshot ? TARGET_H.headshot : TARGET_H.project);
       } catch(e) {
-        appendRow(rowsEl, file.name, `⚠ conversion failed: ${e.message}`, true);
+        appendRow(rowsEl, file.name, `⚠ compression failed: ${e.message}`, true);
         return;
       }
 
       const stem = workFile.name.replace(/\.webp$/i, '');
       const underIdx = stem.indexOf('_');
       const slug = underIdx > 0 ? stem.slice(0, underIdx) : stem;
-      const studentMatch = studentNames().find(s => s.toLowerCase() === slug.toLowerCase());
+      const studentMatch = allStudentNames.find(s => s.toLowerCase() === slug.toLowerCase());
       if (!studentMatch) {
         appendRow(rowsEl, file.name, `⚠ no matching student (${slug})`, true);
         return;
@@ -1386,6 +1447,52 @@
     renderSidebar(); renderDetail(); updateSaveBtn();
   }
 
+  // Re-compress every committed image already in the library: fetch each
+  // blob, run it through the same compressor, and stage any that shrink.
+  // Nothing is committed until the user hits Save.
+  async function compressLibrary() {
+    const staged = new Set(pendingQueue.map(c => c.path));
+    const items = [...headshots, ...projects].filter(
+      f => f.sha && !/\.url$/i.test(f.name) && !staged.has(f.path)
+    );
+    showTask('Compressing library…', items.length ? `0/${items.length}` : '');
+    if (!items.length) { finishTask('Nothing to compress', ''); return; }
+
+    let done = 0, changed = 0, failed = 0;
+    const tasks = items.map(file => async () => {
+      try {
+        const maxH = file.path.startsWith(HS_DIR + '/') ? TARGET_H.headshot : TARGET_H.project;
+        const data = await gh('GET', `/git/blobs/${file.sha}`);
+        const bytes = Uint8Array.from(atob(data.content.replace(/\n/g, '')), c => c.charCodeAt(0));
+        const inputFile = new File([bytes], file.name, { type: 'image/webp' });
+        const out = await compressImage(inputFile, maxH);
+        if (out !== inputFile) {
+          const b64 = await fileToBase64(out);
+          if (file.localUrl) URL.revokeObjectURL(file.localUrl);
+          file.localUrl = URL.createObjectURL(out);
+          file.isPending = true;
+          pendingQueue = pendingQueue.filter(c => c.path !== file.path);
+          pendingQueue.push({ path: file.path, content: b64 });
+          changed++;
+        }
+      } catch (e) {
+        failed++;
+      } finally {
+        done++;
+        showTask('Compressing library…', `${done}/${items.length}`);
+      }
+    });
+
+    await withLimit(tasks, 4);
+    renderSidebar(); renderDetail(); updateSaveBtn();
+    finishTask(
+      failed ? 'Compressed with errors' : 'Compression staged ✓',
+      `${changed} resized · ${items.length - changed - failed} already optimal` +
+        (failed ? ` · ${failed} failed` : ''),
+      failed > 0
+    );
+  }
+
   function doDelete(file) {
     if (file.localUrl) URL.revokeObjectURL(file.localUrl);
     headshots = headshots.filter(h => h.path !== file.path);
@@ -1405,15 +1512,13 @@
 
   // ── Save / Discard ─────────────────────────────────────────────────
   function updateSaveBtn() {
-    const saveBtn = $('saveBtn');
-    const discardBtn = $('discardBtn');
     if (pendingQueue.length > 0) {
-      saveBtn.removeAttribute('hidden');
-      discardBtn.removeAttribute('hidden');
-      saveBtn.textContent = `Save (${pendingQueue.length})`;
+      saveBtnEl.removeAttribute('hidden');
+      discardBtnEl.removeAttribute('hidden');
+      saveBtnEl.textContent = `Save (${pendingQueue.length})`;
     } else {
-      saveBtn.setAttribute('hidden', '');
-      discardBtn.setAttribute('hidden', '');
+      saveBtnEl.setAttribute('hidden', '');
+      discardBtnEl.setAttribute('hidden', '');
     }
   }
 
@@ -1441,11 +1546,14 @@
   }
 
   // ── Modal ──────────────────────────────────────────────────────────
-  function showModal(title, body, onConfirm) {
-    modalEl.querySelector('.modal-title').textContent = title;
-    modalEl.querySelector('.modal-body').textContent = body;
+  const modalTitleEl = modalEl.querySelector('.modal-title');
+  const modalBodyEl = modalEl.querySelector('.modal-body');
+  function showModal(title, body, onConfirm, confirmLabel) {
+    modalTitleEl.textContent = title;
+    modalBodyEl.textContent = body;
     const btn = modalEl.querySelector('.modal-confirm');
     const fresh = btn.cloneNode(true);
+    fresh.textContent = confirmLabel || 'Delete';
     btn.replaceWith(fresh);
     fresh.addEventListener('click', () => { hideModal(); onConfirm(); });
     modalEl.removeAttribute('hidden');
@@ -1455,14 +1563,16 @@
 
   // ── Render ─────────────────────────────────────────────────────────
   function renderSidebar() {
-    sidebarEl.innerHTML = '';
+    const frag = document.createDocumentFragment();
     for (const name of studentNames()) {
       const btn = document.createElement('button');
       btn.className = 'student-btn' + (name === currentStudent ? ' active' : '');
       btn.textContent = displayNameFor(name);
       btn.addEventListener('click', () => selectStudent(name));
-      sidebarEl.appendChild(btn);
+      frag.appendChild(btn);
     }
+    sidebarEl.innerHTML = '';
+    sidebarEl.appendChild(frag);
   }
 
   function selectStudent(name) {
@@ -1472,10 +1582,10 @@
   }
 
   function renderDetail() {
-    detailEl.innerHTML = '';
     if (!currentStudent) { detailEl.innerHTML = '<p class="hint">Select a student</p>'; return; }
 
     const { headshot, unassigned, projects: groupMap } = groupForStudent(currentStudent);
+    const frag = document.createDocumentFragment();
 
     // Headshot section
     const hsSec = document.createElement('section');
@@ -1503,7 +1613,7 @@
       hsGrid.appendChild(addBox);
     }
     hsSec.appendChild(hsGrid);
-    detailEl.appendChild(hsSec);
+    frag.appendChild(hsSec);
 
     // Unassigned section (only shown when there are unassigned files)
     if (unassigned.length > 0) {
@@ -1516,7 +1626,7 @@
       unaGrid.className = 'file-grid';
       unassigned.forEach(f => unaGrid.appendChild(makeCard(f, 'unassigned', null, null)));
       unaSec.appendChild(unaGrid);
-      detailEl.appendChild(unaSec);
+      frag.appendChild(unaSec);
     }
 
     // Project sections (in persisted order)
@@ -1613,7 +1723,7 @@
       grid.appendChild(makeDropZone(projectKey, false));
       grid.appendChild(makeVideoZone(projectKey));
       sec.appendChild(grid);
-      detailEl.appendChild(sec);
+      frag.appendChild(sec);
     }
 
     // + New project button
@@ -1621,7 +1731,10 @@
     newProjBtn.className = 'new-project-btn';
     newProjBtn.textContent = '+ New Project';
     newProjBtn.addEventListener('click', () => doNewProject(currentStudent));
-    detailEl.appendChild(newProjBtn);
+    frag.appendChild(newProjBtn);
+
+    detailEl.innerHTML = '';
+    detailEl.appendChild(frag);
   }
 
   function makeCard(file, context, projectKey, seqN) {
@@ -2194,10 +2307,16 @@
     }
   });
 
-  $('saveBtn').addEventListener('click', doSave);
-  $('discardBtn').addEventListener('click', doDiscard);
+  saveBtnEl.addEventListener('click', doSave);
+  discardBtnEl.addEventListener('click', doDiscard);
 
   $('uploadBtn').addEventListener('click', showUploadModal);
+  $('compressBtn').addEventListener('click', () => showModal(
+    'Compress the whole library?',
+    'Every stored image is checked; oversized ones are re-encoded smaller. Changes are staged — review and Save afterwards.',
+    compressLibrary,
+    'Compress'
+  ));
   $('uploadClose').addEventListener('click', hideUploadModal);
   $('uploadDone').addEventListener('click', hideUploadModal);
 

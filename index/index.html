@@ -371,7 +371,8 @@
     const delim = tabs > commas ? '\t' : ',';
     const rows = [];
     let row = [], field = '', inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
+    const len = text.length;
+    for (let i = 0; i < len; i++) {
       const c = text[i];
       if (inQuotes) {
         if (c === '"') {
@@ -453,6 +454,7 @@
 
   function renderList(entries) {
     listEl.innerHTML = '';
+    const frag = document.createDocumentFragment();
     for (const e of entries) {
       const li = document.createElement('li');
       const inner = document.createElement(e.href ? 'a' : 'div');
@@ -469,12 +471,14 @@
 
       inner.append(name, disc);
       li.appendChild(inner);
-      listEl.appendChild(li);
+      frag.appendChild(li);
     }
+    listEl.appendChild(frag);
   }
 
   function renderFaces(entries) {
     gridEl.innerHTML = '';
+    const frag = document.createDocumentFragment();
     for (const e of entries) {
       if (!e.headshot) continue;
       const li = document.createElement('li');
@@ -489,10 +493,12 @@
       img.src = enc(`/Student Work/Headshots/${e.firstName}.webp`);
       img.alt = `${e.displayName} — portrait`;
       img.loading = 'lazy';
+      img.decoding = 'async';
       a.appendChild(img);
       li.appendChild(a);
-      gridEl.appendChild(li);
+      frag.appendChild(li);
     }
+    gridEl.appendChild(frag);
   }
 
   // Build entries: union of MANIFEST keys (have headshots) and sheet rows
@@ -548,8 +554,8 @@
     } catch {}
   }
 
-  listBtn.addEventListener('click', () => setView('list'));
-  facesBtn.addEventListener('click', () => setView('faces'));
+  listBtn.addEventListener('click', () => setView('list'), { passive: true });
+  facesBtn.addEventListener('click', () => setView('faces'), { passive: true });
 
   searchEl.addEventListener('input', () => {
     const q = searchEl.value.trim().toLowerCase();
@@ -559,7 +565,7 @@
           e.disciplines.toLowerCase().includes(q))
       : allEntries;
     renderList(filtered);
-  });
+  }, { passive: true });
 
   function reveal(entries) {
     allEntries = entries;

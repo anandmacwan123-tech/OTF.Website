@@ -219,6 +219,7 @@
     const FRONT_CHANCE = 0.35;
     const FRONT_CHANCE_MOBILE_MULT = 1.5;
     const mobileMQ = window.matchMedia('(max-width: 768px)');
+    const RECENT_LIMIT = Math.min(8, NAMES.length - 1);
 
     const enc = p => p.split('/').map(encodeURIComponent).join('/');
 
@@ -238,7 +239,7 @@
       const list = pool.length ? pool : NAMES;
       const name = list[Math.floor(Math.random() * list.length)];
       recentNames.push(name);
-      if (recentNames.length > Math.min(8, NAMES.length - 1)) recentNames.shift();
+      if (recentNames.length > RECENT_LIMIT) recentNames.shift();
       return name;
     }
 
@@ -261,9 +262,9 @@
       const place = () => {
         const W = window.innerWidth, H = window.innerHeight;
         const w = img.getBoundingClientRect().width || h;
-        const margin = 8;
-        const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin * 2));
-        const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin * 2));
+        const margin = 8, margin2 = margin * 2;
+        const x = Math.round(margin + Math.random() * Math.max(0, W - w - margin2));
+        const y = Math.round(margin + Math.random() * Math.max(0, H - h - margin2));
         img.style.left = x + 'px';
         img.style.top = y + 'px';
         img.style.visibility = 'visible';
