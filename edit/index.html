@@ -103,7 +103,6 @@
     display: block;
   }
   .thumb.new { outline: 2px solid var(--red); outline-offset: -2px; }
-  .thumb-headshot { height: 132px; }
 
   .file-btn {
     display: inline-block; font: inherit;
@@ -121,14 +120,11 @@
     margin-bottom: 1rem;
   }
   .project-title-row {
-    display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
   }
   .project-num {
     font-size: 0.6rem; font-weight: 500; letter-spacing: 0.04em;
     text-transform: uppercase; color: var(--muted); flex-shrink: 0;
-  }
-  .project-name-static {
-    font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
   }
   .add-project-btn {
     font: inherit; font-size: 0.62rem; font-weight: 500;
@@ -181,15 +177,6 @@
     </div>
 
     <fieldset>
-      <legend>Headshot</legend>
-      <div class="thumbs" id="headshotThumbs"></div>
-      <label class="file-btn">Replace headshot
-        <input type="file" id="headshotInput" accept=".jpg,.jpeg,.png,.webp">
-      </label>
-      <p class="field-hint">Optional. A clear portrait photo — JPG, PNG or WebP.</p>
-    </fieldset>
-
-    <fieldset>
       <legend>About you</legend>
       <label class="field">
         <span class="field-label">Bio</span>
@@ -237,15 +224,15 @@
 (() => {
   // __MANIFEST_START__
     const MANIFEST = {
-      "Anand": ["Anand_Based_1.webp", "Anand_Evolving_1.webp", "Anand_NCI_1.webp", "Anand_RaveBadge_1.webp", "Anand_ThinkingBlock_1.webp"],
+      "Anand": ["Anand_Based_1.webp", "Anand_Based_2.webp", "Anand_Based_3.webp", "Anand_Based_4.webp", "Anand_Evolving_1.webp", "Anand_Non-Consensual-INtelligence_1.webp", "Anand_RaveBadge_1.webp", "Anand_RaveBadge_2.webp", "Anand_RaveBadge_3.webp", "Anand_RaveBadge_4.webp", "Anand_RaveBadge_5.webp", "Anand_RaveBadge_6.webp", "Anand_RaveBadge_7.webp", "Anand_RaveBadge_8.webp", "Anand_RaveBadge_9.webp", "Anand_ThinkingBlock_1.webp", "Anand_ThinkingBlock_2.url"],
       "Arnete": ["Arnete_Aqva_1.webp", "Arnete_Atsijungti_1.webp", "Arnete_InthePresenceofGreen_1.webp", "Arnete_Postcard Series_1.webp"],
       "Becky": ["Becky_Kopparberg1_1.webp", "Becky_Kopparberg2_1.webp", "Becky_Kopparberg2-1_1.webp"],
       "Carolina": ["Carolina_Aqua_1.webp", "Carolina_Packaging_1.webp", "Carolina_Zine_1.webp"],
-      "Charles": ["Charles_Agneshouse_1.webp", "Charles_KpopZine_1.webp", "Charles_TMS_1.webp"],
+      "Charles": ["Charles_Agnes-house_1.webp", "Charles_BRAND-NARRATIVES-IN-K-POP_1.webp", "Charles_CHORUS_1.webp", "Charles_ST-DUNSTAN-RELIEF_1.webp", "Charles_THE-MARSHALL-SYSTEM_1.webp"],
       "Darcy": ["Darcy_Untitled_1.webp"],
       "Divine": ["Divine_ABOTABOT_1.webp", "Divine_TerraCotta_1.webp", "Divine_UntitledZine_1.webp"],
       "Elise": ["Elise_Tera1_1.webp", "Elise_Tera2_1.webp", "Elise_Tera3_1.webp"],
-      "Emily": ["Emily_4THGENZine_1.webp", "Emily_Globular_1.webp", "Emily_Sign_1.webp"],
+      "Emily": ["Emily_4TH-generation_1.webp", "Emily_Globular_1.webp", "Emily_Sign_1.webp", "Emily_Sign_2.webp"],
       "Jaeden": ["Jaeden_FameSucks_1.webp", "Jaeden_FameSucks1_1.webp", "Jaeden_FameSucks2_1.webp"],
       "Jamie": ["Jamie_HemDuyen_1.webp", "Jamie_Kynexus_1.webp"],
       "Jenna": ["Jenna_Aer_1.webp", "Jenna_Privacy Matters_1.webp", "Jenna_Veil_1.webp"],
@@ -255,18 +242,18 @@
       "Martim": ["Martim_5PP_1.webp", "Martim_B33ChairPoster_1.webp", "Martim_Reflections_1.webp"],
       "Maseray": ["Maseray_IgnisStudios_1.webp", "Maseray_LordandSaviour_1.webp", "Maseray_ThedesignersArchive_1.webp"],
       "Nikol": ["Nikol_Aquari_1.webp", "Nikol_CREATEPoster_1.webp", "Nikol_WWTPLUposter_1.webp"],
-      "Noora": ["Noora_Lipstick_1.webp", "Noora_PFI_1.webp", "Noora_RP_1.webp"],
+      "Noora": ["Noora_Golestan-Palce_1.webp", "Noora_Golestan-Palce_2.webp", "Noora_Lipstick_1.webp", "Noora_PFI_1.webp", "Noora_RAAZE-PERSIA_1.webp", "Noora_RAAZE-PERSIA_2.webp"],
       "Nora": ["Nora_Overstack_1.webp", "Nora_PhobiaFiles_1.webp", "Nora_ShakenNotStirred_1.webp", "Nora_ShakenNotStirred2_1.webp", "Nora_SmultringerPhotography_1.webp", "Nora_SmultringerPhotography2_1.webp"],
-      "Nuria": ["Nuria_Project1_1.webp", "Nuria_Project2_1.webp", "Nuria_Project3_1.webp"],
+      "Nuria": ["Nuria_HARINGEY-ZINE_1.webp", "Nuria_HARINGEY-ZINE_2.webp", "Nuria_Project2_1.webp"],
       "Oli": ["Oli_Project1_1.webp", "Oli_Project2_1.webp", "Oli_Project3_1.webp"],
       "Olya": [],
       "Oscar": ["Oscar_AER_1.webp", "Oscar_Rutt-Etra_1.webp", "Oscar_Zine_1.webp"],
       "Rebecca": ["Rebecca_Project1_1.webp", "Rebecca_Project2_1.webp", "Rebecca_Project3_1.webp"],
-      "Sara": ["Sara_Project1_1.webp", "Sara_Project2_1.webp", "Sara_Project3_1.webp"],
+      "Sara": ["Sara_BLOOMPACKAGING_1.webp", "Sara_BLOOMPACKAGING_2.webp", "Sara_ESCAPISM_1.webp", "Sara_ESCAPISM_2.url"],
       "Sasha": ["Sasha_Project1_1.webp", "Sasha_Project2_1.webp", "Sasha_Project3_1.webp"],
       "Sebastian": ["Sebastian_Project1_1.webp", "Sebastian_Project2_1.webp", "Sebastian_Project3_1.webp"],
       "Shalom": ["Shalom_Project1_1.webp", "Shalom_Project2_1.webp", "Shalom_Project3_1.webp"],
-      "Surayya": ["Surayya_Project1_1.webp", "Surayya_Project2_1.webp", "Surayya_Project3_1.webp"],
+      "Surayya": ["Surayya_BINDERS_1.webp", "Surayya_KHALCHA_1.webp", "Surayya_terra-science-museum_1.webp"],
       "Taleb": ["Taleb_Project1_1.webp", "Taleb_Project2_1.webp", "Taleb_Project3_1.webp"],
       "Tallulah": ["Tallulah_Project1_1.webp", "Tallulah_Project2_1.webp", "Tallulah_Project3_1.webp"],
       "Valentina": ["Valentina_Project1_1.webp"],
@@ -419,7 +406,6 @@
   }
 
   // ── Form state ──────────────────────────────────────────────────────
-  let newHeadshot = null;          // File or null
   const projectBlocks = [];        // { key, isNew, titleInput, base, descInput, newFiles, numEl }
 
   function makeProjectBlock({ key, base, files, isNew, description }) {
@@ -432,20 +418,25 @@
     numEl.className = 'project-num';
     titleRow.appendChild(numEl);
 
-    let titleInput;
-    if (isNew) {
-      titleInput = document.createElement('input');
-      titleInput.type = 'text';
-      titleInput.placeholder = 'Project title';
-      titleInput.style.flex = '1';
-      titleRow.appendChild(titleInput);
-    } else {
-      const nameEl = document.createElement('span');
-      nameEl.className = 'project-name-static';
-      nameEl.textContent = base;
-      titleRow.appendChild(nameEl);
-    }
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.value = base || '';
+    titleInput.placeholder = 'Project title';
+    titleInput.style.flex = '1';
+    titleRow.appendChild(titleInput);
     block.appendChild(titleRow);
+
+    // Description (above images)
+    const descLabel = document.createElement('label');
+    descLabel.className = 'field';
+    const descSpan = document.createElement('span');
+    descSpan.className = 'field-label';
+    descSpan.textContent = 'Description';
+    const descInput = document.createElement('textarea');
+    descInput.value = description || '';
+    descInput.placeholder = 'What is this project about?';
+    descLabel.append(descSpan, descInput);
+    block.appendChild(descLabel);
 
     // Existing images
     const thumbs = document.createElement('div');
@@ -460,18 +451,6 @@
       thumbs.appendChild(img);
     }
     block.appendChild(thumbs);
-
-    // Description
-    const descLabel = document.createElement('label');
-    descLabel.className = 'field';
-    const descSpan = document.createElement('span');
-    descSpan.className = 'field-label';
-    descSpan.textContent = 'Description';
-    const descInput = document.createElement('textarea');
-    descInput.value = description || '';
-    descInput.placeholder = 'What is this project about?';
-    descLabel.append(descSpan, descInput);
-    block.appendChild(descLabel);
 
     // Add images
     const newFiles = [];
@@ -521,7 +500,7 @@
     try {
       const projects = [];
       for (const b of projectBlocks) {
-        const title = b.isNew ? (b.titleInput.value.trim()) : b.base;
+        const title = b.titleInput.value.trim();
         const description = b.descInput.value.trim();
         const images = [];
         for (const file of b.newFiles) {
@@ -532,12 +511,6 @@
         projects.push({ key: b.isNew ? null : b.key, title, description, images });
       }
 
-      let headshot = null;
-      if (newHeadshot) {
-        const blob = await compressImage(newHeadshot, 900, 0.85);
-        headshot = { origName: newHeadshot.name, dataB64: await blobToBase64(blob) };
-      }
-
       const payload = {
         password,
         student: name,
@@ -545,7 +518,6 @@
         bio: document.getElementById('bio').value.trim(),
         practices: [0, 1, 2].map(i => document.getElementById('practice' + i).value.trim()),
         projects,
-        headshot,
         note: document.getElementById('note').value.trim(),
       };
 
@@ -569,20 +541,6 @@
   }
 
   // ── Init ────────────────────────────────────────────────────────────
-  document.getElementById('headshotInput').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    newHeadshot = file;
-    const thumbs = document.getElementById('headshotThumbs');
-    let img = thumbs.querySelector('.new');
-    if (!img) {
-      img = document.createElement('img');
-      img.className = 'thumb thumb-headshot new';
-      thumbs.appendChild(img);
-    }
-    img.src = URL.createObjectURL(file);
-  });
-
   document.getElementById('addProject').addEventListener('click', () => {
     if (projectBlocks.length >= MAX_PROJECTS) return;
     makeProjectBlock({ key: null, base: '', files: [], isNew: true, description: '' });
@@ -593,15 +551,6 @@
   function build(row, overrides) {
     document.getElementById('heading').textContent = (field(row, 'Name') || name) + ' — edit your page';
     document.getElementById('heading').dataset.fullName = field(row, 'Name') || name;
-
-    // Headshot
-    const hsThumbs = document.getElementById('headshotThumbs');
-    const hs = document.createElement('img');
-    hs.className = 'thumb thumb-headshot';
-    hs.src = enc('/Student Work/Headshots/' + name + '.webp');
-    hs.alt = '';
-    hs.onerror = () => hs.remove();
-    hsThumbs.appendChild(hs);
 
     // Bio + practices (override wins over sheet)
     document.getElementById('bio').value = overrides.bio != null ? overrides.bio : field(row, 'Bio');
