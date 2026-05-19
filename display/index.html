@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>OTF — Display</title>
+<link rel="icon" type="image/jpeg" href="/Favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FF002F;   /* red display background */
+    --scale: 1;      /* image-size multiplier (scale control) */
+    --speed: 1;      /* animation-rate multiplier (speed control) */
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: #000;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Floating project image — label stacked above, both fixed. */
+  .float-wrap {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    pointer-events: none;
+    user-select: none;
+    visibility: hidden;
+  }
+
+  .student-img {
+    display: block;
+    width: auto;
+    -webkit-user-drag: none;
+  }
+
+  /* Labels — 0.8× the public showcase (19.2px), black & white on red. */
+  .label {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0 2px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 19.2px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -0.12em;
+    text-transform: uppercase;
+  }
+  .label-headshot,
+  .label-project { background: #000; color: #fff; }
+
+  /* Project labels can be switched off; headshot labels stay on. */
+  body.no-project-labels .label-project { display: none; }
+
+  /* Central headshot name label — JS-positioned above the headshot. */
+  #headshotLabel {
+    position: fixed;
+    z-index: 5;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .media-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Headshot — 0.8× the public showcase size, times the scale control. */
+  .headshot-link {
+    display: inline-block;
+    position: relative;
+    height: calc(clamp(269px, 52.8vh, 595px) * var(--scale));
+    line-height: 0;
+  }
+
+  .headshot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    opacity: 0;
+    transition: opacity calc(0.6s / var(--speed)) ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .headshot.active { opacity: 1; }
+
+  /* ─── Controls — hidden, revealed on bottom-edge hover ─── */
+  .controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(1.5rem, 4vw, 4.5rem);
+    /* Soft, light gradient rising from the bottom edge — no hard container. */
+    padding: 5rem 2.5rem 1.75rem;
+    background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.2) 40%,
+      rgba(0, 0, 0, 0) 100%);
+    color: #fff;
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .controls.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ctl {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .ctl-name {
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Slider — thin stroke base, square thumb, thicker stroke to its left. */
+  .ctl-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: clamp(110px, 13vw, 220px);
+    height: 14px;
+    background: transparent;
+    cursor: pointer;
+    margin: 0;
+  }
+  .ctl-range::-webkit-slider-runnable-track {
+    height: 14px;
+    background:
+      linear-gradient(#fff, #fff) no-repeat left center / 100% 1px,
+      linear-gradient(#fff, #fff) no-repeat left center / var(--p, 50%) 4px;
+  }
+  .ctl-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 9px;
+    height: 9px;
+    margin-top: 2.5px;
+    background: #fff;
+    border: 0;
+  }
+  .ctl-range::-moz-range-track {
+    height: 14px;
+    background:
+      linear-gradient(#fff, #fff) no-repeat left center / 100% 1px,
+      linear-gradient(#fff, #fff) no-repeat left center / var(--p, 50%) 4px;
+  }
+  .ctl-range::-moz-range-thumb {
+    width: 9px;
+    height: 9px;
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* Precise numeric entry alongside each slider. */
+  .ctl-num {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: none;
+    width: 3.2rem;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    font: inherit;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 0.15rem 0;
+    outline: none;
+  }
+  .ctl-num:focus { border-bottom-color: #fff; }
+  .ctl-num::-webkit-outer-spin-button,
+  .ctl-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .ctl-toggle {
+    font: inherit;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .ctl-toggle[aria-pressed="false"] { opacity: 0.4; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body class="no-project-labels">
+  <h1 class="sr-only">OTF — Graphic Design Degree Show display</h1>
+
+  <div class="media-wrap">
+    <div id="headshotLink" class="headshot-link">
+      <img id="headshotA" class="headshot" alt="">
+      <img id="headshotB" class="headshot" alt="">
+    </div>
+  </div>
+
+  <div class="label label-headshot" id="headshotLabel" aria-hidden="true"></div>
+
+  <div class="controls" id="controls">
+    <div class="ctl">
+      <span class="ctl-name">Scale</span>
+      <input type="range" class="ctl-range" id="scaleCtl" min="0.5" max="1.75" step="0.05" value="1" aria-label="Image scale">
+      <input type="number" class="ctl-num" id="scaleNum" min="0.5" max="1.75" step="0.05" value="1" aria-label="Image scale value">
+    </div>
+    <div class="ctl">
+      <span class="ctl-name">Speed</span>
+      <input type="range" class="ctl-range" id="speedCtl" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed">
+      <input type="number" class="ctl-num" id="speedNum" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed value">
+    </div>
+    <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="false">Project labels</button>
+  </div>
+
+  <script>
+  (() => {
+    // __MANIFEST_START__
+    const MANIFEST = {
+      "Anand": ["Anand_Based_1.webp", "Anand_Evolving_1.webp", "Anand_NCI_1.webp", "Anand_RaveBadge_1.webp", "Anand_ThinkingBlock_1.webp"],
+      "Arnete": ["Arnete_Aqva_1.webp", "Arnete_Atsijungti_1.webp", "Arnete_InthePresenceofGreen_1.webp", "Arnete_Postcard Series_1.webp"],
+      "Becky": ["Becky_Kopparberg1_1.webp", "Becky_Kopparberg2_1.webp", "Becky_Kopparberg2-1_1.webp"],
+      "Carolina": ["Carolina_Aqua_1.webp", "Carolina_Packaging_1.webp", "Carolina_Zine_1.webp"],
+      "Charles": ["Charles_Agneshouse_1.webp", "Charles_KpopZine_1.webp", "Charles_TMS_1.webp"],
+      "Darcy": ["Darcy_Untitled_1.webp"],
+      "Divine": ["Divine_ABOTABOT_1.webp", "Divine_TerraCotta_1.webp", "Divine_UntitledZine_1.webp"],
+      "Elise": ["Elise_Tera1_1.webp", "Elise_Tera2_1.webp", "Elise_Tera3_1.webp"],
+      "Emily": ["Emily_4THGENZine_1.webp", "Emily_Globular_1.webp", "Emily_Sign_1.webp"],
+      "Jaeden": ["Jaeden_FameSucks_1.webp", "Jaeden_FameSucks1_1.webp", "Jaeden_FameSucks2_1.webp"],
+      "Jamie": ["Jamie_HemDuyen_1.webp", "Jamie_Kynexus_1.webp"],
+      "Jenna": ["Jenna_Aer_1.webp", "Jenna_Privacy Matters_1.webp", "Jenna_Veil_1.webp"],
+      "Jess": ["Jess_Aqya_1.webp", "Jess_CFTSOC_1.webp", "Jess_Untitled_1.webp"],
+      "Kami": ["Kami_Football-outside-of-football_1.webp", "Kami_Football-outside-of-football_2.webp", "Kami_Football-outside-of-football_3.webp"],
+      "Kye": ["Kye_HeadphonesAd_1.webp", "Kye_IncensePackaging_1.webp", "Kye_Untitled_1.webp"],
+      "Martim": ["Martim_5PP_1.webp", "Martim_B33ChairPoster_1.webp", "Martim_Reflections_1.webp"],
+      "Maseray": ["Maseray_IgnisStudios_1.webp", "Maseray_LordandSaviour_1.webp", "Maseray_ThedesignersArchive_1.webp"],
+      "Nikol": ["Nikol_Aquari_1.webp", "Nikol_CREATEPoster_1.webp", "Nikol_WWTPLUposter_1.webp"],
+      "Noora": ["Noora_Lipstick_1.webp", "Noora_PFI_1.webp", "Noora_RP_1.webp"],
+      "Nora": ["Nora_Overstack_1.webp", "Nora_PhobiaFiles_1.webp", "Nora_ShakenNotStirred_1.webp", "Nora_ShakenNotStirred2_1.webp", "Nora_SmultringerPhotography_1.webp", "Nora_SmultringerPhotography2_1.webp"],
+      "Nuria": ["Nuria_Project1_1.webp", "Nuria_Project2_1.webp", "Nuria_Project3_1.webp"],
+      "Oli": ["Oli_Project1_1.webp", "Oli_Project2_1.webp", "Oli_Project3_1.webp"],
+      "Olya": [],
+      "Oscar": ["Oscar_AER_1.webp", "Oscar_Rutt-Etra_1.webp", "Oscar_Zine_1.webp"],
+      "Rebecca": ["Rebecca_Project1_1.webp", "Rebecca_Project2_1.webp", "Rebecca_Project3_1.webp"],
+      "Sara": ["Sara_Project1_1.webp", "Sara_Project2_1.webp", "Sara_Project3_1.webp"],
+      "Sasha": ["Sasha_Project1_1.webp", "Sasha_Project2_1.webp", "Sasha_Project3_1.webp"],
+      "Sebastian": ["Sebastian_Project1_1.webp", "Sebastian_Project2_1.webp", "Sebastian_Project3_1.webp"],
+      "Shalom": ["Shalom_Project1_1.webp", "Shalom_Project2_1.webp", "Shalom_Project3_1.webp"],
+      "Surayya": ["Surayya_Project1_1.webp", "Surayya_Project2_1.webp", "Surayya_Project3_1.webp"],
+      "Taleb": ["Taleb_Project1_1.webp", "Taleb_Project2_1.webp", "Taleb_Project3_1.webp"],
+      "Tallulah": ["Tallulah_Project1_1.webp", "Tallulah_Project2_1.webp", "Tallulah_Project3_1.webp"],
+      "Valentina": ["Valentina_Project1_1.webp"],
+      "Vanessa": ["Vanessa_Project1_1.webp", "Vanessa_Project2_1.webp", "Vanessa_Project3_1.webp"],
+      "Will": ["Will_Project1_1.webp", "Will_Project2_1.webp", "Will_Project3_1.webp"]
+    };
+    // __MANIFEST_END__
+
+    const STUDENTS = Object.keys(MANIFEST);
+    if (STUDENTS.length === 0) return;  // no assets — leave the screen idle
+
+    // Base timings (the public showcase rates); the speed control divides these.
+    const BASE_HEADSHOT_MS = 3000;
+    const BASE_SPAWN_MS = 180;
+    const MAX_ACTIVE = 3;
+    const FRONT_CHANCE = 0.35;
+
+    // Runtime controls.
+    let imgScale = 1;   // scale slider — multiplies image size
+    let speed = 1;      // speed slider — multiplies the animation rate
+
+    const enc = p => p.split('/').map(encodeURIComponent).join('/');
+    const root = document.documentElement;
+
+    // Floating project image height: 0.55 × 0.8 = 0.44 of viewport height,
+    // clamped — the placement maths is viewport-relative so it adapts to a
+    // tall portrait screen on its own.
+    const baseProjectH = () => Math.max(224, Math.min(496, window.innerHeight * 0.44));
+
+    // ── Full names from the sheet (headshot label shows e.g. "Anand Macwan") ──
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
+    const fullNames = new Map();
+    fetch(SHEET_URL + '&t=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.ok ? r.text() : '')
+      .then(text => {
+        for (const line of text.split(/\r?\n/)) {
+          const parts = line.split(',');
+          const raw = (parts[2] || '').replace(/^"|"$/g, '').trim();
+          if (raw) fullNames.set(raw.split(/\s+/)[0], raw);
+        }
+        if (currentStudent && fullNames.has(currentStudent)) positionLabel();
+      })
+      .catch(() => {});
+
+    // Warm the cache for every headshot and project image.
+    STUDENTS.forEach(name => {
+      (new Image()).src = enc(`/Student Work/Headshots/${name}.webp`);
+      (MANIFEST[name] || []).forEach(file => {
+        if (/\.webp$/i.test(file)) (new Image()).src = enc(`/Student Work/Projects/${file}`);
+      });
+    });
+
+    /* ───── Headshot slideshow ───── */
+    const headshotLink = document.getElementById('headshotLink');
+    const headshotLabel = document.getElementById('headshotLabel');
+    const imgs = [
+      document.getElementById('headshotA'),
+      document.getElementById('headshotB'),
+    ];
+    let activeIdx = 0;
+    let currentStudent = null;
+    let projectQueue = [];
+    let studentBag = [];
+    let lastStudent = null;
+    const brokenStudents = new Set();
+
+    function shuffled(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // Shuffle bag — every student shown once before any repeats.
+    function refillBag() {
+      const eligible = STUDENTS.filter(n => !brokenStudents.has(n));
+      const bag = shuffled(eligible);
+      if (bag.length > 1 && bag[bag.length - 1] === lastStudent) {
+        [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+      }
+      studentBag = bag;
+    }
+
+    function pickStudent() {
+      for (let guard = 0; guard <= STUDENTS.length; guard++) {
+        if (studentBag.length === 0) refillBag();
+        if (studentBag.length === 0) return null;
+        const name = studentBag.pop();
+        if (!brokenStudents.has(name)) { lastStudent = name; return name; }
+      }
+      return null;
+    }
+
+    // Place the name label flush above the top-left of the active headshot.
+    function positionLabel() {
+      if (!currentStudent) return;
+      headshotLabel.textContent = fullNames.get(currentStudent) || currentStudent;
+      headshotLabel.style.visibility = 'visible';
+      const r = imgs[activeIdx].getBoundingClientRect();
+      headshotLabel.style.left = r.left + 'px';
+      headshotLabel.style.top = (r.top - headshotLabel.offsetHeight) + 'px';
+    }
+
+    function swapHeadshot() {
+      const name = pickStudent();
+      if (!name) return;
+
+      const nextIdx = 1 - activeIdx;
+      const nextImg = imgs[nextIdx];
+      const currentImg = imgs[activeIdx];
+
+      const onload = () => {
+        nextImg.classList.add('active');
+        currentImg.classList.remove('active');
+        currentStudent = name;
+        projectQueue = shuffled((MANIFEST[name] || []).filter(f => /\.webp$/i.test(f)));
+        activeIdx = nextIdx;
+        for (const el of placed) el.remove();
+        placed.clear();
+        requestAnimationFrame(positionLabel);
+      };
+
+      const onerror = () => {
+        brokenStudents.add(name);
+        nextImg.onload = nextImg.onerror = null;
+        swapHeadshot();  // try another student in this same tick
+      };
+
+      nextImg.onload = onload;
+      nextImg.onerror = onerror;
+      nextImg.alt = `${name} — student portrait`;
+      nextImg.src = enc(`/Student Work/Headshots/${name}.webp`);
+    }
+
+    /* ───── Floating project images ───── */
+    const active = new Set();
+    const placed = new Set();
+
+    function projectLabelFor(student, file) {
+      const stem = file.replace(/\.webp$/i, '').replace(new RegExp('^' + student + '_'), '');
+      const m = stem.match(/^(.+)_\d+$/);
+      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ');
+    }
+
+    function spawn() {
+      if (!currentStudent) return;
+      if (projectQueue.length === 0) return;
+      if (active.size >= MAX_ACTIVE) return;
+      if (active.size > 0 && Math.random() < 0.4) return;  // vary the count
+
+      const zIndex = Math.random() < FRONT_CHANCE ? 3 : 1;  // in front of / behind headshot
+      const file = projectQueue.pop();
+
+      const wrap = document.createElement('div');
+      wrap.className = 'float-wrap';
+      wrap.style.zIndex = zIndex;
+
+      const lbl = document.createElement('div');
+      lbl.className = 'label label-project';
+      lbl.textContent = projectLabelFor(currentStudent, file);
+      wrap.appendChild(lbl);
+
+      const img = document.createElement('img');
+      img.className = 'student-img';
+      img.src = enc(`/Student Work/Projects/${file}`);
+      img.alt = '';
+      wrap.appendChild(img);
+
+      const place = () => {
+        active.delete(wrap);
+        const W = window.innerWidth, H = window.innerHeight;
+        const renderedH = Math.round(baseProjectH() * imgScale);
+        img.style.height = renderedH + 'px';
+        const w = img.naturalHeight > 0
+          ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
+          : renderedH;
+        const hs = headshotLink.getBoundingClientRect();
+        const hsMidY = hs.top + hs.height / 2;
+        const hsArea = hs.width * hs.height;
+        const minVisibleArea = 0.8 * w * renderedH;
+        const maxHsOverlap = 0.3 * hsArea;
+
+        const ok = (x, y) => {
+          // At least 80% of the image's area must be within the viewport
+          const visW = Math.max(0, Math.min(x + w, W) - Math.max(x, 0));
+          const visH = Math.max(0, Math.min(y + renderedH, H) - Math.max(y, 0));
+          if (visW * visH < minVisibleArea) return false;
+          // Must not overlap the top half of the headshot
+          if (x + w > hs.left && x < hs.right && y + renderedH > hs.top && y < hsMidY) return false;
+          // Must not cover more than 30% of the headshot
+          const ow = Math.max(0, Math.min(x + w, hs.right) - Math.max(x, hs.left));
+          const oh = Math.max(0, Math.min(y + renderedH, hs.bottom) - Math.max(y, hs.top));
+          return ow * oh <= maxHsOverlap;
+        };
+
+        const xMin = -Math.round(w * 0.2), xMax = W - Math.round(w * 0.8);
+        const yMin = -Math.round(renderedH * 0.2), yMax = H - Math.round(renderedH * 0.8);
+        const xRange = xMax - xMin, yRange = yMax - yMin;
+        const halfW = w / 2, halfH = renderedH / 2;
+
+        // Best-candidate sampling — spread images away from neighbours.
+        const centers = [];
+        for (const el of placed) {
+          const r = el.getBoundingClientRect();
+          centers.push([r.left + r.width / 2, r.top + r.height / 2]);
+        }
+
+        let best = null, bestScore = -1;
+        for (let tries = 0; tries < 40; tries++) {
+          const px = Math.round(xMin + Math.random() * xRange);
+          const py = Math.round(yMin + Math.random() * yRange);
+          if (!ok(px, py)) continue;
+          const mx = px + halfW, my = py + halfH;
+          let nearest = Infinity;
+          for (const [ox, oy] of centers) {
+            nearest = Math.min(nearest, Math.hypot(mx - ox, my - oy));
+          }
+          const dist = nearest === Infinity ? 1e6 : nearest;
+          const score = dist * (0.75 + Math.random() * 0.5);
+          if (score > bestScore) { bestScore = score; best = { x: px, y: py }; }
+        }
+        if (!best) { wrap.remove(); return; }  // only show images >=80% in frame
+
+        wrap.style.left = best.x + 'px';
+        wrap.style.top = best.y + 'px';
+        wrap.style.visibility = 'visible';
+        placed.add(wrap);
+      };
+      img.addEventListener('load', place, { once: true });
+      img.addEventListener('error', () => {
+        wrap.remove();
+        active.delete(wrap);
+      }, { once: true });
+
+      document.body.appendChild(wrap);
+      active.add(wrap);
+    }
+
+    /* ───── Timers — restarted whenever the speed control changes ───── */
+    let headshotTimer = null, spawnTimer = null;
+    function applySpeed() {
+      clearInterval(headshotTimer);
+      clearInterval(spawnTimer);
+      headshotTimer = setInterval(swapHeadshot, BASE_HEADSHOT_MS / speed);
+      spawnTimer = setInterval(spawn, BASE_SPAWN_MS / speed);
+      root.style.setProperty('--speed', speed);
+    }
+
+    swapHeadshot();
+    applySpeed();
+    requestAnimationFrame(spawn);
+
+    /* ───── Resize / visibility ───── */
+    let resizeT;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(() => {
+        for (const el of active) el.remove();
+        active.clear();
+        for (const el of placed) el.remove();
+        placed.clear();
+        requestAnimationFrame(positionLabel);
+      }, 120);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        for (const el of active) el.remove();
+        active.clear();
+        for (const el of placed) el.remove();
+        placed.clear();
+      }
+    });
+
+    /* ───── Controls — hidden until the cursor reaches the bottom edge ───── */
+    const controls = document.getElementById('controls');
+    const HOVER_ZONE = 170;  // px from the bottom edge
+    document.addEventListener('mousemove', e => {
+      controls.classList.toggle('visible', e.clientY >= window.innerHeight - HOVER_ZONE);
+    });
+    document.addEventListener('mouseleave', () => controls.classList.remove('visible'));
+
+    // Wire a slider + its numeric input as one two-way control. The slider's
+    // --p custom property drives the thicker stroke to the left of the thumb.
+    function bindControl(rangeId, numId, onValue) {
+      const range = document.getElementById(rangeId);
+      const num = document.getElementById(numId);
+      const min = parseFloat(range.min), max = parseFloat(range.max);
+      const sync = () => {
+        range.style.setProperty('--p',
+          ((parseFloat(range.value) - min) / (max - min) * 100) + '%');
+      };
+      sync();
+      range.addEventListener('input', () => {
+        num.value = range.value;
+        sync();
+        onValue(parseFloat(range.value));
+      });
+      num.addEventListener('change', () => {
+        let v = parseFloat(num.value);
+        if (isNaN(v)) { num.value = range.value; return; }
+        v = Math.min(max, Math.max(min, v));
+        range.value = v;
+        v = parseFloat(range.value);  // snapped to the slider step
+        num.value = v;
+        sync();
+        onValue(v);
+      });
+    }
+
+    // Scale — resizes images while keeping the placement/centring rules.
+    bindControl('scaleCtl', 'scaleNum', v => {
+      imgScale = v;
+      root.style.setProperty('--scale', v);
+      requestAnimationFrame(positionLabel);
+    });
+
+    // Speed — divides the headshot + spawn intervals and the crossfade.
+    bindControl('speedCtl', 'speedNum', v => {
+      speed = v;
+      applySpeed();
+    });
+
+    // Labels — toggles project labels only; headshot labels always show.
+    const labelsCtl = document.getElementById('labelsCtl');
+    labelsCtl.addEventListener('click', () => {
+      const off = document.body.classList.toggle('no-project-labels');
+      labelsCtl.setAttribute('aria-pressed', String(!off));
+    });
+  })();
+  </script>
+</body>
+</html>
