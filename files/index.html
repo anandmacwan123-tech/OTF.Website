@@ -1919,6 +1919,7 @@
         newImageCount: (p.images || []).length,
       })),
       note: record.note || '',
+      headshotProvided: !!record.headshot,
       createdAt: record.createdAt,
       status,
       processedAt: Date.now(),
@@ -2013,6 +2014,7 @@
       if (Object.keys(ov).length) overridesData[s] = ov;
 
       stageOverrides();
+      if (record.headshot) stageHeadshotB64(s, record.headshot);
 
       // Stage archive file so it's committed alongside the changes.
       const arch = buildArchiveEntry(id, record, 'applied');
@@ -2100,6 +2102,33 @@
 
     const hasBio = !!(record.bio && record.bio.trim());
     const subPractices = (record.practices || []).filter(p => p && p.trim());
+
+    if (record.headshot) {
+      const f = document.createElement('div');
+      f.className = 'sub-field';
+      const b = document.createElement('b'); b.textContent = 'Headshot';
+      f.appendChild(b);
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:1rem;align-items:flex-start;margin-top:0.4rem;flex-wrap:wrap';
+      const curWrap = document.createElement('div');
+      const curLbl = document.createElement('span');
+      curLbl.className = 'sub-compare-label'; curLbl.textContent = 'Current';
+      const curImg = document.createElement('img');
+      curImg.className = 'sub-thumbs'; curImg.style.cssText = 'height:96px;width:auto;max-width:140px;background:rgba(0,0,0,0.05)';
+      curImg.src = '/Student Work/Headshots/' + record.student + '.webp';
+      curImg.onerror = () => { curImg.replaceWith(Object.assign(document.createElement('span'), { className: 'sub-compare-label', textContent: '(none)' })); };
+      curWrap.append(curLbl, curImg);
+      const newWrap = document.createElement('div');
+      const newLbl = document.createElement('span');
+      newLbl.className = 'sub-compare-label'; newLbl.textContent = 'Proposed';
+      const newImg = document.createElement('img');
+      newImg.style.cssText = 'height:96px;width:auto;max-width:140px;background:rgba(0,0,0,0.05);outline:2px solid #1a7f37;outline-offset:-2px';
+      newImg.src = 'data:image/webp;base64,' + record.headshot;
+      newWrap.append(newLbl, newImg);
+      row.append(curWrap, newWrap);
+      f.appendChild(row);
+      detail.appendChild(f);
+    }
 
     if (hasBio || subPractices.length) {
       const grid = makeCompare();
