@@ -2318,7 +2318,10 @@
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);
-    window.location.href = '/files/logout';
+    pat = ''; currentStudent = null;
+    appEl.setAttribute('hidden', '');
+    patPromptEl.removeAttribute('hidden');
+    patInput.value = '';
   });
 
   // Auto-login if stored
