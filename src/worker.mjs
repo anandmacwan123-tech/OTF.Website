@@ -197,6 +197,23 @@ async function handleApi(request, env, url) {
     return json({ ok: true });
   }
 
+  if (url.pathname === '/api/submission-status' && request.method === 'POST') {
+    let body;
+    try { body = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400); }
+    const id = body && typeof body.id === 'string' ? body.id : '';
+    const status = body && typeof body.status === 'string' ? body.status : '';
+    if (!id.startsWith('sub:')) return json({ error: 'Bad id' }, 400);
+    if (!['applied', 'denied'].includes(status)) return json({ error: 'Bad status' }, 400);
+    const { value, metadata } = await kv.getWithMetadata(id);
+    if (value == null) return json({ error: 'Not found' }, 404);
+    let record;
+    try { record = JSON.parse(value); } catch { return json({ error: 'Corrupt record' }, 500); }
+    record.status = status;
+    record.processedAt = Date.now();
+    await kv.put(id, JSON.stringify(record), { metadata: { ...(metadata || {}), status } });
+    return json({ ok: true });
+  }
+
   return json({ error: 'Not found' }, 404);
 }
 

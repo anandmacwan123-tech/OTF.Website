@@ -103,6 +103,17 @@
     display: block;
   }
   .thumb.new { outline: 2px solid var(--red); outline-offset: -2px; }
+  .thumb-wrap { position: relative; display: inline-block; }
+  .thumb-wrap .thumb { display: block; }
+  .thumb-del {
+    position: absolute; top: 3px; right: 3px;
+    width: 22px; height: 22px; padding: 0;
+    background: rgba(0,0,0,0.55); color: #fff;
+    border: 0; cursor: pointer; font-size: 14px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .thumb-wrap.removing .thumb { opacity: 0.28; }
+  .thumb-wrap.removing .thumb-del { background: var(--red); }
 
   .file-btn {
     display: inline-block; font: inherit;
@@ -438,17 +449,37 @@
     descLabel.append(descSpan, descInput);
     block.appendChild(descLabel);
 
-    // Existing images
+    // Existing images (with removal toggle)
+    const removedFiles = new Set();
     const thumbs = document.createElement('div');
     thumbs.className = 'thumbs';
     for (const f of (files || [])) {
       if (/\.url$/i.test(f)) continue;
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb-wrap';
       const img = document.createElement('img');
       img.className = 'thumb';
       img.loading = 'lazy';
       img.src = enc('/Student Work/Projects/' + f);
       img.alt = '';
-      thumbs.appendChild(img);
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'thumb-del';
+      del.title = 'Mark for removal';
+      del.textContent = '×';
+      del.addEventListener('click', () => {
+        if (removedFiles.has(f)) {
+          removedFiles.delete(f);
+          wrap.classList.remove('removing');
+          del.title = 'Mark for removal';
+        } else {
+          removedFiles.add(f);
+          wrap.classList.add('removing');
+          del.title = 'Undo removal';
+        }
+      });
+      wrap.append(img, del);
+      thumbs.appendChild(wrap);
     }
     block.appendChild(thumbs);
 
@@ -476,7 +507,7 @@
     block.appendChild(addLabel);
 
     document.getElementById('projects').appendChild(block);
-    const entry = { key, isNew, titleInput, base, descInput, newFiles, numEl };
+    const entry = { key, isNew, titleInput, base, descInput, newFiles, removedFiles, numEl };
     projectBlocks.push(entry);
     renumberProjects();
     return entry;
@@ -507,8 +538,9 @@
           const blob = await compressImage(file, 760, 0.82);
           images.push({ origName: file.name, dataB64: await blobToBase64(blob) });
         }
+        const removedFiles = [...b.removedFiles];
         if (b.isNew && !title && !description && !images.length) continue;
-        projects.push({ key: b.isNew ? null : b.key, title, description, images });
+        projects.push({ key: b.isNew ? null : b.key, title, description, images, removedFiles });
       }
 
       const payload = {
