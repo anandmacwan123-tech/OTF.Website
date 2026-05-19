@@ -294,7 +294,7 @@
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.35);
     display: flex; align-items: center; justify-content: center;
-    z-index: 200;
+    z-index: 300;
   }
   #modal[hidden] { display: none; }
   .modal-box {
@@ -473,7 +473,7 @@
   }
   #subModal[hidden] { display: none; }
   .sub-box {
-    background: var(--bg); width: min(640px, 94vw); max-height: 86vh;
+    background: var(--bg); width: min(780px, 96vw); max-height: 86vh;
     display: flex; flex-direction: column; overflow: hidden;
   }
   .sub-head {
@@ -515,6 +515,30 @@
   }
   .ovr-name { font-weight: 500; flex-shrink: 0; }
   .ovr-fields { color: var(--muted); flex: 1; font-size: 0.68rem; }
+
+  /* Before / After comparison grid inside submission detail */
+  .sub-compare {
+    border: 1px solid var(--border); margin: 0.5rem 0 0.75rem;
+  }
+  .sub-compare-hdrs {
+    display: flex; background: rgba(0,0,0,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .sub-compare-hdrs span {
+    flex: 1; padding: 0.3rem 0.75rem;
+    font-size: 0.5rem; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .sub-compare-hdrs span + span { border-left: 1px solid var(--border); }
+  .sub-compare-row { display: flex; }
+  .sub-compare-row + .sub-compare-row { border-top: 1px solid var(--border); }
+  .sub-compare-cell { flex: 1; padding: 0.6rem 0.75rem; line-height: 1.5; font-size: 0.78rem; }
+  .sub-compare-cell + .sub-compare-cell { border-left: 1px solid var(--border); }
+  .sub-compare-label {
+    font-weight: 500; font-size: 0.5rem; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.2rem;
+  }
+  .sub-compare-new { background: rgba(0,120,60,0.04); }
 </style>
 </head>
 <body>
@@ -2040,20 +2064,52 @@
     renderSubModal(lastSubItems);
   }
 
-  function renderSubDetail(detail, id, record, status) {
+  async function renderSubDetail(detail, id, record, status) {
     detail.innerHTML = '';
-    const addField = (label, value) => {
-      if (!value) return;
-      const f = document.createElement('div');
-      f.className = 'sub-field';
-      const b = document.createElement('b'); b.textContent = label;
-      const span = document.createElement('span'); span.textContent = value;
-      f.append(b, span);
-      detail.appendChild(f);
+
+    let currentOv = {};
+    try { await loadOverrides(); currentOv = overridesData[record.student] || {}; } catch {}
+
+    const makeCompare = () => {
+      const wrap = document.createElement('div');
+      wrap.className = 'sub-compare';
+      const hdrs = document.createElement('div');
+      hdrs.className = 'sub-compare-hdrs';
+      const h1 = document.createElement('span'); h1.textContent = 'Current';
+      const h2 = document.createElement('span'); h2.textContent = 'Proposed';
+      hdrs.append(h1, h2);
+      wrap.appendChild(hdrs);
+      return wrap;
     };
-    addField('Bio', record.bio);
-    const pr = (record.practices || []).filter(p => p && p.trim());
-    if (pr.length) addField('Practices', pr.join('  ·  '));
+
+    const addCompareRow = (wrap, label, beforeText, afterText) => {
+      const row = document.createElement('div');
+      row.className = 'sub-compare-row';
+      const bc = document.createElement('div'); bc.className = 'sub-compare-cell';
+      const lb = document.createElement('span'); lb.className = 'sub-compare-label'; lb.textContent = label;
+      const bv = document.createElement('span'); bv.textContent = beforeText || '(none)';
+      if (!beforeText) bv.style.color = 'var(--muted)';
+      bc.append(lb, bv);
+      const ac = document.createElement('div'); ac.className = 'sub-compare-cell sub-compare-new';
+      const la = document.createElement('span'); la.className = 'sub-compare-label'; la.textContent = label;
+      const av = document.createElement('span'); av.textContent = afterText;
+      ac.append(la, av);
+      row.append(bc, ac);
+      wrap.appendChild(row);
+    };
+
+    const hasBio = !!(record.bio && record.bio.trim());
+    const subPractices = (record.practices || []).filter(p => p && p.trim());
+
+    if (hasBio || subPractices.length) {
+      const grid = makeCompare();
+      if (hasBio) addCompareRow(grid, 'Bio', currentOv.bio || '', record.bio);
+      if (subPractices.length) {
+        const curPr = (currentOv.practices || []).filter(Boolean);
+        addCompareRow(grid, 'Practices', curPr.join('  ·  '), subPractices.join('  ·  '));
+      }
+      detail.appendChild(grid);
+    }
 
     for (const p of record.projects || []) {
       const title = p.key ? baseOf(p.key) : (p.title || 'Untitled');
@@ -2062,12 +2118,20 @@
       const b = document.createElement('b');
       b.textContent = 'Project — ' + title + (p.key ? '' : ' (new)');
       f.appendChild(b);
-      if (p.description) {
-        const span = document.createElement('span');
-        span.textContent = p.description;
-        f.appendChild(span);
+
+      if (p.description && p.description.trim()) {
+        const curDesc = ((currentOv.projectDescriptions || {})[title]) || '';
+        const grid = makeCompare();
+        addCompareRow(grid, 'Description', curDesc, p.description);
+        f.appendChild(grid);
       }
+
       if ((p.images || []).length) {
+        const lbl = document.createElement('span');
+        lbl.className = 'sub-compare-label';
+        lbl.style.marginTop = '0.4rem';
+        lbl.textContent = `+ ${p.images.length} new image${p.images.length === 1 ? '' : 's'}`;
+        f.appendChild(lbl);
         const tw = document.createElement('div');
         tw.className = 'sub-thumbs';
         for (const im of p.images) {
@@ -2078,15 +2142,24 @@
         }
         f.appendChild(tw);
       }
+
       if ((p.removedFiles || []).length) {
         const span = document.createElement('span');
         span.style.color = 'var(--red)';
-        span.textContent = 'Removal requested: ' + p.removedFiles.join(', ');
+        span.textContent = '− Remove: ' + p.removedFiles.join(', ');
         f.appendChild(span);
       }
       detail.appendChild(f);
     }
-    addField('Note', record.note);
+
+    if (record.note && record.note.trim()) {
+      const f = document.createElement('div');
+      f.className = 'sub-field';
+      const b = document.createElement('b'); b.textContent = 'Note';
+      const span = document.createElement('span'); span.textContent = record.note;
+      f.append(b, span);
+      detail.appendChild(f);
+    }
 
     const acts = document.createElement('div');
     acts.className = 'sub-acts';
@@ -2139,7 +2212,7 @@
       try {
         const record = await apiGet('/api/submission?id=' + encodeURIComponent(item.id));
         loaded = true;
-        renderSubDetail(detail, item.id, record, status);
+        await renderSubDetail(detail, item.id, record, status);
       } catch (e) {
         detail.textContent = 'Failed to load: ' + e.message;
       }
@@ -2318,7 +2391,10 @@
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);
-    window.location.href = '/files/logout';
+    pat = ''; currentStudent = null;
+    appEl.setAttribute('hidden', '');
+    patPromptEl.removeAttribute('hidden');
+    patInput.value = '';
   });
 
   // Auto-login if stored
