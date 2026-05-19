@@ -1,0 +1,38 @@
+{
+  "id": "sub:1779206954134-f7978c9b",
+  "student": "Charles",
+  "fullName": "Charles Latagan",
+  "bio": "Charles Latagan is a designer whose entire thing is just playing around and making things he thinks is 'cold' or has 'aura'. He approaches design in ways you could never think of, honing his professional design skills in software one might say is 'just not right'. In addition to his fluency on primary industry software like Illustrator, Charles has a thing for applying his critical design thinking on software that has absolutely no business being used for industry graphic design, like legit bro makes motion graphics in RAW Geometry Dash. I know, strange right? Could never be me.",
+  "practices": [
+    "Motion Graphics",
+    "Web design",
+    "Branding"
+  ],
+  "projects": [
+    {
+      "key": "Agneshouse",
+      "title": "Agneshouse",
+      "description": "The core visual identity for a museum called \"Agnes' House\". Developed for a Studio Blackburn brief, this project was awarded an honorary mention by the studio themselves.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "KpopZine",
+      "title": "KpopZine",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "TMS",
+      "title": "TMS",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "The core visual identity for a museum called \"Agnes' House\". Developed for a Studio Blackburn brief, this project was awarded an honorary mention by the studio themselves.",
+  "createdAt": 1779206954134,
+  "status": "denied",
+  "processedAt": 1779208818362
+}
