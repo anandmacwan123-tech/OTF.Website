@@ -1,0 +1,52 @@
+{
+  "id": "sub:1779209157234-77292fdd",
+  "student": "Anand",
+  "fullName": "Anand Macwan",
+  "bio": "What I find interesting about Anand is his curiosity about digital systems. What does it mean for a non-Western individual to use tech built on datasets curated from Western culture? He grew up in India and now uses design to address social issues. Projects like Non-Consensual Intelligence, where he pushes TouchDesigner to make surveillance visible, are grounded in deep research and are technically ambitious. If you asked him what he enjoys working with most, you'd get a different answer every time, but most often, you'd find him working with code. He thinks creative coding is \"contemporary and cool\".",
+  "practices": [
+    "Creative Coding",
+    "Branding",
+    "Photography"
+  ],
+  "projects": [
+    {
+      "key": "Based",
+      "title": "Based",
+      "description": "Non-Consensual Intelligence is an interactive experience that makes surveillance visible. AI-backed surveillance is a constant, unconsented breach of privacy, centralised, opaque, and controlled by a handful of companies. This project pulls it into view.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Evolving",
+      "title": "Evolving",
+      "description": "This interactive projection-mapping piece uses a feedback loop: a camera records its own projection, layering on itself like two mirrors facing each other. Time becomes visible as the image compounds on itself, each frame carrying the weight of what came before. Change isn't abstract here. You watch it happen. You are a part of it.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Non-Consensual-INtelligence",
+      "title": "Non-Consensual-INtelligence",
+      "description": "Based questions alcohol brands that glorify consumption. Shifting the narrative from 'getting wasted is necessary to have fun' to encouraging mindful consumption, guided through design that puts transparency and clarity at the forefront.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "RaveBadge",
+      "title": "RaveBadge",
+      "description": "HI",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "ThinkingBlock",
+      "title": "ThinkingBlock",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "createdAt": 1779209157234,
+  "status": "denied",
+  "processedAt": 1779209231136
+}
