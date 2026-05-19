@@ -196,6 +196,18 @@
   .lookup-msg { font-size: 0.8rem; margin-top: 0.6rem; min-height: 1.2rem; }
   .lookup-msg.err { color: var(--red); }
 
+  .headshot-section { display: flex; align-items: flex-start; gap: 1rem; }
+  .headshot-section img {
+    height: 120px; width: auto; max-width: 160px;
+    object-fit: cover; background: rgba(0,0,0,0.05); display: block; flex-shrink: 0;
+  }
+  .headshot-section p { font-size: 0.72rem; color: var(--muted); line-height: 1.45; }
+  #headshotPreview img {
+    height: 120px; width: auto; max-width: 160px; object-fit: cover;
+    background: rgba(0,0,0,0.05); display: block;
+    outline: 2px solid var(--red); outline-offset: -2px;
+  }
+
   @media (min-width: 560px) {
     body { padding: 3.5rem 2rem 6rem; }
   }
@@ -226,6 +238,21 @@
     <div class="banner" id="sheetWarn" hidden>
       Couldn't load existing details — fields may start empty. You can still fill them in.
     </div>
+
+    <fieldset>
+      <legend>Headshot</legend>
+      <div id="headshotDisplay" hidden class="headshot-section">
+        <img id="headshotImg" alt="Your headshot">
+        <p>Your headshot is managed by the OTF team. Contact us if you'd like it updated.</p>
+      </div>
+      <div id="headshotUpload" hidden>
+        <p class="field-hint" style="margin-bottom:0.6rem">You don't have a headshot yet — upload one for the OTF team to review.</p>
+        <label class="file-btn">+ Upload headshot
+          <input type="file" id="headshotInput" accept=".jpg,.jpeg,.png,.webp">
+        </label>
+        <div id="headshotPreview" style="margin-top:0.6rem"></div>
+      </div>
+    </fieldset>
 
     <fieldset>
       <legend>About you</legend>
@@ -316,6 +343,24 @@
   const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTxvTorU4JVoWJPpqxRsiM5SllpkB9mI8oEtaIfX4KYS804dlL6HMo6r97-BHYqhA/pub?output=csv';
   const MAX_PROJECTS = 5;
 
+  // All students by slug → full name (slug = MANIFEST key or first token of name).
+  const STUDENT_NAMES = {
+    'Adam': 'Adam Adam', 'Anand': 'Anand Macwan', 'Arnete': 'Arnete Kuncyte',
+    'Becky': 'Becky Smith', 'Callum': 'Callum Redmond', 'Carolina': 'Carolina Almeida Ferreira',
+    'Charles': 'Charles Latagan', 'Darcy': 'Darcy Young', 'David': 'David Iheanacho',
+    'Divine': 'Divine Ojiaku', 'Elise': 'Elise Havis', 'Emily': 'Emily Amankwaah',
+    'Jaeden': 'Jaeden Small', 'Jamie': 'Jamie Donnelly', 'Jenna': 'Jenna Winckless',
+    'Jess': 'Jess Shrimpton', 'Kaila': 'Kaila Webb', 'Kami': 'Kami Vasquez Quiceno',
+    'Kye': 'Kye Goff', 'Martim': 'Martim Freitas Pereira', 'Maseray': 'Maseray Maiya Sesay',
+    'Nikol': 'Nikol Aleksandrova', 'Noora': 'Noora Ghodrati', 'Nora': 'Nora Ashani',
+    'Nuria': 'Nuria Vargas Santana', 'Oli': 'Oli Parker', 'Olya': 'Olya Grishina',
+    'Oscar': 'Oscar Vigdal', 'Rebecca': 'Rebecca Whippy', 'Sam': 'Sam Fletcher',
+    'Sara': 'Sara Jurkowska', 'Sasha': 'Sasha Brown', 'Sebastian': 'Sebastian McLean',
+    'Shalom': 'Shalom Milton-Gorvie', 'Surayya': 'Surayya Ahmadzada', 'Taleb': 'Taleb Cherif',
+    'Tallulah': 'Tallulah Stott', 'Valentina': 'Valentina Labriola', 'Vanessa': 'Vanessa Franko',
+    'Will': 'Will Vint',
+  };
+
   const stateEl = document.getElementById('state');
   const formEl = document.getElementById('form');
   const msgEl = document.getElementById('msg');
@@ -328,10 +373,13 @@
     stateEl.hidden = true;
     document.getElementById('lookup').hidden = false;
 
-    // Build slug → display map; optionally enrich with full names from sheet.
+    // Build slug → display map from all known students, enriched by sheet.
     const nameMap = new Map(); // key.toLowerCase() → { key, display }
+    for (const [key, fullName] of Object.entries(STUDENT_NAMES)) {
+      nameMap.set(key.toLowerCase(), { key, display: fullName });
+    }
     for (const key of Object.keys(MANIFEST)) {
-      nameMap.set(key.toLowerCase(), { key, display: key });
+      if (!nameMap.has(key.toLowerCase())) nameMap.set(key.toLowerCase(), { key, display: key });
     }
     const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
     fetch(sheetUrl, { cache: 'no-store' })
@@ -432,7 +480,9 @@
   const underStudents = /^\/students\//.test(rawPath);
   const slug = rawPath
     .replace(/^\/students\//, '').replace(/\/edit\/?$/, '').replace(/\/$/, '').toLowerCase();
-  const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
+  const inManifest = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
+  const name = inManifest || Object.keys(STUDENT_NAMES).find(n => n.toLowerCase() === slug);
+  const hasHeadshot = !!inManifest;
 
   if (!name) {
     if (underStudents) { fail('Student not found'); return; }
@@ -569,6 +619,7 @@
 
   // ── Form state ──────────────────────────────────────────────────────
   const projectBlocks = [];        // { key, isNew, titleInput, base, descInput, newFiles, numEl }
+  let headshotFile = null;
 
   function makeProjectBlock({ key, base, files, isNew, description }) {
     const block = document.createElement('div');
@@ -694,6 +745,13 @@
         projects.push({ key: b.isNew ? null : b.key, title, description, images, removedFiles });
       }
 
+      let headshotB64 = null;
+      if (headshotFile) {
+        msgEl.textContent = 'Preparing headshot…';
+        const blob = await compressImage(headshotFile, 1200, 0.88);
+        headshotB64 = await blobToBase64(blob);
+      }
+
       const payload = {
         password,
         student: name,
@@ -701,6 +759,7 @@
         bio: document.getElementById('bio').value.trim(),
         practices: [0, 1, 2].map(i => document.getElementById('practice' + i).value.trim()),
         projects,
+        headshot: headshotB64,
         note: document.getElementById('note').value.trim(),
       };
 
@@ -731,6 +790,18 @@
 
   document.getElementById('submitBtn').addEventListener('click', submit);
 
+  document.getElementById('headshotInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    headshotFile = file;
+    const preview = document.getElementById('headshotPreview');
+    preview.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    preview.appendChild(img);
+    e.target.value = '';
+  });
+
   function build(row, overrides) {
     document.getElementById('heading').textContent = (field(row, 'Name') || name) + ' — edit your page';
     document.getElementById('heading').dataset.fullName = field(row, 'Name') || name;
@@ -757,6 +828,13 @@
     });
     if (!groups.length) {
       makeProjectBlock({ key: null, base: '', files: [], isNew: true, description: '' });
+    }
+
+    if (hasHeadshot) {
+      document.getElementById('headshotImg').src = enc('/Student Work/Headshots/' + name + '.webp');
+      document.getElementById('headshotDisplay').hidden = false;
+    } else {
+      document.getElementById('headshotUpload').hidden = false;
     }
 
     stateEl.hidden = true;

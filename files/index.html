@@ -539,6 +539,26 @@
     text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.2rem;
   }
   .sub-compare-new { background: rgba(0,120,60,0.04); }
+
+  /* Bio field in detail panel */
+  .bio-head {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); margin-bottom: 1rem; padding-bottom: 0.5rem;
+  }
+  .bio-head h2 { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+  .detail-bio {
+    width: 100%; font: inherit; font-size: 0.85rem; line-height: 1.55;
+    color: var(--fg); background: var(--bg);
+    border: 1px solid var(--border); padding: 0.6rem 0.75rem;
+    resize: vertical; min-height: 5.5rem; outline: none; border-radius: 0;
+  }
+  .detail-bio:focus { border-color: var(--fg); }
+  .detail-bio.overridden { border-color: var(--fg); border-width: 2px; }
+  .bio-override-tag {
+    font-size: 0.48rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--fg); color: var(--bg); padding: 0.1rem 0.4rem; margin-left: 0.5rem;
+    vertical-align: middle;
+  }
 </style>
 </head>
 <body>
@@ -670,6 +690,7 @@
   const thumbCache   = new Map(); // sha → objectURL
   let pendingQueue   = []; // changes awaiting commit: { path, content?, sha?, delete? }
   let sheetCache = null;
+  let sheetBioCache = null; // Map<slug, string>
   let pendingNewProjects = []; // { student, key, displayTitle }
   let csvStudents = []; // { slug, fullName }
   let projectOrder = {}; // { "<slug>": ["ProjectKeyA", ...] }
@@ -1314,6 +1335,12 @@
     const csv = await resp.text();
     const rows = parseCSV(csv);
     sheetCache = rows.map(r => r[2]).filter(Boolean);
+    sheetBioCache = new Map();
+    for (const r of rows) {
+      const name = r[2] && r[2].trim();
+      if (!name) continue;
+      sheetBioCache.set(name.split(/\s+/)[0], (r[7] || '').trim());
+    }
     return sheetCache;
   }
 
@@ -1536,6 +1563,58 @@
     }
     hsSec.appendChild(hsGrid);
     detailEl.appendChild(hsSec);
+
+    // Bio section
+    const bioSec = document.createElement('section');
+    bioSec.className = 'detail-section';
+    const bioHead = document.createElement('div');
+    bioHead.className = 'bio-head';
+    const bioH2 = document.createElement('h2');
+    const bioOv = overridesData ? ((overridesData[currentStudent] || {}).bio ?? null) : null;
+    const hasOv = typeof bioOv === 'string';
+    bioH2.textContent = 'Bio';
+    if (hasOv) {
+      const tag = document.createElement('span');
+      tag.className = 'bio-override-tag';
+      tag.textContent = 'overridden';
+      bioH2.appendChild(tag);
+    }
+    bioHead.appendChild(bioH2);
+    if (hasOv) {
+      const revertBtn = mkBtn('Revert to sheet', () => {
+        revertOverride(currentStudent, 'bio');
+        renderDetail();
+      });
+      revertBtn.classList.add('act-del');
+      bioHead.appendChild(revertBtn);
+    }
+    bioSec.appendChild(bioHead);
+
+    const sheetBio = sheetBioCache ? (sheetBioCache.get(currentStudent) || '') : '';
+    const bioVal = hasOv ? bioOv : sheetBio;
+    const bioTA = document.createElement('textarea');
+    bioTA.className = 'detail-bio' + (hasOv ? ' overridden' : '');
+    bioTA.value = bioVal;
+    bioTA.placeholder = sheetBio ? '' : '(no bio in sheet)';
+    let bioPrev = bioVal;
+    bioTA.addEventListener('focus', () => { bioPrev = bioTA.value; });
+    bioTA.addEventListener('blur', () => {
+      const v = bioTA.value.trim();
+      if (v === bioPrev.trim()) return;
+      if (!overridesData) overridesData = {};
+      if (!overridesData[currentStudent]) overridesData[currentStudent] = {};
+      if (v) {
+        overridesData[currentStudent].bio = v;
+        bioTA.classList.add('overridden');
+      } else {
+        delete overridesData[currentStudent].bio;
+        if (!Object.keys(overridesData[currentStudent]).length) delete overridesData[currentStudent];
+        bioTA.classList.remove('overridden');
+      }
+      stageOverrides();
+    });
+    bioSec.appendChild(bioTA);
+    detailEl.appendChild(bioSec);
 
     // Unassigned section (only shown when there are unassigned files)
     if (unassigned.length > 0) {
@@ -1919,6 +1998,7 @@
         newImageCount: (p.images || []).length,
       })),
       note: record.note || '',
+      headshotProvided: !!record.headshot,
       createdAt: record.createdAt,
       status,
       processedAt: Date.now(),
@@ -2013,6 +2093,7 @@
       if (Object.keys(ov).length) overridesData[s] = ov;
 
       stageOverrides();
+      if (record.headshot) stageHeadshotB64(s, record.headshot);
 
       // Stage archive file so it's committed alongside the changes.
       const arch = buildArchiveEntry(id, record, 'applied');
@@ -2100,6 +2181,33 @@
 
     const hasBio = !!(record.bio && record.bio.trim());
     const subPractices = (record.practices || []).filter(p => p && p.trim());
+
+    if (record.headshot) {
+      const f = document.createElement('div');
+      f.className = 'sub-field';
+      const b = document.createElement('b'); b.textContent = 'Headshot';
+      f.appendChild(b);
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:1rem;align-items:flex-start;margin-top:0.4rem;flex-wrap:wrap';
+      const curWrap = document.createElement('div');
+      const curLbl = document.createElement('span');
+      curLbl.className = 'sub-compare-label'; curLbl.textContent = 'Current';
+      const curImg = document.createElement('img');
+      curImg.className = 'sub-thumbs'; curImg.style.cssText = 'height:96px;width:auto;max-width:140px;background:rgba(0,0,0,0.05)';
+      curImg.src = '/Student Work/Headshots/' + record.student + '.webp';
+      curImg.onerror = () => { curImg.replaceWith(Object.assign(document.createElement('span'), { className: 'sub-compare-label', textContent: '(none)' })); };
+      curWrap.append(curLbl, curImg);
+      const newWrap = document.createElement('div');
+      const newLbl = document.createElement('span');
+      newLbl.className = 'sub-compare-label'; newLbl.textContent = 'Proposed';
+      const newImg = document.createElement('img');
+      newImg.style.cssText = 'height:96px;width:auto;max-width:140px;background:rgba(0,0,0,0.05);outline:2px solid #1a7f37;outline-offset:-2px';
+      newImg.src = 'data:image/webp;base64,' + record.headshot;
+      newWrap.append(newLbl, newImg);
+      row.append(curWrap, newWrap);
+      f.appendChild(row);
+      detail.appendChild(f);
+    }
 
     if (hasBio || subPractices.length) {
       const grid = makeCompare();
@@ -2345,7 +2453,11 @@
     appEl.removeAttribute('hidden');
     setStatus('Loading…');
     try {
-      await fetchAssets();
+      await Promise.all([
+        fetchAssets(),
+        loadOverrides(),
+        loadSheet().catch(() => {}),
+      ]);
       renderSidebar();
       renderDetail();
       setStatus('');
