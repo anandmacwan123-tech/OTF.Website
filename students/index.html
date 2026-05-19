@@ -559,10 +559,14 @@
     // Headshot label — student's full name from the sheet's "Name" column.
     document.getElementById('heroName').textContent = field(row, 'Name') || name;
 
-    const practices = row
-      ? [field(row, 'Practice1'), field(row, 'Practice2'), field(row, 'Practice3')]
-          .filter(p => p && p.length)
-      : [];
+    const ovPractices = studentOverride.practices;
+    const practices = [0, 1, 2]
+      .map(i => {
+        const o = Array.isArray(ovPractices) ? ovPractices[i] : null;
+        if (o != null && o !== '') return o;
+        return row ? field(row, 'Practice' + (i + 1)) : '';
+      })
+      .filter(p => p && p.length);
     const practicesEl = document.getElementById('heroPractices');
     if (practices.length) {
       for (const p of practices) {
@@ -575,7 +579,9 @@
     }
 
     const bioEl = document.getElementById('bio');
-    const bioText = field(row, 'Bio');
+    const bioText = (studentOverride.bio != null && studentOverride.bio !== '')
+      ? studentOverride.bio
+      : field(row, 'Bio');
     if (bioText) {
       for (const para of bioText.split(/\n{2,}|\r\n\r\n/)) {
         const p = document.createElement('p');
@@ -761,6 +767,11 @@
   // Populated before renderProjects runs; defaults to {} on 404/error.
   let projectOrder = {};
 
+  // Student-edited content (data/overrides.json) — bio, practices and
+  // project descriptions submitted via the /edit page. When present, an
+  // override value takes precedence over the Google Sheet value.
+  let studentOverride = {};
+
   function renderProjects(row) {
     const files = MANIFEST[name] || [];
     let groups = projectGroups(name, files);
@@ -785,8 +796,10 @@
 
     const container = document.getElementById('projects');
 
+    const ovDescs = studentOverride.projectDescriptions || {};
     groups.forEach((group, i) => {
-      const desc = lookupDesc(row, name, group.base, i);
+      let desc = ovDescs[group.base];
+      if (desc == null || desc === '') desc = lookupDesc(row, name, group.base, i);
       if (!group.files.length && !desc) return;
 
       const article = document.createElement('article');
@@ -850,7 +863,18 @@
     .then(data => { if (data && typeof data === 'object') projectOrder = data; })
     .catch(() => { projectOrder = {}; });
 
-  orderPromise.then(() =>
+  // Fetch student-edited overrides (data/overrides.json). Missing file or
+  // any error falls back to {} so the sheet values are used.
+  const overridesPromise = fetch('/data/overrides.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(r => (r.ok ? r.json() : {}))
+    .then(data => {
+      if (data && typeof data === 'object' && data[name] && typeof data[name] === 'object') {
+        studentOverride = data[name];
+      }
+    })
+    .catch(() => { studentOverride = {}; });
+
+  Promise.all([orderPromise, overridesPromise]).then(() =>
   fetch(sheetUrl, { cache: 'no-store' })
     .then(r => {
       if (!r.ok) throw new Error('HTTP ' + r.status);
