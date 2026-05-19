@@ -64,6 +64,16 @@ async function handleFiles(request, env, url) {
     return loginPage('Incorrect password');
   }
 
+  // Logout: clear cookie for both old Path=/files and new Path=/ then redirect.
+  if (url.pathname === '/files/logout') {
+    const secureFlag = url.protocol === 'https:' ? ' Secure;' : '';
+    const clear = `${COOKIE_NAME}=; Max-Age=0; HttpOnly;${secureFlag} SameSite=Lax`;
+    const headers = new Headers({ 'Location': '/files/' });
+    headers.append('Set-Cookie', clear + '; Path=/');
+    headers.append('Set-Cookie', clear + '; Path=/files');
+    return new Response(null, { status: 303, headers });
+  }
+
   // Redirect bare /files → /files/ so assets can find files/index.html
   if (url.pathname === '/files') {
     return Response.redirect(url.origin + '/files/', 301);
@@ -184,6 +194,23 @@ async function handleApi(request, env, url) {
     const id = body && typeof body.id === 'string' ? body.id : '';
     if (!id.startsWith('sub:')) return json({ error: 'Bad id' }, 400);
     await kv.delete(id);
+    return json({ ok: true });
+  }
+
+  if (url.pathname === '/api/submission-status' && request.method === 'POST') {
+    let body;
+    try { body = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400); }
+    const id = body && typeof body.id === 'string' ? body.id : '';
+    const status = body && typeof body.status === 'string' ? body.status : '';
+    if (!id.startsWith('sub:')) return json({ error: 'Bad id' }, 400);
+    if (!['applied', 'denied'].includes(status)) return json({ error: 'Bad status' }, 400);
+    const { value, metadata } = await kv.getWithMetadata(id);
+    if (value == null) return json({ error: 'Not found' }, 404);
+    let record;
+    try { record = JSON.parse(value); } catch { return json({ error: 'Corrupt record' }, 500); }
+    record.status = status;
+    record.processedAt = Date.now();
+    await kv.put(id, JSON.stringify(record), { metadata: { ...(metadata || {}), status } });
     return json({ ok: true });
   }
 

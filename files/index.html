@@ -488,9 +488,17 @@
     text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 0.6rem;
   }
   .sub-item { border: 1px solid var(--border); padding: 0.85rem 1rem; margin-bottom: 0.75rem; }
-  .sub-item-hdr { display: flex; align-items: baseline; gap: 0.5rem; }
+  .sub-item.is-applied { border-color: rgba(0,0,0,0.08); opacity: 0.7; }
+  .sub-item.is-denied  { border-color: rgba(0,0,0,0.08); opacity: 0.55; }
+  .sub-item-hdr { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
   .sub-item-name { font-size: 0.85rem; font-weight: 700; }
   .sub-item-meta { font-size: 0.62rem; color: var(--muted); flex: 1; }
+  .sub-status {
+    font-size: 0.5rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.15rem 0.45rem; border-radius: 2px;
+  }
+  .sub-status.applied { background: #d4edda; color: #1a7f37; }
+  .sub-status.denied  { background: rgba(0,0,0,0.07); color: var(--muted); }
   .sub-detail { margin-top: 0.75rem; font-size: 0.78rem; line-height: 1.5; }
   .sub-detail[hidden] { display: none; }
   .sub-field { margin-bottom: 0.6rem; }
@@ -1862,6 +1870,42 @@
     });
   }
 
+  async function apiSetStatus(id, status) {
+    const r = await fetch('/api/submission-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    });
+    if (!r.ok) throw new Error('Status update failed');
+  }
+
+  // Build a stripped archive record (no base64 image data) for committing.
+  function buildArchiveEntry(id, record, status) {
+    const stripped = {
+      id,
+      student: record.student,
+      fullName: record.fullName,
+      bio: record.bio || '',
+      practices: record.practices || [],
+      projects: (record.projects || []).map(p => ({
+        key: p.key || null,
+        title: p.title || '',
+        description: p.description || '',
+        removedFiles: p.removedFiles || [],
+        newImageCount: (p.images || []).length,
+      })),
+      note: record.note || '',
+      createdAt: record.createdAt,
+      status,
+      processedAt: Date.now(),
+    };
+    const safeName = id.replace(/[^a-z0-9]/gi, '_');
+    return {
+      path: `archive/submissions/${safeName}.json`,
+      content: b64encode(JSON.stringify(stripped, null, 2) + '\n'),
+    };
+  }
+
   // Load data/overrides.json from GitHub (cached for the session).
   async function loadOverrides() {
     if (overridesData) return overridesData;
@@ -1933,22 +1977,54 @@
         for (const im of p.images || []) {
           if (im && im.dataB64) stageProjectImageB64(s, key, im.dataB64);
         }
+        // Stage removals requested by the student.
+        for (const fname of (p.removedFiles || [])) {
+          const fpath = `${PR_DIR}/${fname}`;
+          const existing = projects.find(f => f.path === fpath);
+          if (existing) doDelete(existing);
+          else { pendingQueue = pendingQueue.filter(c => c.path !== fpath); pendingQueue.push({ path: fpath, delete: true }); }
+        }
       }
       if (Object.keys(descs).length) ov.projectDescriptions = descs;
       if (Object.keys(ov).length) overridesData[s] = ov;
 
-      if (record.headshot && record.headshot.dataB64) {
-        stageHeadshotB64(s, record.headshot.dataB64);
-      }
-
       stageOverrides();
-      await apiDeleteSubmission(id);
+
+      // Stage archive file so it's committed alongside the changes.
+      const arch = buildArchiveEntry(id, record, 'applied');
+      pendingQueue = pendingQueue.filter(c => c.path !== arch.path);
+      pendingQueue.push({ path: arch.path, content: arch.content });
+
+      // Mark submission as applied in KV (keeps it visible in panel).
+      await apiSetStatus(id, 'applied');
+      const item = lastSubItems.find(i => i.id === id);
+      if (item) item.status = 'applied';
 
       renderSidebar(); renderDetail(); updateSaveBtn();
       finishTask('Applied ✓', 'Press Save to commit');
       openSubModal();
     } catch (e) {
       finishTask('Apply failed', e.message, true);
+    }
+  }
+
+  async function denySubmission(id, record) {
+    showTask('Denying', record.fullName || record.student);
+    try {
+      // Write archive to GitHub immediately (deny doesn't go through Save).
+      const arch = buildArchiveEntry(id, record, 'denied');
+      await gh('PUT', `/contents/${encPath(arch.path)}`, {
+        message: `Archive denied submission — ${record.fullName || record.student}`,
+        content: arch.content,
+        branch: BRANCH,
+      });
+      await apiSetStatus(id, 'denied');
+      const item = lastSubItems.find(i => i.id === id);
+      if (item) item.status = 'denied';
+      finishTask('Denied — archived ✓', '');
+      renderSubModal(lastSubItems);
+    } catch (e) {
+      finishTask('Deny failed', e.message, true);
     }
   }
 
@@ -1964,7 +2040,7 @@
     renderSubModal(lastSubItems);
   }
 
-  function renderSubDetail(detail, id, record) {
+  function renderSubDetail(detail, id, record, status) {
     detail.innerHTML = '';
     const addField = (label, value) => {
       if (!value) return;
@@ -2002,38 +2078,43 @@
         }
         f.appendChild(tw);
       }
-      detail.appendChild(f);
-    }
-
-    if (record.headshot && record.headshot.dataB64) {
-      const f = document.createElement('div');
-      f.className = 'sub-field';
-      const b = document.createElement('b'); b.textContent = 'New headshot';
-      const tw = document.createElement('div'); tw.className = 'sub-thumbs';
-      const img = document.createElement('img');
-      img.src = 'data:image/webp;base64,' + record.headshot.dataB64;
-      tw.appendChild(img);
-      f.append(b, tw);
+      if ((p.removedFiles || []).length) {
+        const span = document.createElement('span');
+        span.style.color = 'var(--red)';
+        span.textContent = 'Removal requested: ' + p.removedFiles.join(', ');
+        f.appendChild(span);
+      }
       detail.appendChild(f);
     }
     addField('Note', record.note);
 
     const acts = document.createElement('div');
     acts.className = 'sub-acts';
-    acts.appendChild(mkBtn('Apply → stage changes', () => applySubmission(id, record)));
-    const discardBtn = mkBtn('Discard', () =>
-      showModal('Discard submission?',
-        'This permanently removes the submission without applying it.',
-        async () => { await apiDeleteSubmission(id); openSubModal(); })
-    );
-    discardBtn.classList.add('act-del');
-    acts.appendChild(discardBtn);
+    if (!status) {
+      acts.appendChild(mkBtn('Apply → stage changes', () => applySubmission(id, record)));
+      const denyBtn = mkBtn('Deny', () =>
+        showModal('Deny submission?',
+          'The submission will be archived in the repo but not applied.',
+          () => denySubmission(id, record), 'Deny')
+      );
+      denyBtn.classList.add('act-del');
+      acts.appendChild(denyBtn);
+    } else {
+      const delBtn = mkBtn('Delete permanently', () =>
+        showModal('Delete submission?',
+          'Remove from KV entirely. The archive file in the repo is kept.',
+          async () => { await apiDeleteSubmission(id); lastSubItems = lastSubItems.filter(i => i.id !== id); renderSubModal(lastSubItems); })
+      );
+      delBtn.classList.add('act-del');
+      acts.appendChild(delBtn);
+    }
     detail.appendChild(acts);
   }
 
   function makeSubItem(item) {
+    const status = item.status || null;
     const el = document.createElement('div');
-    el.className = 'sub-item';
+    el.className = 'sub-item' + (status === 'applied' ? ' is-applied' : status === 'denied' ? ' is-denied' : '');
     const hdr = document.createElement('div');
     hdr.className = 'sub-item-hdr';
     const nm = document.createElement('span');
@@ -2058,13 +2139,22 @@
       try {
         const record = await apiGet('/api/submission?id=' + encodeURIComponent(item.id));
         loaded = true;
-        renderSubDetail(detail, item.id, record);
+        renderSubDetail(detail, item.id, record, status);
       } catch (e) {
         detail.textContent = 'Failed to load: ' + e.message;
       }
     });
 
-    hdr.append(nm, meta, reviewBtn);
+    const rightSide = document.createDocumentFragment();
+    if (status) {
+      const badge = document.createElement('span');
+      badge.className = 'sub-status ' + status;
+      badge.textContent = status;
+      rightSide.appendChild(badge);
+    }
+    rightSide.appendChild(reviewBtn);
+
+    hdr.append(nm, meta, rightSide);
     el.append(hdr, detail);
     return el;
   }
@@ -2094,17 +2184,28 @@
     const body = $('subBody');
     body.innerHTML = '';
 
+    const pending = items.filter(i => !i.status || i.status === 'pending');
+    const processed = items.filter(i => i.status === 'applied' || i.status === 'denied');
+
     const pendLabel = document.createElement('p');
     pendLabel.className = 'sub-sect-label';
-    pendLabel.textContent = `Pending submissions (${items.length})`;
+    pendLabel.textContent = `Pending submissions (${pending.length})`;
     body.appendChild(pendLabel);
-    if (!items.length) {
+    if (!pending.length) {
       const e = document.createElement('p');
       e.className = 'sub-empty';
       e.textContent = 'No submissions waiting.';
       body.appendChild(e);
     }
-    for (const item of items) body.appendChild(makeSubItem(item));
+    for (const item of pending) body.appendChild(makeSubItem(item));
+
+    if (processed.length) {
+      const procLabel = document.createElement('p');
+      procLabel.className = 'sub-sect-label';
+      procLabel.textContent = `Processed (${processed.length})`;
+      body.appendChild(procLabel);
+      for (const item of processed) body.appendChild(makeSubItem(item));
+    }
 
     const ovLabel = document.createElement('p');
     ovLabel.className = 'sub-sect-label';
@@ -2133,17 +2234,18 @@
     }
     await loadOverrides();
     renderSubModal(items);
-    updateSubCount(items.length);
+    updateSubCount(items);
   }
 
-  function updateSubCount(n) {
+  function updateSubCount(items) {
+    const n = (items || []).filter(i => !i.status || i.status === 'pending').length;
     $('subBtn').textContent = n ? `Submissions (${n})` : 'Submissions';
   }
 
   async function refreshSubCount() {
     try {
       const { items } = await apiGet('/api/submissions');
-      updateSubCount((items || []).length);
+      updateSubCount(items || []);
     } catch { /* leave label as-is */ }
   }
 
@@ -2216,10 +2318,7 @@
 
   $('signOut').addEventListener('click', () => {
     localStorage.removeItem(LS_PAT);
-    pat = ''; currentStudent = null;
-    appEl.setAttribute('hidden', '');
-    patPromptEl.removeAttribute('hidden');
-    patInput.value = '';
+    window.location.href = '/files/logout';
   });
 
   // Auto-login if stored
