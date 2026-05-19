@@ -1,0 +1,24 @@
+{
+  "id": "sub:1779207350830-8a4b2d2b",
+  "student": "Kami",
+  "fullName": "Kami Vasquez Quiceno",
+  "bio": "Kami Vasquez Quiceno is a Colombian and Spanish photographer/graphic designer based in London, specialising in sports photography and visual design. Passionate about capturing moments and story telling within a single frame, he draws inspiration from his love of football and aims to show the emotions and culture around matchday in a distinctive way. He creates authentic, visually engaging work with strong colour, composition, and atmosphere for brands, clubs, and content platforms.",
+  "practices": [
+    "Sports Photography",
+    "Visual Design",
+    "Branding"
+  ],
+  "projects": [
+    {
+      "key": "Football-outside-of-football",
+      "title": "Football-outside-of-football",
+      "description": "Football Outside of Football explores the culture of the sport outside of its usual environment. It is a collection of photos that reveal how the beautiful game impacts everyday life for communities built around it and the way fans express their support through visual imagery, such as artwork, murals, and stickers.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "test",
+  "createdAt": 1779207350830,
+  "status": "denied",
+  "processedAt": 1779208812263
+}
