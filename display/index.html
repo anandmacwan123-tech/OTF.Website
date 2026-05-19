@@ -71,8 +71,8 @@
     letter-spacing: -0.12em;
     text-transform: uppercase;
   }
-  .label-headshot { background: #fff; color: #000; }
-  .label-project  { background: #000; color: #fff; }
+  .label-headshot,
+  .label-project { background: #000; color: #fff; }
 
   /* Project labels can be switched off; headshot labels stay on. */
   body.no-project-labels .label-project { display: none; }
@@ -125,16 +125,20 @@
     z-index: 20;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
-    gap: clamp(1.25rem, 4vw, 4rem);
-    padding: 1rem 2rem;
-    background: #000;
+    gap: clamp(1.5rem, 4vw, 4.5rem);
+    /* Soft, light gradient rising from the bottom edge — no hard container. */
+    padding: 5rem 2.5rem 1.75rem;
+    background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.2) 40%,
+      rgba(0, 0, 0, 0) 100%);
     color: #fff;
     transform: translateY(100%);
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.25s ease, opacity 0.25s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
   .controls.visible {
     transform: translateY(0);
@@ -144,31 +148,90 @@
   .ctl {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-size: 0.7rem;
+    gap: 0.7rem;
+  }
+  .ctl-name {
+    font-size: 0.6rem;
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    white-space: nowrap;
   }
-  .ctl input[type="range"] {
-    width: clamp(120px, 14vw, 240px);
+
+  /* Slider — thin stroke base, square thumb, thicker stroke to its right. */
+  .ctl-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: clamp(110px, 13vw, 220px);
+    height: 14px;
+    background: transparent;
     cursor: pointer;
-    accent-color: #fff;
+    margin: 0;
   }
+  .ctl-range::-webkit-slider-runnable-track {
+    height: 14px;
+    background:
+      linear-gradient(#fff, #fff) no-repeat left center / 100% 1px,
+      linear-gradient(#fff, #fff) no-repeat right center / calc(100% - var(--p, 50%)) 4px;
+  }
+  .ctl-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 9px;
+    height: 9px;
+    margin-top: 2.5px;
+    background: #fff;
+    border: 0;
+  }
+  .ctl-range::-moz-range-track {
+    height: 14px;
+    background:
+      linear-gradient(#fff, #fff) no-repeat left center / 100% 1px,
+      linear-gradient(#fff, #fff) no-repeat right center / calc(100% - var(--p, 50%)) 4px;
+  }
+  .ctl-range::-moz-range-thumb {
+    width: 9px;
+    height: 9px;
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* Precise numeric entry alongside each slider. */
+  .ctl-num {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: none;
+    width: 3.2rem;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    font: inherit;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 0.15rem 0;
+    outline: none;
+  }
+  .ctl-num:focus { border-bottom-color: #fff; }
+  .ctl-num::-webkit-outer-spin-button,
+  .ctl-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
   .ctl-toggle {
     font: inherit;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     background: none;
     border: 1px solid #fff;
     color: #fff;
-    padding: 0.4rem 0.8rem;
+    padding: 0.45rem 0.9rem;
     cursor: pointer;
+    transition: opacity 0.2s ease;
   }
-  .ctl-toggle[aria-pressed="false"] { opacity: 0.5; }
+  .ctl-toggle[aria-pressed="false"] { opacity: 0.4; }
 
   .sr-only {
     position: absolute;
@@ -196,15 +259,17 @@
   <div class="label label-headshot" id="headshotLabel" aria-hidden="true"></div>
 
   <div class="controls" id="controls">
-    <label class="ctl">
-      <span>Scale</span>
-      <input type="range" id="scaleCtl" min="0.5" max="1.75" step="0.05" value="1" aria-label="Image scale">
-    </label>
-    <label class="ctl">
-      <span>Speed</span>
-      <input type="range" id="speedCtl" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed">
-    </label>
-    <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="true">Project labels: On</button>
+    <div class="ctl">
+      <span class="ctl-name">Scale</span>
+      <input type="range" class="ctl-range" id="scaleCtl" min="0.5" max="1.75" step="0.05" value="1" aria-label="Image scale">
+      <input type="number" class="ctl-num" id="scaleNum" min="0.5" max="1.75" step="0.05" value="1" aria-label="Image scale value">
+    </div>
+    <div class="ctl">
+      <span class="ctl-name">Speed</span>
+      <input type="range" class="ctl-range" id="speedCtl" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed">
+      <input type="number" class="ctl-num" id="speedNum" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed value">
+    </div>
+    <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="true">Project labels</button>
   </div>
 
   <script>
@@ -519,24 +584,50 @@
 
     /* ───── Controls — hidden until the cursor reaches the bottom edge ───── */
     const controls = document.getElementById('controls');
-    const HOVER_ZONE = 140;  // px from the bottom edge
+    const HOVER_ZONE = 170;  // px from the bottom edge
     document.addEventListener('mousemove', e => {
       controls.classList.toggle('visible', e.clientY >= window.innerHeight - HOVER_ZONE);
     });
     document.addEventListener('mouseleave', () => controls.classList.remove('visible'));
 
+    // Wire a slider + its numeric input as one two-way control. The slider's
+    // --p custom property drives the thicker stroke to the right of the thumb.
+    function bindControl(rangeId, numId, onValue) {
+      const range = document.getElementById(rangeId);
+      const num = document.getElementById(numId);
+      const min = parseFloat(range.min), max = parseFloat(range.max);
+      const sync = () => {
+        range.style.setProperty('--p',
+          ((parseFloat(range.value) - min) / (max - min) * 100) + '%');
+      };
+      sync();
+      range.addEventListener('input', () => {
+        num.value = range.value;
+        sync();
+        onValue(parseFloat(range.value));
+      });
+      num.addEventListener('change', () => {
+        let v = parseFloat(num.value);
+        if (isNaN(v)) { num.value = range.value; return; }
+        v = Math.min(max, Math.max(min, v));
+        range.value = v;
+        v = parseFloat(range.value);  // snapped to the slider step
+        num.value = v;
+        sync();
+        onValue(v);
+      });
+    }
+
     // Scale — resizes images while keeping the placement/centring rules.
-    const scaleCtl = document.getElementById('scaleCtl');
-    scaleCtl.addEventListener('input', () => {
-      imgScale = parseFloat(scaleCtl.value);
-      root.style.setProperty('--scale', imgScale);
+    bindControl('scaleCtl', 'scaleNum', v => {
+      imgScale = v;
+      root.style.setProperty('--scale', v);
       requestAnimationFrame(positionLabel);
     });
 
     // Speed — divides the headshot + spawn intervals and the crossfade.
-    const speedCtl = document.getElementById('speedCtl');
-    speedCtl.addEventListener('input', () => {
-      speed = parseFloat(speedCtl.value);
+    bindControl('speedCtl', 'speedNum', v => {
+      speed = v;
       applySpeed();
     });
 
@@ -545,7 +636,6 @@
     labelsCtl.addEventListener('click', () => {
       const off = document.body.classList.toggle('no-project-labels');
       labelsCtl.setAttribute('aria-pressed', String(!off));
-      labelsCtl.textContent = 'Project labels: ' + (off ? 'Off' : 'On');
     });
   })();
   </script>
