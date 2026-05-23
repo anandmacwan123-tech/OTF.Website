@@ -148,6 +148,7 @@
   }
 
   .cta a:hover { opacity: 0.65; }
+  .cta a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
   .sr-only {
     position: absolute;
@@ -279,10 +280,15 @@
       }, LIFETIME_MS);
     }
 
-    requestAnimationFrame(() => {
-      spawn();
-      setInterval(spawn, 180);
-    });
+    // Skip the rapid headshot "confetti" for visitors who ask their OS for
+    // reduced motion; the looping invite video stays as the page's centrepiece.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduceMotion) {
+      requestAnimationFrame(() => {
+        spawn();
+        setInterval(spawn, 180);
+      });
+    }
 
     let resizeT;
     window.addEventListener('resize', () => {
