@@ -262,6 +262,19 @@
     color: #fff;
   }
 
+  /* Keyboard focus rings (suppressed for mouse/touch); search gets a
+     darkened underline since its default outline is removed. */
+  a:focus-visible,
+  .view-toggle button:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+  .search-input:focus { border-bottom-color: var(--fg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; }
+  }
+
   .sr-only {
     position: absolute;
     width: 1px;
@@ -489,6 +502,7 @@
       img.src = enc(`/Student Work/Headshots/${e.firstName}.webp`);
       img.alt = `${e.displayName} — portrait`;
       img.loading = 'lazy';
+      img.decoding = 'async';
       a.appendChild(img);
       li.appendChild(a);
       gridEl.appendChild(li);
