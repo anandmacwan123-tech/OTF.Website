@@ -140,10 +140,17 @@
     pointer-events: none;
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
-  .controls.visible {
+  .controls.visible,
+  .controls:focus-within {
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
+  }
+  .ctl-toggle:focus-visible,
+  .ctl-range:focus-visible,
+  .ctl-num:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
   }
   .ctl {
     display: flex;
