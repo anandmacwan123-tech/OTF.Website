@@ -51,6 +51,20 @@
     padding: 6vh 5vw 8rem;
   }
 
+  /* Keyboard focus ring — visible for tab users, suppressed for mouse/touch. */
+  a:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  /* Honour OS "reduce motion" — drop hover/scroll transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   .portfolio[hidden] { display: none; }
 
   .state {
@@ -180,7 +194,14 @@
     margin: 0 -5vw;
     padding: 0 5vw 0.5rem;
     scrollbar-width: thin;
+    /* Momentum scroll + gentle snap so each image settles into view */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scroll-padding-left: 5vw;
   }
+
+  .project .images img,
+  .project .images .project-video { scroll-snap-align: start; }
 
   .project .images img {
     height: clamp(280px, 50vh, 480px);
@@ -247,7 +268,13 @@
   }
 
   @media (max-width: 720px) {
-    .hero { grid-template-columns: 1fr; align-items: start; }
+    /* Single-column hero; tighten the large desktop vertical rhythm. */
+    .hero {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 1.75rem;
+      margin-bottom: 3.5rem;
+    }
     .hero-right { max-width: none; }
     /* Stack the practices below the headshot. */
     .hero-media { flex-direction: column; align-items: flex-start; gap: 0.75rem; width: 100%; }
@@ -257,6 +284,10 @@
     /* Project images scaled down to 0.6x. */
     .project .images img,
     .project-video { height: clamp(168px, 30vh, 288px); }
+    .projects { gap: 4rem; }
+    /* Shrink the bottom nav so the three links + arrows fit narrow screens. */
+    .nav { gap: 1.25rem; padding: 0.85rem 4vw; }
+    .nav a, .nav-arrow { font-size: 0.85rem; }
   }
 
   /* Labels are 24px on desktop; keep the mobile size unchanged. */
@@ -822,6 +853,7 @@
           img.src = enc(`/Student Work/Projects/${file}`);
           img.alt = '';
           img.loading = 'lazy';
+          img.decoding = 'async';
           imagesDiv.appendChild(img);
         }
         article.appendChild(imagesDiv);
