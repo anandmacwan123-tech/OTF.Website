@@ -123,7 +123,27 @@
     padding: 0.45rem 0.9rem; cursor: pointer; color: var(--fg);
   }
   .file-btn:hover { background: rgba(0,0,0,0.04); }
-  input[type="file"] { display: none; }
+  /* Visually hide the file input but keep it keyboard-focusable so the
+     label button can be reached by tab + activated by space/enter. */
+  input[type="file"] {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0);
+    white-space: nowrap; border: 0;
+  }
+
+  /* Keyboard focus rings on the custom buttons (text inputs already
+     darken their border on focus). */
+  button.submit:focus-visible,
+  .add-project-btn:focus-visible,
+  .lookup-submit:focus-visible,
+  .thumb-del:focus-visible,
+  .suggestions li.active,
+  .file-btn:focus-within {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
 
   /* Project block */
   .project {
@@ -698,11 +718,26 @@
     addInput.addEventListener('change', () => {
       for (const file of addInput.files) {
         newFiles.push(file);
+        const wrap = document.createElement('div');
+        wrap.className = 'thumb-wrap';
         const img = document.createElement('img');
         img.className = 'thumb new';
         img.alt = file.name;
-        img.src = URL.createObjectURL(file);
-        thumbs.appendChild(img);
+        const url = URL.createObjectURL(file);
+        img.src = url;
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'thumb-del';
+        del.title = 'Remove image';
+        del.textContent = '×';
+        del.addEventListener('click', () => {
+          const idx = newFiles.indexOf(file);
+          if (idx >= 0) newFiles.splice(idx, 1);
+          URL.revokeObjectURL(url);
+          wrap.remove();
+        });
+        wrap.append(img, del);
+        thumbs.appendChild(wrap);
       }
       addInput.value = '';
     });
