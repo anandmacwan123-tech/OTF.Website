@@ -1,0 +1,39 @@
+{
+  "id": "sub:1779642360629-2edd0190",
+  "student": "Sebastian",
+  "fullName": "Sebastian McLean",
+  "bio": "Sebastian is a graphic designer and cultural documentarian whose work bridges editorial, branding, and social media. While completing his BA at Ravensbourne University London, he founded Patchwork, a magazine that archives London's unseen creative spaces through original photography, interviews and video. As a freelancer, he has developed brand identities, motion graphics, print assets and social campaigns for clients including Uncommon Fields, LSM Property and MoreThanShows. He manages projects from concept to delivery, balancing client feedback, tight deadlines and multiple revision cycles without losing sight of the story behind the work. His collaborative and organisational skills have been tested across international projects, such as branding a wellness festival with students from St John's University, New York and an in-house role and Creative Lab London. He is comfortable working independently or as part of a creative team, and he brings a research-led approach to every brief - social and cultural context, respecting the audience, and clear communication. Balancing freelance work, magazine production, and his degree, Sebastian consistently delivers considered, culturally aware design.",
+  "practices": [
+    "Editorial",
+    "Branding",
+    "Social Media"
+  ],
+  "projects": [
+    {
+      "key": "Project1",
+      "title": "Patchwork Magazine",
+      "description": "Patchwork is an independent print magazine documenting London's subcultures. These are moments that happen after and inbetween the main event in smoking areas and in the back of the event space. Through candid photography, interviews, and personal reflection, each issue fossilises voices and moments unheard.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project2",
+      "title": "*TERRA PUBLIC BROADCASTING",
+      "description": "An anti-brand workwear system for London's invisible workforce. Rejecting scarcity and resale culture, it distributes freely through pop‑ups and open‑source manuals.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project3",
+      "title": "MORETHANSHOWS vol.3",
+      "description": "MoreThanShows is an open‑mic night founded by Joshua Alexander, spotlighting spoken word, rap, and DJ sets. Volume 3 took place on 8th April at the Prince of Peckham, featuring performances from Charlene the Poet, Chloe Tenesha, and Nolais.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779642360629,
+  "status": "applied",
+  "processedAt": 1779723161527
+}

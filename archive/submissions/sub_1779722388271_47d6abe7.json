@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779722388271-47d6abe7",
+  "student": "Carolina",
+  "fullName": "Carolina Almeida Ferreira",
+  "bio": "Carolina is a dedicated graphic design student who approaches her practice with a strong emphasis on research, experimentation, and thoughtful refinement. Throughout her academic journey, she has developed a disciplined creative process that begins with in-depth investigation and evolves through iterative exploration, allowing ideas to be tested, challenged, and strengthened. This method ensures that each project is not only visually engaging but also conceptually grounded.\nCarolina's portfolio reflects a diverse body of work created during her studies, demonstrating a clear commitment to both creative innovation and technical precision. It highlights a range of projects spanning print and digital media, showcasing her ability to adapt design thinking across different formats and audiences. Each piece illustrates a careful balance between concept development and visual execution, revealing an understanding of how ideas can be translated into compelling design solutions.\nWith a keen eye for detail and a curiosity-driven mindset, Carolina continually seeks to push the boundaries of her creative abilities. Her work is characterised by a willingness to experiment with form, typography, and composition, resulting in outcomes that are both purposeful and visually distinctive. As she continues to grow as a designer, she remains focused on refining her voice and expanding her skill set, aiming to create meaningful and impactful visual communication.",
+  "practices": [
+    "Graphic Design",
+    "Illustration",
+    "Typography"
+  ],
+  "projects": [
+    {
+      "key": "Aqua",
+      "title": "Aqua",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Packaging",
+      "title": "Packaging",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Untitled1",
+      "title": "Untitled",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Zine",
+      "title": "Zine",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722388271,
+  "status": "applied",
+  "processedAt": 1779723178631
+}

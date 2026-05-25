@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779722792793-9ae9ae1e",
+  "student": "Nora",
+  "fullName": "Nora Ashani",
+  "bio": "Nora Ashani is a graphic designer from Kosovo specialising in typography, editorial design as well as brand identity and visual communication with a passion and eagerness in exploring materiality and the vast extent to which materiality, such as collage, can communicate meaning and purpose. Nora focuses on being a compelling story teller constructing layered visual narratives that invites new readings and perspective – primarily through the method of re-contextualising found or existing materials. She approaches each project and brief with experimentation, curiosity and a clear conceptual direction, conveying meaning and intention in nuanced ways as well as visual engagement.",
+  "practices": [
+    "Typography",
+    "Editorial",
+    "Collage"
+  ],
+  "projects": [
+    {
+      "key": "Overstack",
+      "title": "Overstack",
+      "description": "Over-Stack – This project uses layered lino prints to mirror the experience of ADHD: overlapping thoughts, repeated language, shifting attention, and the constant tension between chaos and clarity.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "PhobiaFiles",
+      "title": "PhobiaFiles",
+      "description": "Phobia Files is a series and a collection of phobia that is in a style of a visual pamphlet/guide. The use of collage is intended to explore the extent in which materiality can communicate a concern but also guide a solution for those parents to embrace their phobias within their children. The visual and material choice addressees the seriousness of phobias through a approachable and harmless communication, as well as understanding, managing and communicating the emotional responses.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "ShakenNotStirred2",
+      "title": "ShakenNotStirred2",
+      "description": "Shaken Not Stirred – AQUA is a Martini Brand made for mindful moments... 0% alcohol and 100% taste. AQUA is created for health-conscious drinkers who choose intention over excess. AQUA is more than a drink. It's a place to belong in an exclusive world for those who choose differently.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "SmultringerPhotography2",
+      "title": "SmultringerPhotography2",
+      "description": "Smultringer – Smultringer is a playful display typeface defined by bold curves, sharp terminals, and a handcrafted rhythm. Designed and presented through a printed type specimen created in PaperClips.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722792793,
+  "status": "applied",
+  "processedAt": 1779723196548
+}

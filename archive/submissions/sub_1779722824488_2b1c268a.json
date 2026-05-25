@@ -1,0 +1,32 @@
+{
+  "id": "sub:1779722824488-2b1c268a",
+  "student": "Oli",
+  "fullName": "Oli Parker",
+  "bio": "Oli Parker is a multidisciplinary visual artist working within sports media and currently serves as a junior graphic designer at Millwall FC. Alongside this role, he runs two football-based companies as part of his coaching pathway. His graphic design, photography, and videography skills are applied across his university projects, industry work, and freelance practice, allowing him to take on a wide range of briefs and adapt his creative approach to suit both corporate and more expressive outcomes.",
+  "practices": [
+    "Photography",
+    "Videography",
+    "Sports Media"
+  ],
+  "projects": [
+    {
+      "key": "90thProject",
+      "title": "90thProject",
+      "description": "90thProject – During my work experience, I decided to dedicate a couple of weeks to the media side of my football company, 90th Project. This gave me the opportunity to develop the company further while experimenting with marketing and camera work.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "BUILT-BY-STRUGGLE",
+      "title": "BUILT-BY-STRUGGLE",
+      "description": "This project is a videography piece exploring how South London builds success and reflects its diverse cultures, struggles, and identities. It highlights how these elements shape the area and influence the ways individuals navigate and rise above their environments.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722824488,
+  "status": "applied",
+  "processedAt": 1779723200038
+}

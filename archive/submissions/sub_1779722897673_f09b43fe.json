@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779722897673-f09b43fe",
+  "student": "Rebecca",
+  "fullName": "Rebecca Whippy",
+  "bio": "Rebecca is a print-focused designer specialising in risograph, branding, and experimental design. Rooted in print culture, she creates bold, textured visuals using expressive typography and tactile processes to communicate through both concept and physical form. Her work often explores the relationship between materiality and message, using layering, colour separation, and print imperfections as intentional design elements. This approach allows her to produce outcomes that feel both contemporary and process-driven, with a strong emphasis on experimentation, visual impact, and the physical qualities of printed media.",
+  "practices": [
+    "Risograph",
+    "Branding",
+    "Print"
+  ],
+  "projects": [
+    {
+      "key": "FUKUZATSUNA",
+      "title": "FUKUZATSUNA",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project2",
+      "title": "",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "riso",
+      "title": "ZINE",
+      "description": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "UnsentLetters",
+      "title": "",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722897673,
+  "status": "applied",
+  "processedAt": 1779723203408
+}

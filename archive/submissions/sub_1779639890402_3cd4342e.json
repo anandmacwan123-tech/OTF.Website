@@ -1,0 +1,43 @@
+{
+  "id": "sub:1779639890402-3cd4342e",
+  "student": "Jaeden",
+  "fullName": "Jaeden Small",
+  "bio": "A graphic designer and photographer with an emerging practice in videography, based in London. Focused primarily on visual communication through zine and poster layouts, combining photography and typographic skills to approach any brief with creativity and precision, meeting the needs of both client and audience through InDesign, Photoshop and DaVinci Resolve.",
+  "practices": [
+    "Photography",
+    "Editorial",
+    "Videography"
+  ],
+  "projects": [
+    {
+      "key": "FameSucks",
+      "title": "FameSucks 01",
+      "description": "A zine exploring the dark side of fame through the mental health stories of celebrities including Billie Eilish, Kanye West, Kid Cudi, Kendrick Lamar and Jennifer Lopez. Billie's raw frustration with celebrity life anchors the piece while each artist reveals their own battles including anxiety, body image, bipolar disorder, depression and burnout.",
+      "removedFiles": [
+        "Jaeden_FameSucks_1.webp"
+      ],
+      "newImageCount": 1
+    },
+    {
+      "key": "FameSucks1",
+      "title": "FameSucks 02",
+      "description": "",
+      "removedFiles": [
+        "Jaeden_FameSucks1_1.webp"
+      ],
+      "newImageCount": 1
+    },
+    {
+      "key": "FameSucks2",
+      "title": "FameSucks 03",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779639890402,
+  "status": "applied",
+  "processedAt": 1779723137495
+}

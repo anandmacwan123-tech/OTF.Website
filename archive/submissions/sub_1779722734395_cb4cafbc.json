@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779722734395-cb4cafbc",
+  "student": "Noora",
+  "fullName": "Noora Ghodrati",
+  "bio": "Noora Ghodrati is a London-based Iranian graphic designer with a strong interest in photography. Her practice explores the visual language of Iranian patterns and architecture, often reinterpreting traditional motifs through contemporary design. Colour and pattern play a central role in her work, where she investigates combinations that reflect both cultural heritage and modern aesthetics. Alongside her exploration of materials, she experiments with pottery, fabrics, and different types of paper, as well as a range of printing techniques. Within her design practice, she aims to maintain a minimal approach, focusing on clarity, simplicity, and ease of understanding, ensuring that her visual compositions remain accessible and easy to follow.",
+  "practices": [
+    "Photography",
+    "Pattern Design",
+    "Print"
+  ],
+  "projects": [
+    {
+      "key": "Golestan-Palce",
+      "title": "Golestan-Palce",
+      "description": "Golestan Palce – This project explores how storytelling changes between physical art and digital media through the context of Iranian cultural identity and heritage. Inspired by Golestan Palace, the work combines ceramics, photography, typography, scanned materials, and digital design to investigate themes of memory, fragmentation, resilience, and preservation. Blending physical making with digital processes, the project reflects on how cultural stories are communicated, experienced, and remembered across time.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Lipstick",
+      "title": "Lipstick",
+      "description": "This project focuses on creating a custom typeface using lipstick as the main material. It includes a process book showing how the font was developed, a final typeface showcase, and a photoshoot presenting the outcomes. The concept is inspired by the film How to Lose a Guy in 10 Days, which informs the overall theme and tone of the work. Lipstick is used throughout as both a material and a visual element in the design. Different types of paper are used to support the presentation and reflect the idea behind the project, helping to create a clear and consistent visual outcome.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "PFI",
+      "title": "PFI",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "RAAZE-PERSIA",
+      "title": "RAAZE-PERSIA",
+      "description": "Raaze Persia is a gift-like project that introduces Iran and Iranian culture through a contemporary visual narrative rooted in traditional Persian patterns and characters. It combines these elements with photographic documentation of Tehran today, offering a closer look at the city's identity. The project explores changes in fashion and social expression before and after the Iranian Revolution, supported by an interview with Noora's grandmother, providing a personal account of how everyday dress has evolved over time. A video component captures the atmosphere of Tehran's streets, aiming to present everyday life and a more complete image of Iran and its people.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722734395,
+  "status": "applied",
+  "processedAt": 1779723193158
+}

@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779722255775-c465d2bc",
+  "student": "Surayya",
+  "fullName": "Surayya Ahmadzada",
+  "bio": "Surayya Ahmadzada is a graphic designer from Azerbaijan specialising in editorial design, typography, visual communication, and brand identity. Her practice focuses on translating complex ideas into clear and thoughtful visual systems that balance concept, strategy, and aesthetics. She works across both analogue and digital processes, exploring new techniques, materials, and visual languages as part of her approach. Surayya approaches each project with curiosity and careful attention to detail, aiming to create work that feels considered, meaningful, and intentional, with purpose behind every design decision.",
+  "practices": [
+    "Editorial",
+    "Typography",
+    "Visual Communication"
+  ],
+  "projects": [
+    {
+      "key": "BINDERS",
+      "title": "BINDERS",
+      "description": "binders specimen – presents binders, a lowercase display typeface designed by Surayya. Constructed from the form of a paperclip using ink and stamping techniques before being digitised, the typeface takes its name from the Norwegian word for paperclip, paying homage to its origins and historical invention. The specimen showcases the typeface through compositions featuring the names of famous Norwegian fjords paired with landscape photography, creating a visual dialogue between letterforms and place.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "KHALCHA",
+      "title": "KHALCHA",
+      "description": "Khalcha is a textile-based cultural identity design project that reimagines Azerbaijani carpet symbolism through the use of neon yarns and glow-in-the-dark UV interaction. By combining craft and technology, the work reflects on material and tradition and explores how traditional ornaments and patterns can be reinterpreted within a contemporary visual language while preserving their symbolic meaning.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "raverealm",
+      "title": "raverealm",
+      "description": "Rave:Realm is a collaborative brand identity developed for Ravensbourne University London’s Annual Student Showcase 2025. selected as the winning concept, the project explored generative design and modular systems to create a flexible visual language across print and digital...",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "terra-science-museum",
+      "title": "terra-science-museum",
+      "description": "terra science museum – is a museum brand identity developed by Surayya. Moving away from trend-driven clichés, the identity combines subtle design choices, cool colour tones, materiality, and modern systems to create a contemporary visual language. Situated within Battersea Power Station, the project establishes a dialogue between industrial history and scientific discovery. Fast-moving, widely accessible, and embedded within everyday life, terra presents science as something constant, grounded, and relevant.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722255775,
+  "status": "applied",
+  "processedAt": 1779723165965
+}

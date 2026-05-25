@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779722636561-c1479e76",
+  "student": "Jamie",
+  "fullName": "Jamie Donnelly",
+  "bio": "Jamie Donnelly is a London-based graphic designer from Vietnam, working with branding as a way to build immersive, atmospheric worlds. Her practice is driven by an intuitive and visual way of thinking, shaped by her background in illustration and the everyday visual rhythms of life growing up in Vietnam. She pushes software beyond its conventional role, using 3D and live visual tools to create identities that move, respond, and unfold over time. Moving away from fixed brand systems, she designs through rhythm, narrative, and behaviour, exploring how branding can feel more alive, human, and connected within digital spaces.",
+  "practices": [
+    "Branding",
+    "Illustration",
+    "3D Design"
+  ],
+  "projects": [
+    {
+      "key": "hearth-studio",
+      "title": "hearth-studio",
+      "description": "HEARTH STUDIO is a workwear brand that redefines the visual language of fire-resistant uniform through warmth, individuality, and personal narrative. Challenging the rigid and impersonal vernacular of the sector, it introduces a flexible brand system that adapts to the wearer, reframing workwear as something shaped by rhythm, routine, and lived experience rather than standardisation.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "HEM-DUYEN",
+      "title": "HEM-DUYEN",
+      "description": "HºmM DUYÊN is a Vietnamese café concept that translates cultural rhythm into a digital brand personality. Existing primarily on Instagram, it captures the temporal flow of Vietnamese café culture from morning to night through transitions in light, atmosphere, and pacing. 3D-rendered desserts and coffee function as cultural artefacts, constructing an intimate and nostalgic brand world that expresses duyên through quiet, evolving moments rather than a fixed identity.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "KAWSxKEINEMUSIK",
+      "title": "KAWSxKEINEMUSIK",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "KYNEXUS",
+      "title": "KYNEXUS",
+      "description": "KYNEXUS is a brand that reactivates connection within contemporary dance and music spaces through live data-driven visuals. Built using TouchDesigner, the system captures motion and sound in real time, translating the energy of people, music, and space into a unified visual output. Extending beyond a singular identity, Kynexus operates as an accessible platform, offering toolkits and digital drops that enable others to generate their own visuals, fostering a decentralised community at the intersection of dance, design, and collective experience.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779722636561,
+  "status": "applied",
+  "processedAt": 1779723186655
+}

@@ -3,9 +3,220 @@
     "bio": "Kye Goff is a graphic designer who enjoys creating minimalist, clean, and simple work and is looking to branch out into a more primarily branding-focused background, as they want to help brands assert themselves and communicate to their audience what they represent. Even so, Kye remains open to creating posters and publications, as that is something they also enjoy working on. They can use a range of software such as Adobe and are also getting into photography as a supporting hobby to help further elevate their design work."
   },
   "Rebecca": {
-    "bio": "Rebecca is a print-focused designer specialising in risograph, branding, and experimental design. Rooted in print culture, she creates bold, textured visuals using expressive typography and tactile processes to communicate through both concept and physical form. Her work often explores the relationship between materiality and message, using layering, colour separation, and print imperfections as intentional design elements. This approach allows her to produce outcomes that feel both contemporary and process-driven, with a strong emphasis on experimentation, visual impact, and the physical qualities of printed media."
+    "bio": "Rebecca is a print-focused designer specialising in risograph, branding, and experimental design. Rooted in print culture, she creates bold, textured visuals using expressive typography and tactile processes to communicate through both concept and physical form. Her work often explores the relationship between materiality and message, using layering, colour separation, and print imperfections as intentional design elements. This approach allows her to produce outcomes that feel both contemporary and process-driven, with a strong emphasis on experimentation, visual impact, and the physical qualities of printed media.",
+    "practices": [
+      "Risograph",
+      "Branding",
+      "Print"
+    ],
+    "projectDescriptions": {
+      "riso": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form."
+    }
   },
   "Martim": {
     "bio": "Martim Freitas Pereira is a British-Portuguese multidisciplinary graphic designer based in London, specialising in wayfinding, information and navigation-based, and exhibition design, with additional interests in immersive and editorial design.\n\nHis work is grounded in a thorough understanding of the nuances of designing for physical spaces and environments. With a sharp critical eye and keen attention to detail, Pereira approaches design with a broad perspective, placing emphasis on outcomes that are intentional and meaningful rather than surface-level.\n\nA collaborative team player, he brings a fresh and unconventional perspective to his work."
+  },
+  "Anand": {
+    "bio": "What I find interesting about Anand is his curiosity about digital systems. What does it mean for a non-Western individual to use tech built on datasets curated from Western culture? He grew up in India and now uses design to address social issues. Projects like Non-Consensual Intelligence, where he pushes TouchDesigner to make surveillance visible, are grounded in deep research and are technically ambitious. If you asked him what he enjoys working with most, you'd get a different answer every time, but most often, you'd find him working with code. He thinks creative coding is \"contemporary and cool\".",
+    "practices": [
+      "Creative Coding",
+      "Branding",
+      "Photography"
+    ],
+    "projectDescriptions": {
+      "Based": "Based questions alcohol brands that glorify consumption. Shifting the narrative from 'getting wasted is necessary to have fun' to encouraging mindful consumption, guided through design that puts transparency and clarity at the forefront.",
+      "Evolving": "This interactive projection-mapping piece uses a feedback loop: a camera records its own projection, layering on itself like two mirrors facing each other. Time becomes visible as the image compounds on itself, each frame carrying the weight of what came before. Change isn't abstract here. You watch it happen. You are a part of it.",
+      "Non-Consensual-INtelligence": "Non-Consensual Intelligence is an interactive experience that makes surveillance visible. AI-backed surveillance is a constant, unconsented breach of privacy, centralised, opaque, and controlled by a handful of companies. This project pulls it into view.",
+      "RaveBadge": "A badge that embodies the graphic design culture at Ravensbourne University London, crafted carefully to balance nostalgic charm with everyday accessibility.",
+      "ThinkingBlock": "A research-led short film demonstrating the incompatibility of AI with non-Western cultures. It explores how the lack of diverse training data shapes inclusivity in design."
+    }
+  },
+  "Jaeden": {
+    "bio": "A graphic designer and photographer with an emerging practice in videography, based in London. Focused primarily on visual communication through zine and poster layouts, combining photography and typographic skills to approach any brief with creativity and precision, meeting the needs of both client and audience through InDesign, Photoshop and DaVinci Resolve.",
+    "practices": [
+      "Photography",
+      "Editorial",
+      "Videography"
+    ],
+    "projectDescriptions": {
+      "FameSucks": "A zine exploring the dark side of fame through the mental health stories of celebrities including Billie Eilish, Kanye West, Kid Cudi, Kendrick Lamar and Jennifer Lopez. Billie's raw frustration with celebrity life anchors the piece while each artist reveals their own battles including anxiety, body image, bipolar disorder, depression and burnout."
+    }
+  },
+  "Sebastian": {
+    "bio": "Sebastian is a graphic designer and cultural documentarian whose work bridges editorial, branding, and social media. While completing his BA at Ravensbourne University London, he founded Patchwork, a magazine that archives London's unseen creative spaces through original photography, interviews and video. As a freelancer, he has developed brand identities, motion graphics, print assets and social campaigns for clients including Uncommon Fields, LSM Property and MoreThanShows. He manages projects from concept to delivery, balancing client feedback, tight deadlines and multiple revision cycles without losing sight of the story behind the work. His collaborative and organisational skills have been tested across international projects, such as branding a wellness festival with students from St John's University, New York and an in-house role and Creative Lab London. He is comfortable working independently or as part of a creative team, and he brings a research-led approach to every brief - social and cultural context, respecting the audience, and clear communication. Balancing freelance work, magazine production, and his degree, Sebastian consistently delivers considered, culturally aware design.",
+    "practices": [
+      "Editorial",
+      "Branding",
+      "Social Media"
+    ],
+    "projectDescriptions": {
+      "Project1": "Patchwork is an independent print magazine documenting London's subcultures. These are moments that happen after and inbetween the main event in smoking areas and in the back of the event space. Through candid photography, interviews, and personal reflection, each issue fossilises voices and moments unheard.",
+      "Project2": "An anti-brand workwear system for London's invisible workforce. Rejecting scarcity and resale culture, it distributes freely through pop‑ups and open‑source manuals.",
+      "Project3": "MoreThanShows is an open‑mic night founded by Joshua Alexander, spotlighting spoken word, rap, and DJ sets. Volume 3 took place on 8th April at the Prince of Peckham, featuring performances from Charlene the Poet, Chloe Tenesha, and Nolais."
+    }
+  },
+  "Surayya": {
+    "bio": "Surayya Ahmadzada is a graphic designer from Azerbaijan specialising in editorial design, typography, visual communication, and brand identity. Her practice focuses on translating complex ideas into clear and thoughtful visual systems that balance concept, strategy, and aesthetics. She works across both analogue and digital processes, exploring new techniques, materials, and visual languages as part of her approach. Surayya approaches each project with curiosity and careful attention to detail, aiming to create work that feels considered, meaningful, and intentional, with purpose behind every design decision.",
+    "practices": [
+      "Editorial",
+      "Typography",
+      "Visual Communication"
+    ],
+    "projectDescriptions": {
+      "BINDERS": "binders specimen – presents binders, a lowercase display typeface designed by Surayya. Constructed from the form of a paperclip using ink and stamping techniques before being digitised, the typeface takes its name from the Norwegian word for paperclip, paying homage to its origins and historical invention. The specimen showcases the typeface through compositions featuring the names of famous Norwegian fjords paired with landscape photography, creating a visual dialogue between letterforms and place.",
+      "KHALCHA": "Khalcha is a textile-based cultural identity design project that reimagines Azerbaijani carpet symbolism through the use of neon yarns and glow-in-the-dark UV interaction. By combining craft and technology, the work reflects on material and tradition and explores how traditional ornaments and patterns can be reinterpreted within a contemporary visual language while preserving their symbolic meaning.",
+      "raverealm": "Rave:Realm is a collaborative brand identity developed for Ravensbourne University London’s Annual Student Showcase 2025. selected as the winning concept, the project explored generative design and modular systems to create a flexible visual language across print and digital...",
+      "terra-science-museum": "terra science museum – is a museum brand identity developed by Surayya. Moving away from trend-driven clichés, the identity combines subtle design choices, cool colour tones, materiality, and modern systems to create a contemporary visual language. Situated within Battersea Power Station, the project establishes a dialogue between industrial history and scientific discovery. Fast-moving, widely accessible, and embedded within everyday life, terra presents science as something constant, grounded, and relevant."
+    }
+  },
+  "Arnete": {
+    "bio": "Arnete Kuncyte is a creative and detail-oriented designer based in London, with a strong passion for graphic editorials and handcrafts. She combines visual storytelling with both digital design and hands-on techniques, creating work that is both cohesive and purposeful. Her skills span composition, aesthetics, and practical execution, allowing her to bring ideas to life across different mediums. Alongside her creative practice, she works in social media marketing, developing strategic and engaging content, while also establishing an event signage business as a focused professional venture.",
+    "practices": [
+      "Editorial",
+      "Handcraft",
+      "Social Media"
+    ],
+    "projectDescriptions": {
+      "Aqva": "???",
+      "Atsijungti": "Atsijungti explores the feeling of being disconnected from Lithuanian culture while growing up in a different country. It combines personal experiences with interviews from close friends and family to understand how identity, language, and distance shape our relationship with where we come from. Through written stories and visual elements, the publication reflects on what it means to feel \"in-between\" cultures and how those connections can change over time.",
+      "InthePresenceofGreen": "In the Presence of Green – Design project inspired by nature, exploring digital and physical forms to promote slowing down and reconnecting with the natural world through mindful, nature-led design.",
+      "PostcardSeries": "Postcard Series – Postcard series inspired by Kumai Kyoko’s artefact ‘Memory’, featuring handwritten stories from survivors and victims of the 2011 Tohoku disaster."
+    }
+  },
+  "Becky": {
+    "bio": "Becky is a London-based graphic designer specialising in branding, editorial, visual communication, and strategy. Her practice works across both digital and analogue processes, allowing her to create thoughtful, well-crafted design solutions that are grounded within research. She has gained valuable industry experience through working and collaborating with Kopparberg and Transport for London. Becky is a motivated designer who enjoys being challenged with open-ended briefs, using them as an opportunity to explore ideas, push creative boundaries, and develop meaningful visual outcomes.",
+    "practices": [
+      "Branding",
+      "Editorial",
+      "Visual Communication"
+    ],
+    "projectDescriptions": {
+      "IGNIS": "Ignis was a workwear branding project developed in response to a live industry brief from Studio Blackburn. The brand focuses on modern office wear, creating versatile outfits from traditional fabrics that seamlessly transition between professional and personal life, reflecting the evolving balance of on-duty and off-duty dressing in contemporary society.",
+      "ISSUES-IN-BRANDING": "Issues in Branding was a research-led project that explored the concept of authenticity in contemporary branding. The final outcome featured a research interview conducted with a senior designer working within a branding agency, offering professional insight and perception of authenticity in modern brand design.",
+      "Kopparberg": "Winner of a university-wide competition, this project involved designing a new draught glass for Kopparberg. The final outcome reflects the brand's identity through a distinctive yet user-focused form, developed from concept to production."
+    }
+  },
+  "Carolina": {
+    "bio": "Carolina is a dedicated graphic design student who approaches her practice with a strong emphasis on research, experimentation, and thoughtful refinement. Throughout her academic journey, she has developed a disciplined creative process that begins with in-depth investigation and evolves through iterative exploration, allowing ideas to be tested, challenged, and strengthened. This method ensures that each project is not only visually engaging but also conceptually grounded.\nCarolina's portfolio reflects a diverse body of work created during her studies, demonstrating a clear commitment to both creative innovation and technical precision. It highlights a range of projects spanning print and digital media, showcasing her ability to adapt design thinking across different formats and audiences. Each piece illustrates a careful balance between concept development and visual execution, revealing an understanding of how ideas can be translated into compelling design solutions.\nWith a keen eye for detail and a curiosity-driven mindset, Carolina continually seeks to push the boundaries of her creative abilities. Her work is characterised by a willingness to experiment with form, typography, and composition, resulting in outcomes that are both purposeful and visually distinctive. As she continues to grow as a designer, she remains focused on refining her voice and expanding her skill set, aiming to create meaningful and impactful visual communication.",
+    "practices": [
+      "Graphic Design",
+      "Illustration",
+      "Typography"
+    ]
+  },
+  "Divine": {
+    "bio": "Divine Ojiaku is a London-based graphic designer specialising in branding, editorial design and typography. Her practice focuses on creating thoughtful and engaging design outcomes through strong typography, image-making, and clear visual systems. She is interested in how design can communicate ideas in a way that feels both expressive and considered, balancing creativity with purposeful structure.",
+    "practices": [
+      "Branding",
+      "Editorial",
+      "Typography"
+    ],
+    "projectDescriptions": {
+      "ABOTABOT": "A zine exploring my Black British identity through personal photos, stories, and everyday places. Using collage and riso-inspired textures.",
+      "SourRice": "A vibrant sushi bar concept blending authentic Japanese practices with a modern, refreshing twist. It offers inventive sushi rolls, crafted cocktails, and a lively atmosphere. With a focus on shareable moments and cultural authenticity, Sour Rice reimagines the sushi experience while staying rooted in tradition.",
+      "SPIKE": "Spike is an experimental display typeface constructed from rubber band balls, deliberately subverting the material’s expected softness and elasticity through rigid, spiked letterforms. The typeface embraces irregularity by exploring how physical objects can generate typographic systems.",
+      "TerraCotta": "Terracotta is a wine brand dedicated to reconnecting people to the earth, themselves, and each other. Inspired by ceramics and natural materials, Terracotta takes a more human and tactile approach by selling wine in reusable terracotta vessels, celebrating craftsmanship and sustainability whilst turning a quiet sip into a shared moment. It stands out by blending tradition with warmth and modern design."
+    }
+  },
+  "Jamie": {
+    "bio": "Jamie Donnelly is a London-based graphic designer from Vietnam, working with branding as a way to build immersive, atmospheric worlds. Her practice is driven by an intuitive and visual way of thinking, shaped by her background in illustration and the everyday visual rhythms of life growing up in Vietnam. She pushes software beyond its conventional role, using 3D and live visual tools to create identities that move, respond, and unfold over time. Moving away from fixed brand systems, she designs through rhythm, narrative, and behaviour, exploring how branding can feel more alive, human, and connected within digital spaces.",
+    "practices": [
+      "Branding",
+      "Illustration",
+      "3D Design"
+    ],
+    "projectDescriptions": {
+      "hearth-studio": "HEARTH STUDIO is a workwear brand that redefines the visual language of fire-resistant uniform through warmth, individuality, and personal narrative. Challenging the rigid and impersonal vernacular of the sector, it introduces a flexible brand system that adapts to the wearer, reframing workwear as something shaped by rhythm, routine, and lived experience rather than standardisation.",
+      "HEM-DUYEN": "HºmM DUYÊN is a Vietnamese café concept that translates cultural rhythm into a digital brand personality. Existing primarily on Instagram, it captures the temporal flow of Vietnamese café culture from morning to night through transitions in light, atmosphere, and pacing. 3D-rendered desserts and coffee function as cultural artefacts, constructing an intimate and nostalgic brand world that expresses duyên through quiet, evolving moments rather than a fixed identity.",
+      "KYNEXUS": "KYNEXUS is a brand that reactivates connection within contemporary dance and music spaces through live data-driven visuals. Built using TouchDesigner, the system captures motion and sound in real time, translating the energy of people, music, and space into a unified visual output. Extending beyond a singular identity, Kynexus operates as an accessible platform, offering toolkits and digital drops that enable others to generate their own visuals, fostering a decentralised community at the intersection of dance, design, and collective experience."
+    }
+  },
+  "Jenna": {
+    "bio": "Jenna is a London/Essex-based graphic designer with a focus on branding, marketing, and immersive visual experiences. Her work explores how design can move beyond static outcomes to create engaging, sensory-driven interactions that connect with audiences on a deeper level. She has worked with local and independent clients, developing her ability to translate ideas into considered visual identities across both print and digital formats. Her approach is shaped by a strong interest in how design operates within real-world contexts, balancing creativity with clear communication. Jenna is particularly interested in the intersection of design and experience, often drawing inspiration from automotive and motorsport culture. She approaches briefs with energy and curiosity, aiming to create work that is both visually striking and memorable.",
+    "practices": [
+      "Branding",
+      "Marketing",
+      "Immersive Design"
+    ],
+    "projectDescriptions": {
+      "Aer": "AER – AER is a speculative brand concept for a high-performance racing team, centred around an AI-driven system that supports drivers both on and off the track. The project explores how data, technology, and design can work together to enhance performance while creating a strong and immersive brand identity.\n \n The visual language reflects precision, speed, and control, combining clean design with dynamic elements to communicate a forward-thinking approach to motorsport. AER positions itself as more than a team, but as a system built to optimise performance and redefine the relationship between driver and machine.",
+      "Veil": "VEIL – Veil is an brand designed for immersive spaces, where visuals are activated through the presence of the viewer. Combining static posters with projection and real-time interaction."
+    }
+  },
+  "Noora": {
+    "bio": "Noora Ghodrati is a London-based Iranian graphic designer with a strong interest in photography. Her practice explores the visual language of Iranian patterns and architecture, often reinterpreting traditional motifs through contemporary design. Colour and pattern play a central role in her work, where she investigates combinations that reflect both cultural heritage and modern aesthetics. Alongside her exploration of materials, she experiments with pottery, fabrics, and different types of paper, as well as a range of printing techniques. Within her design practice, she aims to maintain a minimal approach, focusing on clarity, simplicity, and ease of understanding, ensuring that her visual compositions remain accessible and easy to follow.",
+    "practices": [
+      "Photography",
+      "Pattern Design",
+      "Print"
+    ],
+    "projectDescriptions": {
+      "Golestan-Palce": "Golestan Palce – This project explores how storytelling changes between physical art and digital media through the context of Iranian cultural identity and heritage. Inspired by Golestan Palace, the work combines ceramics, photography, typography, scanned materials, and digital design to investigate themes of memory, fragmentation, resilience, and preservation. Blending physical making with digital processes, the project reflects on how cultural stories are communicated, experienced, and remembered across time.",
+      "Lipstick": "This project focuses on creating a custom typeface using lipstick as the main material. It includes a process book showing how the font was developed, a final typeface showcase, and a photoshoot presenting the outcomes. The concept is inspired by the film How to Lose a Guy in 10 Days, which informs the overall theme and tone of the work. Lipstick is used throughout as both a material and a visual element in the design. Different types of paper are used to support the presentation and reflect the idea behind the project, helping to create a clear and consistent visual outcome.",
+      "RAAZE-PERSIA": "Raaze Persia is a gift-like project that introduces Iran and Iranian culture through a contemporary visual narrative rooted in traditional Persian patterns and characters. It combines these elements with photographic documentation of Tehran today, offering a closer look at the city's identity. The project explores changes in fashion and social expression before and after the Iranian Revolution, supported by an interview with Noora's grandmother, providing a personal account of how everyday dress has evolved over time. A video component captures the atmosphere of Tehran's streets, aiming to present everyday life and a more complete image of Iran and its people."
+    }
+  },
+  "Nora": {
+    "bio": "Nora Ashani is a graphic designer from Kosovo specialising in typography, editorial design as well as brand identity and visual communication with a passion and eagerness in exploring materiality and the vast extent to which materiality, such as collage, can communicate meaning and purpose. Nora focuses on being a compelling story teller constructing layered visual narratives that invites new readings and perspective – primarily through the method of re-contextualising found or existing materials. She approaches each project and brief with experimentation, curiosity and a clear conceptual direction, conveying meaning and intention in nuanced ways as well as visual engagement.",
+    "practices": [
+      "Typography",
+      "Editorial",
+      "Collage"
+    ],
+    "projectDescriptions": {
+      "Overstack": "Over-Stack – This project uses layered lino prints to mirror the experience of ADHD: overlapping thoughts, repeated language, shifting attention, and the constant tension between chaos and clarity.",
+      "PhobiaFiles": "Phobia Files is a series and a collection of phobia that is in a style of a visual pamphlet/guide. The use of collage is intended to explore the extent in which materiality can communicate a concern but also guide a solution for those parents to embrace their phobias within their children. The visual and material choice addressees the seriousness of phobias through a approachable and harmless communication, as well as understanding, managing and communicating the emotional responses.",
+      "ShakenNotStirred2": "Shaken Not Stirred – AQUA is a Martini Brand made for mindful moments... 0% alcohol and 100% taste. AQUA is created for health-conscious drinkers who choose intention over excess. AQUA is more than a drink. It's a place to belong in an exclusive world for those who choose differently.",
+      "SmultringerPhotography2": "Smultringer – Smultringer is a playful display typeface defined by bold curves, sharp terminals, and a handcrafted rhythm. Designed and presented through a printed type specimen created in PaperClips."
+    }
+  },
+  "Oli": {
+    "bio": "Oli Parker is a multidisciplinary visual artist working within sports media and currently serves as a junior graphic designer at Millwall FC. Alongside this role, he runs two football-based companies as part of his coaching pathway. His graphic design, photography, and videography skills are applied across his university projects, industry work, and freelance practice, allowing him to take on a wide range of briefs and adapt his creative approach to suit both corporate and more expressive outcomes.",
+    "practices": [
+      "Photography",
+      "Videography",
+      "Sports Media"
+    ],
+    "projectDescriptions": {
+      "90thProject": "90thProject – During my work experience, I decided to dedicate a couple of weeks to the media side of my football company, 90th Project. This gave me the opportunity to develop the company further while experimenting with marketing and camera work.",
+      "BUILT-BY-STRUGGLE": "This project is a videography piece exploring how South London builds success and reflects its diverse cultures, struggles, and identities. It highlights how these elements shape the area and influence the ways individuals navigate and rise above their environments."
+    }
+  },
+  "Taleb": {
+    "bio": "Taleb Cherif is a designer born in Paris, coming from an artistic background where he won three art trophies and a medal. He enjoys reading webcomics, drawing and watching anime interests that have been a major influence on his creative process. They push him to combine ideas to unusual and contradicting lengths. Taking on graphic design allows him to expand his skills into different areas such as 3D, motion, and illustration. He considers himself a surrealist who is fascinated by visual depth and immersion, possessing the inventive mindset to explore the abstract and make the once unknown feel truly known.",
+    "practices": [
+      "3D Design",
+      "Motion",
+      "Illustration"
+    ],
+    "projectDescriptions": {
+      "aer": "Aer is a beer brand inspired by the Leake Street graffiti tunnel. It's about how people leave their mark, building layers of stickers on a wall until it embodies culture itself. Cities don't create culture, people do, and individuality is what drives it. Aer encourages others to be raw, real, and to express themselves exactly as they are. Everyone's input enriches the scene and adds value to the street life of London.",
+      "Project3": "Gamion Survey (which stands for Gamify Opinion Survey) is a project about gamifying the user experience of doing surveys to make it feel like you're playing a game. The goal is to encourage more users to give feedback, as it's important to receive that input so we can adapt and improve. My concept is a throwing interaction where you fire chalk at sleeping students. Each student in the illustration is numbered based on the answers, and clicking an answer triggers the throwing mechanic. This makes the survey fun and interesting to interact with compared to just ticking a checkbox."
+    }
+  },
+  "Vanessa": {
+    "bio": "Vanessa Franko is a London-based graphic designer from Istanbul, specialising in visual identity systems, music design, digital media, and cultural communication. Their practice explores how technology shapes media and design, influencing audience behaviour and contemporary culture through research-led visual outcomes. They focus on communicating complex ideas through engaging work across print and digital platforms.",
+    "practices": [
+      "Visual Identity",
+      "Music Design",
+      "Digital Media"
+    ],
+    "projectDescriptions": {
+      "Project3": "A fan concept CD cover for Obituary's Cause of Death, combining a hand-drawn sigil, custom typography, and chrome experiments with distressed textures. Cause of Death is considered a classic album in the history of death metal.",
+      "Substance": "A photographic document of London’s post-punk and\n new wave revival scenes, shot on 35mm film at venues\n including The Shacklewell Arms, Paper Dress Vintage,\n The Windmill, and Dream Bags Jaguar Shoes.",
+      "SubstanceTheInterviews": "A photographic document of London’s post-punk and\n new wave revival scenes, shot on 35mm film at venues\n including The Shacklewell Arms, Paper Dress Vintage,\n The Windmill, and Dream Bags Jaguar Shoes."
+    }
+  },
+  "Will": {
+    "bio": "London-based graphic designer, Will Vint is working across all mediums of design; motion graphics, visual communication, branding & editorial work. Will is a motivated designer who enjoys being challenged in every piece of work, using every project as an opportunity to push boundaries of ideas, and develop meaningful visual outcomes. Most importantly, he finds each project enjoyable; dipping his hands in all areas of design.",
+    "practices": [
+      "Motion Graphics",
+      "Visual Communication",
+      "Branding"
+    ],
+    "projectDescriptions": {
+      "CAPE-OF-GOOD-HOPE": "The work responds to the course theme of identity, by trying to represent belonging that is partly invented and partly inherited, it asks how visual media can make imagined belonging feel credible and affecting using anemoia.",
+      "terra": "The work responds to recaptivating culture and identity to create a brand that feels encompassed in what it is. A tequila cocktail brand selling an experience. From the salt you lick. To the lemon you squeeze. To the tequila that follows… Rooted in Mexican culture and Mythology, we create a ceremonial drinking experience where ancient symbolism meets modern design. Concept brief by @studioblackburn"
+    }
   }
 }
