@@ -112,6 +112,19 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // Per-student subdomain: <student>.otf.show serves that student's
+    // portfolio at the root. www and the apex fall through to normal
+    // routing; the student page reads the slug from the hostname.
+    const subMatch = url.hostname.match(/^([^.]+)\.otf\.show$/i);
+    if (subMatch && subMatch[1].toLowerCase() !== 'www') {
+      if (url.pathname.startsWith('/api/')) return handleApi(request, env, url);
+      if (url.pathname === '/' || url.pathname === '') {
+        return env.ASSETS.fetch(new URL('/students/', url.origin));
+      }
+      // Images, JSON and other assets are served as-is for this host.
+      return env.ASSETS.fetch(request);
+    }
+
     if (url.pathname.startsWith('/api/')) {
       return handleApi(request, env, url);
     }
