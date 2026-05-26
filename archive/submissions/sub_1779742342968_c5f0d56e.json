@@ -1,0 +1,55 @@
+{
+  "id": "sub:1779742342968-c5f0d56e",
+  "student": "Divine",
+  "fullName": "Divine Ojiaku",
+  "bio": "Divine Ojiaku is a London-based graphic designer specialising in branding, editorial design and typography. Her practice focuses on creating thoughtful and engaging design outcomes through strong typography, image-making, and clear visual systems. She is interested in how design can communicate ideas in a way that feels both expressive and considered, balancing creativity with purposeful structure.",
+  "practices": [
+    "Branding",
+    "Editorial",
+    "Typography"
+  ],
+  "projects": [
+    {
+      "key": "ABOTABOT",
+      "title": "ABOT",
+      "description": "A zine exploring my Black British identity through personal photos, stories, and everyday places. Using collage and riso-inspired textures.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "RavensbournePinBadge",
+      "title": "RavensbournePinBadge",
+      "description": "A pin badge embodying the tech-focused, collaborative, and cross-media essence of the graphic design course. The badge symbolises connectivity, featuring a pencil highlighting the transition from traditional to digital tools.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "SourRice",
+      "title": "Sour Rice",
+      "description": "A vibrant sushi bar concept blending authentic Japanese practices with a modern, refreshing twist. It offers inventive sushi rolls, crafted cocktails, and a lively atmosphere. With a focus on shareable moments and cultural authenticity, Sour Rice reimagines the sushi experience while staying rooted in tradition.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "SPIKE",
+      "title": "SPIKE",
+      "description": "Spike is an experimental display typeface constructed from rubber band balls, deliberately subverting the material’s expected softness and elasticity through rigid, spiked letterforms. The typeface embraces irregularity by exploring how physical objects can generate typographic systems.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "TerraCotta",
+      "title": "TerraCotta",
+      "description": "Terracotta is a wine brand dedicated to reconnecting people to the earth, themselves, and each other. Inspired by ceramics and natural materials, Terracotta takes a more human and tactile approach by selling wine in reusable terracotta vessels, celebrating craftsmanship and sustainability whilst turning a quiet sip into a shared moment. It stands out by blending tradition with warmth and modern design.",
+      "removedFiles": [
+        "Divine_TerraCotta_5.webp"
+      ],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779742342968,
+  "status": "applied",
+  "processedAt": 1779777441711
+}

@@ -1,6 +1,16 @@
 {
   "Kye": {
-    "bio": "Kye Goff is a graphic designer who enjoys creating minimalist, clean, and simple work and is looking to branch out into a more primarily branding-focused background, as they want to help brands assert themselves and communicate to their audience what they represent. Even so, Kye remains open to creating posters and publications, as that is something they also enjoy working on. They can use a range of software such as Adobe and are also getting into photography as a supporting hobby to help further elevate their design work."
+    "bio": "Kye Goff is a graphic designer who enjoys creating minimalist, clean, and simple work and is looking to branch out into a more primarily branding-focused background, as they want to help brands assert themselves and communicate to their audience what they represent. Even so, Kye remains open to creating posters and publications, as that is something they also enjoy working on. They can use a range of software such as Adobe and are also getting into photography as a supporting hobby to help further elevate their design work.",
+    "practices": [
+      "Branding",
+      "Poster Design",
+      "Photography"
+    ],
+    "projectDescriptions": {
+      "HeadphonesAd": "A core piece of work was a poster for a work-based learning outcome which followed how noise cancelling headphones are great for people with anxiety in crowded and loud environments like train stations and how a quality pair of headphones can help you feel safe and calm.",
+      "IncensePackaging": "Incense Packaging",
+      "StepsBetween": "Booklet"
+    }
   },
   "Rebecca": {
     "bio": "Rebecca is a print-focused designer specialising in risograph, branding, and experimental design. Rooted in print culture, she creates bold, textured visuals using expressive typography and tactile processes to communicate through both concept and physical form. Her work often explores the relationship between materiality and message, using layering, colour separation, and print imperfections as intentional design elements. This approach allows her to produce outcomes that feel both contemporary and process-driven, with a strong emphasis on experimentation, visual impact, and the physical qualities of printed media.",
@@ -65,7 +75,7 @@
     "projectDescriptions": {
       "BINDERS": "binders specimen – presents binders, a lowercase display typeface designed by Surayya. Constructed from the form of a paperclip using ink and stamping techniques before being digitised, the typeface takes its name from the Norwegian word for paperclip, paying homage to its origins and historical invention. The specimen showcases the typeface through compositions featuring the names of famous Norwegian fjords paired with landscape photography, creating a visual dialogue between letterforms and place.",
       "KHALCHA": "Khalcha is a textile-based cultural identity design project that reimagines Azerbaijani carpet symbolism through the use of neon yarns and glow-in-the-dark UV interaction. By combining craft and technology, the work reflects on material and tradition and explores how traditional ornaments and patterns can be reinterpreted within a contemporary visual language while preserving their symbolic meaning.",
-      "raverealm": "Rave:Realm is a collaborative brand identity developed for Ravensbourne University London’s Annual Student Showcase 2025. selected as the winning concept, the project explored generative design and modular systems to create a flexible visual language across print and digital...",
+      "raverealm": "Rave:Realm is a collaborative, award winning brand identity developed for Ravensbourne University London’s Annual Student Showcase 2025. selected as the winning concept, the project explored generative design and modular systems to create a flexible visual language across print and digital.",
       "terra-science-museum": "terra science museum – is a museum brand identity developed by Surayya. Moving away from trend-driven clichés, the identity combines subtle design choices, cool colour tones, materiality, and modern systems to create a contemporary visual language. Situated within Battersea Power Station, the project establishes a dialogue between industrial history and scientific discovery. Fast-moving, widely accessible, and embedded within everyday life, terra presents science as something constant, grounded, and relevant."
     }
   },
@@ -115,7 +125,8 @@
       "ABOTABOT": "A zine exploring my Black British identity through personal photos, stories, and everyday places. Using collage and riso-inspired textures.",
       "SourRice": "A vibrant sushi bar concept blending authentic Japanese practices with a modern, refreshing twist. It offers inventive sushi rolls, crafted cocktails, and a lively atmosphere. With a focus on shareable moments and cultural authenticity, Sour Rice reimagines the sushi experience while staying rooted in tradition.",
       "SPIKE": "Spike is an experimental display typeface constructed from rubber band balls, deliberately subverting the material’s expected softness and elasticity through rigid, spiked letterforms. The typeface embraces irregularity by exploring how physical objects can generate typographic systems.",
-      "TerraCotta": "Terracotta is a wine brand dedicated to reconnecting people to the earth, themselves, and each other. Inspired by ceramics and natural materials, Terracotta takes a more human and tactile approach by selling wine in reusable terracotta vessels, celebrating craftsmanship and sustainability whilst turning a quiet sip into a shared moment. It stands out by blending tradition with warmth and modern design."
+      "TerraCotta": "Terracotta is a wine brand dedicated to reconnecting people to the earth, themselves, and each other. Inspired by ceramics and natural materials, Terracotta takes a more human and tactile approach by selling wine in reusable terracotta vessels, celebrating craftsmanship and sustainability whilst turning a quiet sip into a shared moment. It stands out by blending tradition with warmth and modern design.",
+      "RavensbournePinBadge": "A pin badge embodying the tech-focused, collaborative, and cross-media essence of the graphic design course. The badge symbolises connectivity, featuring a pencil highlighting the transition from traditional to digital tools."
     }
   },
   "Jamie": {
@@ -134,13 +145,14 @@
   "Jenna": {
     "bio": "Jenna is a London/Essex-based graphic designer with a focus on branding, marketing, and immersive visual experiences. Her work explores how design can move beyond static outcomes to create engaging, sensory-driven interactions that connect with audiences on a deeper level. She has worked with local and independent clients, developing her ability to translate ideas into considered visual identities across both print and digital formats. Her approach is shaped by a strong interest in how design operates within real-world contexts, balancing creativity with clear communication. Jenna is particularly interested in the intersection of design and experience, often drawing inspiration from automotive and motorsport culture. She approaches briefs with energy and curiosity, aiming to create work that is both visually striking and memorable.",
     "practices": [
+      "Immersive Design",
       "Branding",
-      "Marketing",
-      "Immersive Design"
+      "Marketing"
     ],
     "projectDescriptions": {
       "Aer": "AER – AER is a speculative brand concept for a high-performance racing team, centred around an AI-driven system that supports drivers both on and off the track. The project explores how data, technology, and design can work together to enhance performance while creating a strong and immersive brand identity.\n \n The visual language reflects precision, speed, and control, combining clean design with dynamic elements to communicate a forward-thinking approach to motorsport. AER positions itself as more than a team, but as a system built to optimise performance and redefine the relationship between driver and machine.",
-      "Veil": "VEIL – Veil is an brand designed for immersive spaces, where visuals are activated through the presence of the viewer. Combining static posters with projection and real-time interaction."
+      "Veil": "VEIL – Veil is an brand designed for immersive spaces, where visuals are activated through the presence of the viewer. Combining static posters with projection and real-time interaction.",
+      "YOUR-PRIVACY-MATTERS": "VEIL – Veil is an brand designed for immersive spaces, where visuals are activated through the presence of the viewer. Combining static posters with projection and real-time interaction."
     }
   },
   "Noora": {
@@ -153,7 +165,8 @@
     "projectDescriptions": {
       "Golestan-Palce": "Golestan Palce – This project explores how storytelling changes between physical art and digital media through the context of Iranian cultural identity and heritage. Inspired by Golestan Palace, the work combines ceramics, photography, typography, scanned materials, and digital design to investigate themes of memory, fragmentation, resilience, and preservation. Blending physical making with digital processes, the project reflects on how cultural stories are communicated, experienced, and remembered across time.",
       "Lipstick": "This project focuses on creating a custom typeface using lipstick as the main material. It includes a process book showing how the font was developed, a final typeface showcase, and a photoshoot presenting the outcomes. The concept is inspired by the film How to Lose a Guy in 10 Days, which informs the overall theme and tone of the work. Lipstick is used throughout as both a material and a visual element in the design. Different types of paper are used to support the presentation and reflect the idea behind the project, helping to create a clear and consistent visual outcome.",
-      "RAAZE-PERSIA": "Raaze Persia is a gift-like project that introduces Iran and Iranian culture through a contemporary visual narrative rooted in traditional Persian patterns and characters. It combines these elements with photographic documentation of Tehran today, offering a closer look at the city's identity. The project explores changes in fashion and social expression before and after the Iranian Revolution, supported by an interview with Noora's grandmother, providing a personal account of how everyday dress has evolved over time. A video component captures the atmosphere of Tehran's streets, aiming to present everyday life and a more complete image of Iran and its people."
+      "RAAZE-PERSIA": "Raaze Persia is a gift-like project that introduces Iran and Iranian culture through a contemporary visual narrative rooted in traditional Persian patterns and characters. It combines these elements with photographic documentation of Tehran today, offering a closer look at the city's identity. The project explores changes in fashion and social expression before and after the Iranian Revolution, supported by an interview with Noora's grandmother, providing a personal account of how everyday dress has evolved over time. A video component captures the atmosphere of Tehran's streets, aiming to present everyday life and a more complete image of Iran and its people.",
+      "PFI": "Postcards: All images taken in Iran"
     }
   },
   "Nora": {
@@ -191,7 +204,8 @@
     ],
     "projectDescriptions": {
       "aer": "Aer is a beer brand inspired by the Leake Street graffiti tunnel. It's about how people leave their mark, building layers of stickers on a wall until it embodies culture itself. Cities don't create culture, people do, and individuality is what drives it. Aer encourages others to be raw, real, and to express themselves exactly as they are. Everyone's input enriches the scene and adds value to the street life of London.",
-      "Project3": "Gamion Survey (which stands for Gamify Opinion Survey) is a project about gamifying the user experience of doing surveys to make it feel like you're playing a game. The goal is to encourage more users to give feedback, as it's important to receive that input so we can adapt and improve. My concept is a throwing interaction where you fire chalk at sleeping students. Each student in the illustration is numbered based on the answers, and clicking an answer triggers the throwing mechanic. This makes the survey fun and interesting to interact with compared to just ticking a checkbox."
+      "Project3": "Gamion Survey (which stands for Gamify Opinion Survey) is a project about gamifying the user experience of doing surveys to make it feel like you're playing a game. The goal is to encourage more users to give feedback, as it's important to receive that input so we can adapt and improve. My concept is a throwing interaction where you fire chalk at sleeping students. Each student in the illustration is numbered based on the answers, and clicking an answer triggers the throwing mechanic. This makes the survey fun and interesting to interact with compared to just ticking a checkbox.",
+      "Unminimal-play": "Most digital interfaces today are made of flat, basic buttons and sliders. Unminimal Play is a project that breaks away from this serious corporate minimalism and replaces it with something colorful and packed with personality. The word “Play” has a double meaning here: it’s short for “display,” and it’s a literal invitation to have fun. \n\n‎My concept reimagines a digital music mixer, transforming a standard tech tool into an illustrative world. Instead of regular knobs and sound meters, users control elements like speed, tempo, and volume by interacting with graphics of magic wands, glowing circles, witches, and gargoyles. Inspired by the tactile electronic gadgets made by Teenage Engineering, this piece takes the fun of physical instruments and turns them into an imaginative digital experience that anyone can enjoy."
     }
   },
   "Vanessa": {
@@ -216,7 +230,35 @@
     ],
     "projectDescriptions": {
       "CAPE-OF-GOOD-HOPE": "The work responds to the course theme of identity, by trying to represent belonging that is partly invented and partly inherited, it asks how visual media can make imagined belonging feel credible and affecting using anemoia.",
-      "terra": "The work responds to recaptivating culture and identity to create a brand that feels encompassed in what it is. A tequila cocktail brand selling an experience. From the salt you lick. To the lemon you squeeze. To the tequila that follows… Rooted in Mexican culture and Mythology, we create a ceremonial drinking experience where ancient symbolism meets modern design. Concept brief by @studioblackburn"
+      "terra": "TERRA Cocktail Branding – The work responds to recaptivating culture and identity to create a brand that\n feels encompassed in what it is. A tequila cocktail brand selling an experience.\n From the salt you lick. To the lemon you squeeze. To the tequila that follows…\n Rooted in Mexican culture and Mythology, we create a ceremonial drinking\n experience where ancient symbolism meets modern design.\n Concept brief by @studioblackburn",
+      "nolocation": "The work responds to recaptivating culture and identity to create a brand that feels encompassed in what it is. A tequila cocktail brand selling an experience. From the salt you lick. To the lemon you squeeze. To the tequila that follows… Rooted in Mexican culture and Mythology, we create a ceremonial drinking experience where ancient symbolism meets modern design. Concept brief by @studioblackburn",
+      "vault-sans": "Exploration of crafting fonts based on Credit Cards."
+    }
+  },
+  "Oscar": {
+    "bio": "A creative whose practice is rooted in experimentation, play, and exploration. Rather than sticking himself into one box, his work moves across digital and analogue mediums, constantly exploring how different tools and processes can be used in unconventional ways.",
+    "practices": [
+      "Analogue Design",
+      "Art Direction",
+      "Motion"
+    ],
+    "projectDescriptions": {
+      "AER": "Branding & Art Direction",
+      "Rutt-Etra": "Coding & Motion",
+      "Zine": "Publication & RISO"
+    }
+  },
+  "Jess": {
+    "bio": "Jess is a London-based designer who specializes in motion graphics, video editing and animation, with an additional interest in both branding and watercolour painting. Her work focuses a lot on attention to detail and engagement, creating artworks that are visually appealing and interesting to look at, encouraging prolonged attention. Jess' work also dives into storytelling, particularly in her editing, including typographic and visual decisions that convey a specific tone of voice. Additionally, Jess enjoys working in an illustrative style on some occasions, creating characters and icons to go alongside her work.",
+    "practices": [
+      "Motion Graphics",
+      "Video Editing",
+      "Animation"
+    ],
+    "projectDescriptions": {
+      "Aqya": "Aqya is a streetwear clothing brand that has a secondary focus on ocean preservation. In collaboration with Oceana, Aqya works to improve the quality of our oceans as well as providing stylish clothing pieces for everyday wear",
+      "CFTSOC": "'Creating for the Sake of Creating' is a lyric video focusing on the development of typographic animation and keyframing with its animations developing as the song progresses. Its message is to create something simply because you find enjoyment in it, not because you have a reputation to maintain or because you feel pressured. Creating just for you because you think it's fun is enough and that should be normalised.",
+      "Untitled": "Watercolour postcards for the borough of Kensington and Chelsea, reflecting on and representing both the upper and lower classes and the surrounding areas, demonstrating the contrasting living conditions in one location"
     }
   }
 }

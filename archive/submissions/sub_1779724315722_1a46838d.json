@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779724315722-1a46838d",
+  "student": "Kye",
+  "fullName": "Kye Goff",
+  "bio": "Kye Goff is a graphic designer who enjoys creating minimalist, clean, and simple work and is looking to branch out into a more primarily branding-focused background, as they want to help brands assert themselves and communicate to their audience what they represent. Even so, Kye remains open to creating posters and publications, as that is something they also enjoy working on. They can use a range of software such as Adobe and are also getting into photography as a supporting hobby to help further elevate their design work.",
+  "practices": [
+    "Branding",
+    "Poster Design",
+    "Photography"
+  ],
+  "projects": [
+    {
+      "key": "HeadphonesAd",
+      "title": "HeadphonesAd",
+      "description": "A core piece of work was a poster for a work-based learning outcome which followed how noise cancelling headphones are great for people with anxiety in crowded and loud environments like train stations and how a quality pair of headphones can help you feel safe and calm.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "IncensePackaging",
+      "title": "Collaborative Project",
+      "description": "Incense Packaging",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "StepsBetween",
+      "title": "StepsBetween",
+      "description": "Booklet",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Untitled",
+      "title": "Photography",
+      "description": "",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779724315722,
+  "status": "applied",
+  "processedAt": 1779777366696
+}

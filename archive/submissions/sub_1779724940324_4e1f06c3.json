@@ -1,0 +1,39 @@
+{
+  "id": "sub:1779724940324-4e1f06c3",
+  "student": "Jess",
+  "fullName": "Jess Shrimpton",
+  "bio": "Jess is a London-based designer who specializes in motion graphics, video editing and animation, with an additional interest in both branding and watercolour painting. Her work focuses a lot on attention to detail and engagement, creating artworks that are visually appealing and interesting to look at, encouraging prolonged attention. Jess' work also dives into storytelling, particularly in her editing, including typographic and visual decisions that convey a specific tone of voice. Additionally, Jess enjoys working in an illustrative style on some occasions, creating characters and icons to go alongside her work.",
+  "practices": [
+    "Motion Graphics",
+    "Video Editing",
+    "Animation"
+  ],
+  "projects": [
+    {
+      "key": "Aqya",
+      "title": "Aqya",
+      "description": "Aqya is a streetwear clothing brand that has a secondary focus on ocean preservation. In collaboration with Oceana, Aqya works to improve the quality of our oceans as well as providing stylish clothing pieces for everyday wear",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "CFTSOC",
+      "title": "Creating for the Sake of Creating",
+      "description": "'Creating for the Sake of Creating' is a lyric video focusing on the development of typographic animation and keyframing with its animations developing as the song progresses. Its message is to create something simply because you find enjoyment in it, not because you have a reputation to maintain or because you feel pressured. Creating just for you because you think it's fun is enough and that should be normalised.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Untitled",
+      "title": "Watercolour Postcards",
+      "description": "Watercolour postcards for the borough of Kensington and Chelsea, reflecting on and representing both the upper and lower classes and the surrounding areas, demonstrating the contrasting living conditions in one location",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779724940324,
+  "status": "applied",
+  "processedAt": 1779777382850
+}

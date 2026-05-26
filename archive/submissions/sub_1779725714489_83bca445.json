@@ -1,0 +1,39 @@
+{
+  "id": "sub:1779725714489-83bca445",
+  "student": "Taleb",
+  "fullName": "Taleb Cherif",
+  "bio": "Taleb Cherif is a designer born in Paris, coming from an artistic background where he won three art trophies and a medal. He enjoys reading webcomics, drawing and watching anime interests that have been a major influence on his creative process. They push him to combine ideas to unusual and contradicting lengths. Taking on graphic design allows him to expand his skills into different areas such as 3D, motion, and illustration. He considers himself a surrealist who is fascinated by visual depth and immersion, possessing the inventive mindset to explore the abstract and make the once unknown feel truly known.",
+  "practices": [
+    "3D Design",
+    "Motion",
+    "Illustration"
+  ],
+  "projects": [
+    {
+      "key": "aer",
+      "title": "aer",
+      "description": "Aer is a beer brand inspired by the Leake Street graffiti tunnel. It's about how people leave their mark, building layers of stickers on a wall until it embodies culture itself. Cities don't create culture, people do, and individuality is what drives it. Aer encourages others to be raw, real, and to express themselves exactly as they are. Everyone's input enriches the scene and adds value to the street life of London.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project3",
+      "title": "Project3",
+      "description": "Gamion Survey (which stands for Gamify Opinion Survey) is a project about gamifying the user experience of doing surveys to make it feel like you're playing a game. The goal is to encourage more users to give feedback, as it's important to receive that input so we can adapt and improve. My concept is a throwing interaction where you fire chalk at sleeping students. Each student in the illustration is numbered based on the answers, and clicking an answer triggers the throwing mechanic. This makes the survey fun and interesting to interact with compared to just ticking a checkbox.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": null,
+      "title": "Unminimal play",
+      "description": "Most digital interfaces today are made of flat, basic buttons and sliders. Unminimal Play is a project that breaks away from this serious corporate minimalism and replaces it with something colorful and packed with personality. The word “Play” has a double meaning here: it’s short for “display,” and it’s a literal invitation to have fun. \n\n‎My concept reimagines a digital music mixer, transforming a standard tech tool into an illustrative world. Instead of regular knobs and sound meters, users control elements like speed, tempo, and volume by interacting with graphics of magic wands, glowing circles, witches, and gargoyles. Inspired by the tactile electronic gadgets made by Teenage Engineering, this piece takes the fun of physical instruments and turns them into an imaginative digital experience that anyone can enjoy.",
+      "removedFiles": [],
+      "newImageCount": 1
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779725714489,
+  "status": "applied",
+  "processedAt": 1779777413560
+}

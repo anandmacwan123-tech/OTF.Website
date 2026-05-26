@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779724101463-ebab89cd",
+  "student": "Will",
+  "fullName": "Will Vint",
+  "bio": "London-based graphic designer, Will Vint is working across all mediums of design; motion graphics, visual communication, branding & editorial work. Will is a motivated designer who enjoys being challenged in every piece of work, using every project as an opportunity to push boundaries of ideas, and develop meaningful visual outcomes. Most importantly, he finds each project enjoyable; dipping his hands in all areas of design.",
+  "practices": [
+    "Motion Graphics",
+    "Visual Communication",
+    "Branding"
+  ],
+  "projects": [
+    {
+      "key": "CAPE-OF-GOOD-HOPE",
+      "title": "CAPE-OF-GOOD-HOPE",
+      "description": "The work responds to the course theme of identity, by trying to represent belonging that is partly invented and partly inherited, it asks how visual media can make imagined belonging feel credible and affecting using anemoia.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "nolocation",
+      "title": "nolocation",
+      "description": "The work responds to recaptivating culture and identity to create a brand that feels encompassed in what it is. A tequila cocktail brand selling an experience. From the salt you lick. To the lemon you squeeze. To the tequila that follows… Rooted in Mexican culture and Mythology, we create a ceremonial drinking experience where ancient symbolism meets modern design. Concept brief by @studioblackburn",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "terra",
+      "title": "terra",
+      "description": "TERRA Cocktail Branding – The work responds to recaptivating culture and identity to create a brand that\n feels encompassed in what it is. A tequila cocktail brand selling an experience.\n From the salt you lick. To the lemon you squeeze. To the tequila that follows…\n Rooted in Mexican culture and Mythology, we create a ceremonial drinking\n experience where ancient symbolism meets modern design.\n Concept brief by @studioblackburn",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "vault-sans",
+      "title": "Vault-Sans",
+      "description": "Exploration of crafting fonts based on Credit Cards.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779724101463,
+  "status": "applied",
+  "processedAt": 1779777339064
+}
