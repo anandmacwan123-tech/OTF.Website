@@ -11,7 +11,12 @@
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    // Run the worker before static assets so subdomain requests for "/"
+    // reach the routing logic instead of being served the root index.html
+    // (the landing page) directly. The worker falls back to ASSETS.fetch
+    // for normal asset requests.
+    "run_worker_first": true
   },
   "kv_namespaces": [
 { "binding": "SUBMISSIONS", "id": "2b783e92b7fb486f91a498e1d35ef284" }  ]
