@@ -390,11 +390,30 @@
 
   const enc = p => p.split('/').map(encodeURIComponent).join('/');
 
+  // Page can be reached two ways: the path form (otf.show/students/<slug>/)
+  // or the per-student subdomain (<slug>.otf.show). Detect the subdomain so
+  // the slug, links and canonical URL all stay in the right host.
+  const subMatch = location.hostname.match(/^([^.]+)\.otf\.show$/i);
+  const onSubdomain = !!subMatch && subMatch[1].toLowerCase() !== 'www';
+
   // Resolve slug to canonical student name from MANIFEST keys
-  const slug = decodeURIComponent(location.pathname).replace(/^\/students\/?/, '').replace(/\/$/, '').toLowerCase();
+  let slug = decodeURIComponent(location.pathname).replace(/^\/students\/?/, '').replace(/\/$/, '').toLowerCase();
+  if (!slug && onSubdomain) slug = subMatch[1].toLowerCase();
   if (!slug) { fail('Student not found'); return; }
   const name = Object.keys(MANIFEST).find(n => n.toLowerCase() === slug);
   if (!name) { fail('Student not found'); return; }
+
+  // Link to another student in whichever URL form we're currently using.
+  const studentHref = s =>
+    onSubdomain ? `https://${s.toLowerCase()}.otf.show/` : `/students/${s.toLowerCase()}/`;
+
+  // On a subdomain, the footer's root-relative links (Showcase, Index) must
+  // point back at the apex rather than this student's host.
+  if (onSubdomain) {
+    document.querySelectorAll('.nav a:not(.nav-arrow)[href^="/"]').forEach(a => {
+      a.href = 'https://otf.show' + a.getAttribute('href');
+    });
+  }
 
   // Prev/next student arrows — alphabetical order, wrapping at the ends.
   (() => {
@@ -404,8 +423,16 @@
     const next = keys[(i + 1) % keys.length];
     const prevEl = document.getElementById('prevStudent');
     const nextEl = document.getElementById('nextStudent');
-    if (prevEl) prevEl.href = `/students/${prev.toLowerCase()}/`;
-    if (nextEl) nextEl.href = `/students/${next.toLowerCase()}/`;
+    if (prevEl) prevEl.href = studentHref(prev);
+    if (nextEl) nextEl.href = studentHref(next);
+  })();
+
+  // Canonical URL — the per-student subdomain is the preferred address.
+  (() => {
+    const canonical = `https://${name.toLowerCase()}.otf.show/`;
+    let link = document.querySelector('link[rel="canonical"]');
+    if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
+    link.href = canonical;
   })();
 
   // CSV/TSV parser — quoted fields, doubled-quote escape, CRLF/LF newlines.
