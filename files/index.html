@@ -2281,6 +2281,7 @@
       denyBtn.classList.add('act-del');
       acts.appendChild(denyBtn);
     } else {
+      acts.appendChild(mkBtn('Re-apply → stage changes', () => applySubmission(id, record)));
       const delBtn = mkBtn('Delete permanently', () =>
         showModal('Delete submission?',
           'Remove from KV entirely. The archive file in the repo is kept.',
