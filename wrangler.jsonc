@@ -3,6 +3,11 @@
   "name": "otfshow",
   "main": "./src/worker.mjs",
   "compatibility_date": "2026-05-14",
+  // otf.show (apex) stays a Custom Domain; this wildcard route sends every
+  // student subdomain (anand.otf.show, etc.) to this worker.
+  "routes": [
+    { "pattern": "*.otf.show/*", "zone_name": "otf.show" }
+  ],
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
