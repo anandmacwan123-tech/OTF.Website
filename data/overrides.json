@@ -276,5 +276,16 @@
       "Globular": "A museum brand based on gaming and internet achievements. it's a transforming museum pop-up museum about the gamers on the internet. The branding is very experimental, diverse and transformative.",
       "Sign": "Sign is an app based on signs in the UK created by John Kinneir and Margaret Calvert. Their reason for this app is because they use signs to get around the way and since there is no app for that they created a social media-ish app that collects and archives Signs (Which is also used for Maps as well to help get around London)"
     }
+  },
+  "Darcy": {
+    "bio": "Darcy is a London-based Graphic Designer, specialising in branding, advertising, and editorial design, as well as web design and illustration and print design. By merging digital expertise with a foundational approach to visual storytelling, Darcy creates cohesive, research-driven outcomes tailored to the contemporary landscape. She has gained industry experience through spending time with DrMartens and Peter Holmes Creative Imaging. Darcy is a dedicated and proactive designer who excels in collaborative environments, viewing every brief as an opportunity to tackle creative challenges and turn ideas into a visual story.",
+    "practices": [
+      "Print design",
+      "Advertising",
+      "Editorial"
+    ],
+    "projectDescriptions": {
+      "Untitled": "The Algorithmic Edit is an exploration of what happens when we swap human intuition for machine logic. In this project, metadata isn't just a background tool, it’s the main driver of the design. I wanted to see if I could replace my own \"designer’s voice\" with the cold logic of a system, using data to dictate the structure of the work rather than just my own feeling."
+    }
   }
 }
