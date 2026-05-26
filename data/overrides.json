@@ -20,7 +20,10 @@
       "Print"
     ],
     "projectDescriptions": {
-      "riso": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form."
+      "riso": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form.",
+      "FUKUZATSUNA": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form.",
+      "Project2": "This project explores the creation of typography inspired by unconventional objects, specifically matchsticks. The design was printed using textures techniques to emphasise the contrast between clean , structured letterforms and rough tactile surfaces.",
+      "UnsentLetters": "This project consists of a three-part fanzine series inspired by alternative music and the way opinions and perspectives can influence design . The publication uses a limited colour palette and creates a strong visual connection to music through the use of opacity ,typography and experimental font formatting ."
     }
   },
   "Martim": {
@@ -94,11 +97,11 @@
     }
   },
   "Becky": {
-    "bio": "Becky is a London-based graphic designer specialising in branding, editorial, visual communication, and strategy. Her practice works across both digital and analogue processes, allowing her to create thoughtful, well-crafted design solutions that are grounded within research. She has gained valuable industry experience through working and collaborating with Kopparberg and Transport for London. Becky is a motivated designer who enjoys being challenged with open-ended briefs, using them as an opportunity to explore ideas, push creative boundaries, and develop meaningful visual outcomes.",
+    "bio": "Becky is a London-based graphic designer specialising in branding, visual communication, editorial, and strategy. Her practice works across both digital and analogue processes, allowing her to create thoughtful, well-crafted design solutions that are grounded within research. She has gained valuable industry experience through working and collaborating with Kopparberg and Transport for London. Becky is a motivated designer who enjoys being challenged with open-ended briefs, using them as an opportunity to explore ideas, push creative boundaries, and develop meaningful visual outcomes.",
     "practices": [
       "Branding",
-      "Editorial",
-      "Visual Communication"
+      "Visual Communication",
+      "Editorial"
     ],
     "projectDescriptions": {
       "IGNIS": "Ignis was a workwear branding project developed in response to a live industry brief from Studio Blackburn. The brand focuses on modern office wear, creating versatile outfits from traditional fabrics that seamlessly transition between professional and personal life, reflecting the evolving balance of on-duty and off-duty dressing in contemporary society.",
@@ -259,6 +262,19 @@
       "Aqya": "Aqya is a streetwear clothing brand that has a secondary focus on ocean preservation. In collaboration with Oceana, Aqya works to improve the quality of our oceans as well as providing stylish clothing pieces for everyday wear",
       "CFTSOC": "'Creating for the Sake of Creating' is a lyric video focusing on the development of typographic animation and keyframing with its animations developing as the song progresses. Its message is to create something simply because you find enjoyment in it, not because you have a reputation to maintain or because you feel pressured. Creating just for you because you think it's fun is enough and that should be normalised.",
       "Untitled": "Watercolour postcards for the borough of Kensington and Chelsea, reflecting on and representing both the upper and lower classes and the surrounding areas, demonstrating the contrasting living conditions in one location"
+    }
+  },
+  "Emily": {
+    "bio": "Emily is exploring gaming, computers, movies and music through a graphic design lens. By using a visual language of Bold, Loud, Bright, and Usual styles and mediums, they create a base of their branding.",
+    "practices": [
+      "App Branding",
+      "Museum Branding",
+      "Fanzine"
+    ],
+    "projectDescriptions": {
+      "4TH-generation": "4thGEN is a fanzine about generations of fans in K-Pop. The fanzine is made from the facts to fans in social media to their personal opinions on the 4th generation of fan of K-pop. This issue is about how the other generations impacted the 4th generation acts and can they overpower generations? And how can the 4th generation improve? This fanzine is very experimental by photo mashing with very experimental fonts.",
+      "Globular": "A museum brand based on gaming and internet achievements. it's a transforming museum pop-up museum about the gamers on the internet. The branding is very experimental, diverse and transformative.",
+      "Sign": "Sign is an app based on signs in the UK created by John Kinneir and Margaret Calvert. Their reason for this app is because they use signs to get around the way and since there is no app for that they created a social media-ish app that collects and archives Signs (Which is also used for Maps as well to help get around London)"
     }
   }
 }

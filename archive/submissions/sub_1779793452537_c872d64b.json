@@ -1,0 +1,39 @@
+{
+  "id": "sub:1779793452537-c872d64b",
+  "student": "Becky",
+  "fullName": "Becky Smith",
+  "bio": "Becky is a London-based graphic designer specialising in branding, visual communication, editorial, and strategy. Her practice works across both digital and analogue processes, allowing her to create thoughtful, well-crafted design solutions that are grounded within research. She has gained valuable industry experience through working and collaborating with Kopparberg and Transport for London. Becky is a motivated designer who enjoys being challenged with open-ended briefs, using them as an opportunity to explore ideas, push creative boundaries, and develop meaningful visual outcomes.",
+  "practices": [
+    "Branding",
+    "Visual Communication",
+    "Editorial"
+  ],
+  "projects": [
+    {
+      "key": "IGNIS",
+      "title": "IGNIS",
+      "description": "Ignis was a workwear branding project developed in response to a live industry brief from Studio Blackburn. The brand focuses on modern office wear, creating versatile outfits from traditional fabrics that seamlessly transition between professional and personal life, reflecting the evolving balance of on-duty and off-duty dressing in contemporary society.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "ISSUES-IN-BRANDING",
+      "title": "ISSUES-IN-BRANDING",
+      "description": "Issues in Branding was a research-led project that explored the concept of authenticity in contemporary branding. The final outcome featured a research interview conducted with a senior designer working within a branding agency, offering professional insight and perception of authenticity in modern brand design.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Kopparberg",
+      "title": "Kopparberg",
+      "description": "Winner of a university-wide competition, this project involved designing a new draught glass for Kopparberg. The final outcome reflects the brand's identity through a distinctive yet user-focused form, developed from concept to production.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779793452537,
+  "status": "applied",
+  "processedAt": 1779802603396
+}

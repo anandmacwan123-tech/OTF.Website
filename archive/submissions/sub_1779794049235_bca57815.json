@@ -1,0 +1,46 @@
+{
+  "id": "sub:1779794049235-bca57815",
+  "student": "Rebecca",
+  "fullName": "Rebecca Whippy",
+  "bio": "Rebecca is a print-focused designer specialising in risograph, branding, and experimental design. Rooted in print culture, she creates bold, textured visuals using expressive typography and tactile processes to communicate through both concept and physical form. Her work often explores the relationship between materiality and message, using layering, colour separation, and print imperfections as intentional design elements. This approach allows her to produce outcomes that feel both contemporary and process-driven, with a strong emphasis on experimentation, visual impact, and the physical qualities of printed media.",
+  "practices": [
+    "Risograph",
+    "Branding",
+    "Print"
+  ],
+  "projects": [
+    {
+      "key": "FUKUZATSUNA",
+      "title": "FUKUZATSUNA",
+      "description": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project2",
+      "title": "Type Specimen",
+      "description": "This project explores the creation of typography inspired by unconventional objects, specifically matchsticks. The design was printed using textures techniques to emphasise the contrast between clean , structured letterforms and rough tactile surfaces.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "riso",
+      "title": "riso",
+      "description": "This project explores risograph-inspired experimentation using Spectrolite, focusing on colour layering, texture, and contrast. Selected designs were later printed using risograph to bring the digital experiments into a physical form.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "UnsentLetters",
+      "title": "UnsentLetters",
+      "description": "This project consists of a three-part fanzine series inspired by alternative music and the way opinions and perspectives can influence design . The publication uses a limited colour palette and creates a strong visual connection to music through the use of opacity ,typography and experimental font formatting .",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779794049235,
+  "status": "applied",
+  "processedAt": 1779802623308
+}

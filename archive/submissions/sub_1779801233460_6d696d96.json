@@ -1,0 +1,41 @@
+{
+  "id": "sub:1779801233460-6d696d96",
+  "student": "Emily",
+  "fullName": "Emily Amankwaah",
+  "bio": "Emily is exploring gaming, computers, movies and music through a graphic design lens. By using a visual language of Bold, Loud, Bright, and Usual styles and mediums, they create a base of their branding.",
+  "practices": [
+    "App Branding",
+    "Museum Branding",
+    "Fanzine"
+  ],
+  "projects": [
+    {
+      "key": "4TH-generation",
+      "title": "4TH-generation",
+      "description": "4thGEN is a fanzine about generations of fans in K-Pop. The fanzine is made from the facts to fans in social media to their personal opinions on the 4th generation of fan of K-pop. This issue is about how the other generations impacted the 4th generation acts and can they overpower generations? And how can the 4th generation improve? This fanzine is very experimental by photo mashing with very experimental fonts.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Globular",
+      "title": "USER_01",
+      "description": "A museum brand based on gaming and internet achievements. it's a transforming museum pop-up museum about the gamers on the internet. The branding is very experimental, diverse and transformative.",
+      "removedFiles": [
+        "Emily_Globular_1.webp"
+      ],
+      "newImageCount": 4
+    },
+    {
+      "key": "Sign",
+      "title": "Sign",
+      "description": "Sign is an app based on signs in the UK created by John Kinneir and Margaret Calvert. Their reason for this app is because they use signs to get around the way and since there is no app for that they created a social media-ish app that collects and archives Signs (Which is also used for Maps as well to help get around London)",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "I need the Globular poster to be deleted if possible thank you",
+  "headshotProvided": false,
+  "createdAt": 1779801233460,
+  "status": "applied",
+  "processedAt": 1779802639578
+}
