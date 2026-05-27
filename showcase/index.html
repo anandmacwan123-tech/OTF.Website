@@ -155,22 +155,15 @@
     text-transform: uppercase;
   }
 
-  /* [bracket] hover — top and bottom strokes draw in to close the rectangle. */
-  .nav a::before, .nav a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: currentColor;
-    transform: scaleX(0);
-    transition: transform 0.22s ease;
-    pointer-events: none;
-  }
-  .nav a::before { top: 0.1em; transform-origin: left center; }
-  .nav a::after  { bottom: 0.1em; transform-origin: right center; }
+  /* Bracketed links — the [ ] are pseudo-elements so they drop away on
+     hover/focus/active, leaving the label in bold. */
+  .nav a::before { content: "["; }
+  .nav a::after  { content: "]"; }
+  .nav a::before, .nav a::after { transition: opacity 0.18s ease; }
+  .nav a:hover, .nav a:focus-visible, .nav a:active { font-weight: 700; }
   .nav a:hover::before, .nav a:hover::after,
-  .nav a:focus-visible::before, .nav a:focus-visible::after { transform: scaleX(1); }
+  .nav a:focus-visible::before, .nav a:focus-visible::after,
+  .nav a:active::before, .nav a:active::after { opacity: 0; }
 
   /* Keyboard focus rings — including the central headshot link, the
      page's primary interactive target. */
@@ -220,9 +213,9 @@
   </div>
 
   <nav class="nav" aria-label="Primary">
-    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">[VISIT]</a>
-    <a href="/info/">[INFO]</a>
-    <a href="/index/">[INDEX]</a>
+    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">VISIT</a>
+    <a href="/info/">INFO</a>
+    <a href="/index/">INDEX</a>
   </nav>
 
   <div class="label label-headshot" id="headshotLabel" aria-hidden="true"></div>

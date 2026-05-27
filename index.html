@@ -147,22 +147,15 @@
     display: inline-block;
   }
 
-  /* [bracket] hover — top and bottom strokes draw in to close the rectangle. */
-  .cta a::before, .cta a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: currentColor;
-    transform: scaleX(0);
-    transition: transform 0.22s ease;
-    pointer-events: none;
-  }
-  .cta a::before { top: 0.1em; transform-origin: left center; }
-  .cta a::after  { bottom: 0.1em; transform-origin: right center; }
+  /* Bracketed link — the [ ] are pseudo-elements so they drop away on
+     hover/focus/active, leaving the label in bold. */
+  .cta a::before { content: "["; }
+  .cta a::after  { content: "]"; }
+  .cta a::before, .cta a::after { transition: opacity 0.18s ease; }
+  .cta a:hover, .cta a:focus-visible, .cta a:active { font-weight: 700; }
   .cta a:hover::before, .cta a:hover::after,
-  .cta a:focus-visible::before, .cta a:focus-visible::after { transform: scaleX(1); }
+  .cta a:focus-visible::before, .cta a:focus-visible::after,
+  .cta a:active::before, .cta a:active::after { opacity: 0; }
   .cta a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
   .sr-only {
@@ -207,7 +200,7 @@
   </div>
   <div class="cta">
     <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0#msdynmkt_trackingcontext=ebd4f3b4-2403-42e8-9137-53b3b1040200" target="_blank" rel="noopener noreferrer">
-      [BOOK YOUR TICKETS]
+      BOOK YOUR TICKETS
     </a>
   </div>
   <script>
