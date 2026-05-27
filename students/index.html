@@ -279,8 +279,9 @@
     .socials { order: 5; }
     /* Override the desktop column placement: fill the single column. */
     .hero-headshot, .bio, .hero-practices, .socials { align-self: stretch; }
-    /* Headshot fills the column so body padding is equal on both sides. */
-    .hero-headshot { width: 100%; height: auto; }
+    /* Headshot fills the column; pull it up under the label (cancel the flex
+       gap) so the label sits flush on top like desktop. */
+    .hero-headshot { width: 100%; height: auto; margin-top: -1.75rem; }
     /* Practices on one horizontal line, middot-separated, at bio text size. */
     .hero-practices {
       flex-flow: row wrap;
@@ -307,9 +308,9 @@
     .nav a, .nav-arrow { font-size: 0.85rem; }
   }
 
-  /* Labels are 24px on desktop; keep the mobile size unchanged. */
+  /* Labels are 24px on desktop; slightly smaller on mobile. */
   @media (max-width: 768px) {
-    .label { font-size: 16px; }
+    .label { font-size: 20px; }
   }
 
   .nav {
