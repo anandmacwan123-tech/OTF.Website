@@ -136,6 +136,7 @@
   }
 
   .cta a {
+    position: relative;
     color: #fff;
     text-decoration: none;
     font-weight: 500;
@@ -144,10 +145,24 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     display: inline-block;
-    transition: opacity 0.2s ease;
   }
 
-  .cta a:hover { opacity: 0.65; }
+  /* [bracket] hover — top and bottom strokes draw in to close the rectangle. */
+  .cta a::before, .cta a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transition: transform 0.22s ease;
+    pointer-events: none;
+  }
+  .cta a::before { top: 0.1em; transform-origin: left center; }
+  .cta a::after  { bottom: 0.1em; transform-origin: right center; }
+  .cta a:hover::before, .cta a:hover::after,
+  .cta a:focus-visible::before, .cta a:focus-visible::after { transform: scaleX(1); }
   .cta a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
   .sr-only {

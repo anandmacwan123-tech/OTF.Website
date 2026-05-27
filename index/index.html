@@ -215,6 +215,7 @@
   }
 
   .nav a {
+    position: relative;
     color: #000;
     text-decoration: none;
     font-weight: 500;
@@ -222,10 +223,24 @@
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    transition: opacity 0.2s ease;
   }
 
-  .nav a:hover { opacity: 0.55; }
+  /* [bracket] hover — top and bottom strokes draw in to close the rectangle. */
+  .nav a::before, .nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transition: transform 0.22s ease;
+    pointer-events: none;
+  }
+  .nav a::before { top: 0.1em; transform-origin: left center; }
+  .nav a::after  { bottom: 0.1em; transform-origin: right center; }
+  .nav a:hover::before, .nav a:hover::after,
+  .nav a:focus-visible::before, .nav a:focus-visible::after { transform: scaleX(1); }
 
   /* List / Faces segmented toggle — a square pill, centred above the nav. */
   .view-toggle {
@@ -256,6 +271,10 @@
   }
 
   .view-toggle button + button { border-left: 1px solid #000; }
+
+  .view-toggle button:hover:not([aria-pressed="true"]) {
+    background: rgba(0, 0, 0, 0.06);
+  }
 
   .view-toggle button[aria-pressed="true"] {
     background: #000;

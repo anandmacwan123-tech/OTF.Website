@@ -145,6 +145,7 @@
   }
 
   .nav a {
+    position: relative;
     color: #000;
     text-decoration: none;
     font-weight: 500;
@@ -152,10 +153,24 @@
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    transition: opacity 0.2s ease;
   }
 
-  .nav a:hover { opacity: 0.55; }
+  /* [bracket] hover — top and bottom strokes draw in to close the rectangle. */
+  .nav a::before, .nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transition: transform 0.22s ease;
+    pointer-events: none;
+  }
+  .nav a::before { top: 0.1em; transform-origin: left center; }
+  .nav a::after  { bottom: 0.1em; transform-origin: right center; }
+  .nav a:hover::before, .nav a:hover::after,
+  .nav a:focus-visible::before, .nav a:focus-visible::after { transform: scaleX(1); }
 
   /* Keyboard focus rings — including the central headshot link, the
      page's primary interactive target. */
@@ -400,7 +415,8 @@
     function projectLabelFor(student, file) {
       const stem = file.replace(/\.webp$/i, '').replace(new RegExp('^' + student + '_'), '');
       const m = stem.match(/^(.+)_\d+$/);
-      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ');
+      // "-" reads as a space, "_" reads as a "-".
+      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ').replace(/_/g, '-');
     }
 
     function spawn() {
