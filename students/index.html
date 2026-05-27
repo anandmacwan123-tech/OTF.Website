@@ -32,6 +32,7 @@
     --muted: #6a6a6a;
     --col-text: 540px;
     --col-image: 960px;
+    --pad-x: 7vw;
   }
 
   html, body {
@@ -48,7 +49,7 @@
   body {
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 6vh 5vw 8rem;
+    padding: 6vh var(--pad-x) 8rem;
   }
 
   /* Keyboard focus ring — visible for tab users, suppressed for mouse/touch. */
@@ -80,21 +81,26 @@
     color: var(--muted);
   }
 
+  /* Two-row grid: row 1 = name label (col 1 only);
+     row 2 = headshot | bio | practices | links, all top-aligned. */
   .hero {
     margin: 0 0 7rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(1.5rem, 4vw, 4rem);
-    align-items: end;
+    grid-template-columns: auto minmax(0, 380px) auto auto;
+    grid-template-rows: auto auto;
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+    row-gap: 0;
+    align-items: start;
   }
 
-  .hero-left { display: flex; justify-content: flex-start; }
-
-  .hero-headshot-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  /* Label occupies row 1 of the headshot column only. */
+  .hero > .label-headshot { grid-column: 1; grid-row: 1; align-self: end; justify-self: start; }
+  /* Headshot sits in row 2, aligned to the top of that row. */
+  .hero-headshot { grid-column: 1; grid-row: 2; align-self: start; }
+  /* Bio, practices, links all in row 2 — top-aligned to the headshot. */
+  .bio            { grid-column: 2; grid-row: 2; align-self: start; }
+  .hero-practices { grid-column: 3; grid-row: 2; align-self: start; }
+  .socials        { grid-column: 4; grid-row: 2; align-self: start; }
 
   /* Display labels — student name (headshot) and project titles. A colored
      container with the title text, rendered in HTML rather than baked into
@@ -116,19 +122,6 @@
   .label-headshot { background: #FC1233; color: #000; }
   .label-project  { background: #000;    color: #fff; }
 
-  .hero-right {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: var(--col-text);
-  }
-
-  .hero-media {
-    display: flex;
-    align-items: flex-end;
-    gap: 1.25rem;
-  }
-
   .hero-headshot {
     height: clamp(280px, 50vh, 560px);
     width: auto;
@@ -136,21 +129,22 @@
     flex-shrink: 0;
   }
 
+  /* Design practices — stacked, left-aligned, body-text size, bold caps. */
   .hero-practices {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
-    padding-bottom: 0.75rem;
-    font-weight: 500;
-    font-size: clamp(0.475rem, 0.55vw + 0.275rem, 0.6rem);
-    line-height: 1.25;
-    letter-spacing: 0.04em;
+    gap: 0.3rem;
+    font-weight: 700;
+    font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
+    line-height: 1.3;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--fg);
   }
 
   .bio {
+    max-width: var(--col-text);
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
@@ -160,10 +154,12 @@
 
   .socials {
     display: flex;
-    gap: clamp(1rem, 2.5vw, 2.5rem);
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
   }
   .socials a {
+    position: relative;
     color: #000;
     text-decoration: none;
     font-weight: 500;
@@ -171,9 +167,7 @@
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    transition: opacity 0.2s ease;
   }
-  .socials a:hover { opacity: 0.55; }
 
   .projects {
     display: flex;
@@ -191,13 +185,13 @@
     overflow-x: auto;
     overflow-y: hidden;
     /* Extend beyond body padding so scrollable strip reaches viewport edge */
-    margin: 0 -5vw;
-    padding: 0 5vw 0.5rem;
+    margin: 0 calc(-1 * var(--pad-x));
+    padding: 0 var(--pad-x) 0.5rem;
     scrollbar-width: thin;
     /* Momentum scroll + gentle snap so each image settles into view */
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
-    scroll-padding-left: 5vw;
+    scroll-padding-left: var(--pad-x);
   }
 
   .project .images img,
@@ -244,7 +238,9 @@
     color: #fff;
     cursor: pointer;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65));
+    transition: transform 0.15s ease;
   }
+  .pv-btn:hover { transform: scale(1.18); }
   .pv-btn svg { width: 16px; height: 16px; display: block; fill: currentColor; }
   .pv-play { left: 0; }
   .pv-fs { right: 0; }
@@ -268,19 +264,40 @@
   }
 
   @media (max-width: 720px) {
-    /* Single-column hero; tighten the large desktop vertical rhythm. */
+    /* Single column, reordered: name, headshot, practices, bio, links. */
     .hero {
-      grid-template-columns: 1fr;
-      align-items: start;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       gap: 1.75rem;
       margin-bottom: 3.5rem;
     }
-    .hero-right { max-width: none; }
-    /* Stack the practices below the headshot. */
-    .hero-media { flex-direction: column; align-items: flex-start; gap: 0.75rem; width: 100%; }
-    .hero-headshot-wrap { width: 100%; }
+    .hero > .label-headshot { order: 1; align-self: flex-start; }
+    .hero-headshot { order: 2; }
+    .hero-practices { order: 3; }
+    .bio { order: 4; max-width: none; }
+    .socials { order: 5; }
+    /* Override the desktop column placement: fill the single column. */
+    .hero-headshot, .bio, .hero-practices, .socials { align-self: stretch; }
     /* Headshot fills the column so body padding is equal on both sides. */
     .hero-headshot { width: 100%; height: auto; }
+    /* Practices on one horizontal line, middot-separated, at bio text size. */
+    .hero-practices {
+      flex-flow: row wrap;
+      align-items: baseline;
+      gap: 0.4rem;
+      font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
+    }
+    .hero-practices span:not(:last-child)::after {
+      content: "·";
+      margin-left: 0.4rem;
+    }
+    /* Links horizontal. */
+    .socials {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: clamp(1rem, 4vw, 2rem);
+    }
     /* Project images scaled down to 0.6x. */
     .project .images img,
     .project-video { height: clamp(168px, 30vh, 288px); }
@@ -315,9 +332,21 @@
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    transition: opacity 0.2s ease;
   }
-  .nav a:hover { opacity: 0.55; }
+  /* Bracketed links — the [ ] are pseudo-elements so they drop away on
+     hover/focus/active, leaving the label in bold. */
+  .nav a::before, .socials a::before { content: "["; }
+  .nav a::after,  .socials a::after  { content: "]"; }
+  .nav a::before, .nav a::after,
+  .socials a::before, .socials a::after { transition: opacity 0.18s ease; }
+  .nav a:hover, .nav a:focus-visible, .nav a:active,
+  .socials a:hover, .socials a:focus-visible, .socials a:active { font-weight: 700; }
+  .nav a:hover::before, .nav a:hover::after,
+  .nav a:focus-visible::before, .nav a:focus-visible::after,
+  .nav a:active::before, .nav a:active::after,
+  .socials a:hover::before, .socials a:hover::after,
+  .socials a:focus-visible::before, .socials a:focus-visible::after,
+  .socials a:active::before, .socials a:active::after { opacity: 0; }
 
   /* Prev/next student arrows — pinned to the nav bar edges. */
   .nav-arrow {
@@ -346,29 +375,21 @@
 
   <main class="portfolio" id="portfolio" hidden>
     <header class="hero">
-      <div class="hero-left">
-        <div class="hero-media">
-          <div class="hero-headshot-wrap">
-            <div class="label label-headshot" id="heroName"></div>
-            <img class="hero-headshot" id="heroHeadshot" alt="">
-          </div>
-          <p class="hero-practices" id="heroPractices"></p>
-        </div>
-      </div>
-      <div class="hero-right">
-        <section class="bio" id="bio"></section>
-        <nav class="socials" id="socials" aria-label="Student links"></nav>
-      </div>
+      <div class="label label-headshot" id="heroName"></div>
+      <img class="hero-headshot" id="heroHeadshot" alt="">
+      <section class="bio" id="bio"></section>
+      <p class="hero-practices" id="heroPractices"></p>
+      <nav class="socials" id="socials" aria-label="Student links"></nav>
     </header>
     <section class="projects" id="projects"></section>
   </main>
 
   <nav class="nav" aria-label="Primary">
-    <a class="nav-arrow nav-prev" id="prevStudent" href="#" aria-label="Previous student">[←]</a>
-    <a href="/showcase/">[SHOWCASE]</a>
-    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">[VISIT]</a>
-    <a href="/index/">[INDEX]</a>
-    <a class="nav-arrow nav-next" id="nextStudent" href="#" aria-label="Next student">[→]</a>
+    <a class="nav-arrow nav-prev" id="prevStudent" href="#" aria-label="Previous student">←</a>
+    <a href="/showcase/">SHOWCASE</a>
+    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">VISIT</a>
+    <a href="/index/">INDEX</a>
+    <a class="nav-arrow nav-next" id="nextStudent" href="#" aria-label="Next student">→</a>
   </nav>
 
 <script>
@@ -665,7 +686,7 @@
       a.href = href;
       a.target = '_blank';
       a.rel = 'noopener';
-      a.textContent = `[${label}]`;
+      a.textContent = label;
       socialsEl.appendChild(a);
     }
     if (!hasSocial) socialsEl.remove();
@@ -865,7 +886,9 @@
 
       const titleEl = document.createElement('h2');
       titleEl.className = 'label label-project';
-      titleEl.textContent = group.base;
+      // Project titles: "-" reads as a space, "_" reads as a "-" (so a real
+      // dash in a name like "Non-Consensual Intelligence" is stored with "_").
+      titleEl.textContent = group.base.replace(/-/g, ' ').replace(/_/g, '-');
       article.appendChild(titleEl);
 
       if (group.files.length) {

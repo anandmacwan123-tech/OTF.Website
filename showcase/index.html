@@ -145,6 +145,7 @@
   }
 
   .nav a {
+    position: relative;
     color: #000;
     text-decoration: none;
     font-weight: 500;
@@ -152,10 +153,17 @@
     line-height: 1.25;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    transition: opacity 0.2s ease;
   }
 
-  .nav a:hover { opacity: 0.55; }
+  /* Bracketed links — the [ ] are pseudo-elements so they drop away on
+     hover/focus/active, leaving the label in bold. */
+  .nav a::before { content: "["; }
+  .nav a::after  { content: "]"; }
+  .nav a::before, .nav a::after { transition: opacity 0.18s ease; }
+  .nav a:hover, .nav a:focus-visible, .nav a:active { font-weight: 700; }
+  .nav a:hover::before, .nav a:hover::after,
+  .nav a:focus-visible::before, .nav a:focus-visible::after,
+  .nav a:active::before, .nav a:active::after { opacity: 0; }
 
   /* Keyboard focus rings — including the central headshot link, the
      page's primary interactive target. */
@@ -205,9 +213,9 @@
   </div>
 
   <nav class="nav" aria-label="Primary">
-    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">[VISIT]</a>
-    <a href="/info/">[INFO]</a>
-    <a href="/index/">[INDEX]</a>
+    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">VISIT</a>
+    <a href="/info/">INFO</a>
+    <a href="/index/">INDEX</a>
   </nav>
 
   <div class="label label-headshot" id="headshotLabel" aria-hidden="true"></div>
@@ -400,7 +408,8 @@
     function projectLabelFor(student, file) {
       const stem = file.replace(/\.webp$/i, '').replace(new RegExp('^' + student + '_'), '');
       const m = stem.match(/^(.+)_\d+$/);
-      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ');
+      // "-" reads as a space, "_" reads as a "-".
+      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ').replace(/_/g, '-');
     }
 
     function spawn() {

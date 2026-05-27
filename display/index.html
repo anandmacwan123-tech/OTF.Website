@@ -236,9 +236,10 @@
     color: #fff;
     padding: 0.45rem 0.9rem;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
   }
   .ctl-toggle[aria-pressed="false"] { opacity: 0.4; }
+  .ctl-toggle:hover { opacity: 1; background: #fff; color: var(--bg); }
 
   .sr-only {
     position: absolute;
@@ -456,7 +457,8 @@
     function projectLabelFor(student, file) {
       const stem = file.replace(/\.webp$/i, '').replace(new RegExp('^' + student + '_'), '');
       const m = stem.match(/^(.+)_\d+$/);
-      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ');
+      // "-" reads as a space, "_" reads as a "-".
+      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ').replace(/_/g, '-');
     }
 
     function spawn() {
