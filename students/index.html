@@ -32,6 +32,7 @@
     --muted: #6a6a6a;
     --col-text: 540px;
     --col-image: 960px;
+    --pad-x: 7vw;
   }
 
   html, body {
@@ -48,7 +49,7 @@
   body {
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 6vh 5vw 8rem;
+    padding: 6vh var(--pad-x) 8rem;
   }
 
   /* Keyboard focus ring — visible for tab users, suppressed for mouse/touch. */
@@ -83,12 +84,27 @@
   .hero {
     margin: 0 0 7rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto auto minmax(0, var(--col-text));
     gap: clamp(1.5rem, 4vw, 4rem);
     align-items: start;
   }
 
   .hero-left { display: flex; justify-content: flex-start; }
+
+  /* Name label sits flush on top of the headshot. */
+  .hero-headshot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Practices + links column, to the left of the bio, all left-aligned. */
+  .hero-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
 
   /* Display labels — student name (headshot) and project titles. A colored
      container with the title text, rendered in HTML rather than baked into
@@ -110,14 +126,6 @@
   .label-headshot { background: #FC1233; color: #000; }
   .label-project  { background: #000;    color: #fff; }
 
-  .hero-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.25rem;
-    max-width: var(--col-text);
-  }
-
   .hero-headshot {
     height: clamp(280px, 50vh, 560px);
     width: auto;
@@ -125,14 +133,12 @@
     flex-shrink: 0;
   }
 
-  /* Design practices — a single line under the name, at body-text size,
-     bold and uppercase, middot-separated. */
+  /* Design practices — stacked, left-aligned, body-text size, bold caps. */
   .hero-practices {
     display: flex;
-    flex-flow: row wrap;
-    align-items: baseline;
-    gap: 0.4rem;
-    margin-top: -0.4rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
     font-weight: 700;
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.3;
@@ -140,12 +146,9 @@
     text-transform: uppercase;
     color: var(--fg);
   }
-  .hero-practices span:not(:last-child)::after {
-    content: "·";
-    margin-left: 0.4rem;
-  }
 
   .bio {
+    max-width: var(--col-text);
     font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     line-height: 1.55;
     letter-spacing: -0.01em;
@@ -155,8 +158,9 @@
 
   .socials {
     display: flex;
-    gap: clamp(1rem, 2.5vw, 2.5rem);
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
   }
   .socials a {
     position: relative;
@@ -185,13 +189,13 @@
     overflow-x: auto;
     overflow-y: hidden;
     /* Extend beyond body padding so scrollable strip reaches viewport edge */
-    margin: 0 -5vw;
-    padding: 0 5vw 0.5rem;
+    margin: 0 calc(-1 * var(--pad-x));
+    padding: 0 var(--pad-x) 0.5rem;
     scrollbar-width: thin;
     /* Momentum scroll + gentle snap so each image settles into view */
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
-    scroll-padding-left: 5vw;
+    scroll-padding-left: var(--pad-x);
   }
 
   .project .images img,
@@ -264,17 +268,36 @@
   }
 
   @media (max-width: 720px) {
-    /* Single-column hero; tighten the large desktop vertical rhythm. */
+    /* Single column, reordered: name+headshot, bio, practices, links. */
     .hero {
-      grid-template-columns: 1fr;
-      align-items: start;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       gap: 1.75rem;
       margin-bottom: 3.5rem;
     }
-    .hero-right { max-width: none; }
+    .hero-left { order: 1; width: 100%; }
+    .bio { order: 2; max-width: none; }
+    .hero-meta { order: 3; gap: 1.25rem; }
     /* Headshot fills the column so body padding is equal on both sides. */
-    .hero-left { width: 100%; }
+    .hero-headshot-wrap { width: 100%; }
     .hero-headshot { width: 100%; height: auto; }
+    /* Practices on one horizontal line, middot-separated. */
+    .hero-practices {
+      flex-flow: row wrap;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+    .hero-practices span:not(:last-child)::after {
+      content: "·";
+      margin-left: 0.4rem;
+    }
+    /* Links horizontal. */
+    .socials {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: clamp(1rem, 4vw, 2rem);
+    }
     /* Project images scaled down to 0.6x. */
     .project .images img,
     .project-video { height: clamp(168px, 30vh, 288px); }
@@ -353,14 +376,16 @@
   <main class="portfolio" id="portfolio" hidden>
     <header class="hero">
       <div class="hero-left">
-        <img class="hero-headshot" id="heroHeadshot" alt="">
+        <div class="hero-headshot-wrap">
+          <div class="label label-headshot" id="heroName"></div>
+          <img class="hero-headshot" id="heroHeadshot" alt="">
+        </div>
       </div>
-      <div class="hero-right">
-        <div class="label label-headshot" id="heroName"></div>
+      <div class="hero-meta">
         <p class="hero-practices" id="heroPractices"></p>
-        <section class="bio" id="bio"></section>
         <nav class="socials" id="socials" aria-label="Student links"></nav>
       </div>
+      <section class="bio" id="bio"></section>
     </header>
     <section class="projects" id="projects"></section>
   </main>
