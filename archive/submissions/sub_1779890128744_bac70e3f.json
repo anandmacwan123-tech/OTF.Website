@@ -1,0 +1,53 @@
+{
+  "id": "sub:1779890128744-bac70e3f",
+  "student": "Vanessa",
+  "fullName": "Vanessa Franko",
+  "bio": "Vanessa Franko is a London-based graphic designer from Istanbul, specialising in visual identity systems, music design, digital media, and cultural communication. Their practice explores how technology shapes media and design, influencing audience behaviour and contemporary culture through research-led visual outcomes. They focus on communicating complex ideas through engaging work across print and digital platforms.",
+  "practices": [
+    "Visual Identity",
+    "Music Design",
+    "Digital Media"
+  ],
+  "projects": [
+    {
+      "key": "Project1",
+      "title": "Obituary's Cause of Death",
+      "description": "A fan concept CD cover for Obituary's Cause of Death, combining a hand-drawn sigil, custom typography, and chrome experiments with distressed textures. Cause of Death is considered a classic album in the history of death metal.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project2",
+      "title": "Substance",
+      "description": "Substance – A photographic document of London’s post-punk and\n new wave revival scenes, shot on 35mm film at venues\n including The Shacklewell Arms, Paper Dress Vintage,\n The Windmill, and Dream Bags Jaguar Shoes.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Project3",
+      "title": "Obituary's Cause of Death 2",
+      "description": "A fan concept CD cover for Obituary's Cause of Death, combining a hand-drawn sigil, custom typography, and chrome experiments with distressed textures. Cause of Death is considered a classic album in the history of death metal.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Substance",
+      "title": "Substance",
+      "description": "A photographic document of London’s post-punk and\n new wave revival scenes, shot on 35mm film at venues\n including The Shacklewell Arms, Paper Dress Vintage,\n The Windmill, and Dream Bags Jaguar Shoes.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "SubstanceTheInterviews",
+      "title": "Substance The Interviews",
+      "description": "A photographic document of London’s post-punk and\n new wave revival scenes, shot on 35mm film at venues\n including The Shacklewell Arms, Paper Dress Vintage,\n The Windmill, and Dream Bags Jaguar Shoes.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779890128744,
+  "status": "applied",
+  "processedAt": 1779891962544
+}
