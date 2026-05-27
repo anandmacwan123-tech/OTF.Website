@@ -243,8 +243,8 @@
     transform: translateX(-50%);
     z-index: 10;
     display: inline-flex;
-    border: 1px solid var(--fg);
-    background: var(--bg);
+    border: 1px solid #FC1233;
+    background: #FC1233;
   }
 
   .view-toggle button {
@@ -252,7 +252,7 @@
     border: 0;
     margin: 0;
     padding: 0.4em 0.8em;
-    color: var(--fg);
+    color: #fff;
     font-family: inherit;
     font-weight: 500;
     font-size: 1rem;
@@ -263,15 +263,15 @@
     transition: background 0.2s ease, color 0.2s ease;
   }
 
-  .view-toggle button + button { border-left: 1px solid var(--fg); }
+  .view-toggle button + button { border-left: 1px solid rgba(255, 255, 255, 0.4); }
 
   .view-toggle button:hover:not([aria-pressed="true"]) {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.15);
   }
 
   .view-toggle button[aria-pressed="true"] {
-    background: var(--fg);
-    color: var(--bg);
+    background: #000;
+    color: #fff;
   }
 
   /* Keyboard focus rings (suppressed for mouse/touch); search gets a
