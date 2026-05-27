@@ -6,7 +6,7 @@
 <title>OTF — Student Showcase</title>
 <meta name="description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
 <link rel="canonical" href="https://otfshow.anandmacwan123.workers.dev/showcase/">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#FC1233">
 <meta property="og:title" content="OTF — Student Showcase">
 <meta property="og:description" content="OTF Student Showcase — graphic design work from BA (Hons) Graphic Design, Ravensbourne University London.">
 <meta property="og:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
@@ -30,13 +30,13 @@
 
   :root {
     --red: #FF002F;
-    --bg: #fff;
+    --bg: #FC1233;
   }
 
   html, body {
     background: var(--bg);
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
-    color: #000;
+    color: #fff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
@@ -56,10 +56,11 @@
     overflow: hidden;
   }
 
+  /* Floating project images — 0.6x scale (matched in the JS placement math). */
   .student-img {
     display: block;
     width: auto;
-    height: clamp(280px, 55vh, 620px);
+    height: clamp(168px, 33vh, 372px);
     -webkit-user-drag: none;
   }
 
@@ -88,8 +89,7 @@
     letter-spacing: -0.12em;
     text-transform: uppercase;
   }
-  .label-headshot { background: #FC1233; color: #000; }
-  .label-project  { background: #000;    color: #fff; }
+  .label-headshot { background: #000; color: #fff; }
 
   /* Central headshot name label — JS-positioned to match the image's left edge */
   #headshotLabel {
@@ -146,7 +146,7 @@
 
   .nav a {
     position: relative;
-    color: #000;
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
     font-size: 1rem;
@@ -169,7 +169,7 @@
      page's primary interactive target. */
   .nav a:focus-visible,
   .headshot-link:focus-visible {
-    outline: 2px solid #000;
+    outline: 2px solid #fff;
     outline-offset: 4px;
   }
 
@@ -405,13 +405,6 @@
     const active = new Set();
     const placed = new Set();
 
-    function projectLabelFor(student, file) {
-      const stem = file.replace(/\.webp$/i, '').replace(new RegExp('^' + student + '_'), '');
-      const m = stem.match(/^(.+)_\d+$/);
-      // "-" reads as a space, "_" reads as a "-".
-      return (m ? m[1] : stem.replace(/\d+$/, '') || stem).replace(/-/g, ' ').replace(/_/g, '-');
-    }
-
     function spawn() {
       if (!currentStudent) return;
       if (projectQueue.length === 0) return;
@@ -428,11 +421,6 @@
       wrap.className = 'float-wrap';
       wrap.style.zIndex = zIndex;
 
-      const lbl = document.createElement('div');
-      lbl.className = 'label label-project';
-      lbl.textContent = projectLabelFor(currentStudent, file);
-      wrap.appendChild(lbl);
-
       const img = document.createElement('img');
       img.className = 'student-img';
       img.src = enc(`/Student Work/Projects/${file}`);
@@ -442,7 +430,7 @@
       const place = () => {
         active.delete(wrap);
         const W = window.innerWidth, H = window.innerHeight;
-        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)) * (mobileMQ.matches ? 0.6 : 1));
+        const renderedH = Math.round(Math.max(280, Math.min(620, H * 0.55)) * 0.6);
         const w = img.naturalHeight > 0
           ? Math.round(img.naturalWidth * (renderedH / img.naturalHeight))
           : renderedH;
