@@ -83,13 +83,12 @@
 
   .hero {
     margin: 0 0 7rem;
-    display: grid;
-    grid-template-columns: auto auto minmax(0, var(--col-text));
+    display: flex;
+    align-items: flex-end;
     gap: clamp(1.5rem, 4vw, 4rem);
-    align-items: start;
   }
 
-  .hero-left { display: flex; justify-content: flex-start; }
+  .hero-left { display: flex; justify-content: flex-start; flex-shrink: 0; }
 
   /* Name label sits flush on top of the headshot. */
   .hero-headshot-wrap {
@@ -98,10 +97,18 @@
     align-items: flex-start;
   }
 
-  /* Practices + links column, to the left of the bio, all left-aligned. */
+  /* Bio + practices/links, bottom-aligned to the headshot. */
+  .hero-body-lockup {
+    display: flex;
+    align-items: stretch;
+    gap: clamp(1.5rem, 4vw, 4rem);
+  }
+
+  /* Practices (top) + links (bottom), far right, spanning the bio's height. */
   .hero-meta {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: flex-start;
     gap: 1.5rem;
   }
@@ -268,7 +275,7 @@
   }
 
   @media (max-width: 720px) {
-    /* Single column, reordered: name+headshot, bio, practices, links. */
+    /* Single column, reordered: name+headshot, practices, bio, links. */
     .hero {
       display: flex;
       flex-direction: column;
@@ -276,17 +283,21 @@
       gap: 1.75rem;
       margin-bottom: 3.5rem;
     }
+    /* Flatten the lockup so practices/bio/links order independently. */
+    .hero-body-lockup, .hero-meta { display: contents; }
     .hero-left { order: 1; width: 100%; }
-    .bio { order: 2; max-width: none; }
-    .hero-meta { order: 3; gap: 1.25rem; }
+    .hero-practices { order: 2; }
+    .bio { order: 3; max-width: none; }
+    .socials { order: 4; }
     /* Headshot fills the column so body padding is equal on both sides. */
     .hero-headshot-wrap { width: 100%; }
     .hero-headshot { width: 100%; height: auto; }
-    /* Practices on one horizontal line, middot-separated. */
+    /* Practices on one horizontal line, middot-separated, at bio text size. */
     .hero-practices {
       flex-flow: row wrap;
       align-items: baseline;
       gap: 0.4rem;
+      font-size: clamp(1rem, 0.4vw + 0.85rem, 1.0625rem);
     }
     .hero-practices span:not(:last-child)::after {
       content: "·";
@@ -381,11 +392,13 @@
           <img class="hero-headshot" id="heroHeadshot" alt="">
         </div>
       </div>
-      <div class="hero-meta">
-        <p class="hero-practices" id="heroPractices"></p>
-        <nav class="socials" id="socials" aria-label="Student links"></nav>
+      <div class="hero-body-lockup">
+        <section class="bio" id="bio"></section>
+        <div class="hero-meta">
+          <p class="hero-practices" id="heroPractices"></p>
+          <nav class="socials" id="socials" aria-label="Student links"></nav>
+        </div>
       </div>
-      <section class="bio" id="bio"></section>
     </header>
     <section class="projects" id="projects"></section>
   </main>
