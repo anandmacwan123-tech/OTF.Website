@@ -1,0 +1,39 @@
+{
+  "id": "sub:1779860336946-caa1e561",
+  "student": "Maseray",
+  "fullName": "Maseray Maiya Sesay",
+  "bio": "When you come across my work, I want you to feel seen and heard instantly like \"finally, someone gets it\". I create culturally intuitive experiences that people can truly relate to, blending storytelling, shapes, and a balance of function and aesthetics to bring ideas to life. My work is driven by curiosity, optimism and a natural ability to solve problems creatively. I'm drawn to the why behind everything, using design as a way to translate meaning into something visual and tangible. From building concepts to executing them. I design with purpose, playfulness and intention. I'm unapologetically bringing my vision to life.",
+  "practices": [
+    "Illustration",
+    "Brand Identity",
+    "Editorial"
+  ],
+  "projects": [
+    {
+      "key": "Ignis-Studios",
+      "title": "Ignis-Studios",
+      "description": "I created IGNIS Studios as a workwear inspired brand rooted in craft and function. It focuses on modular balaclavas that transform into hoods and hats. I wanted to design something practical and intentional, inspired by women in labour, creating pieces that adapt, protect and move with the wearer.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Lord-and-Saviour",
+      "title": "Lord-and-Saviour",
+      "description": "A reimagined take on a Renaissance style frame of Mary, Jesus, and angels. I've used modern typography and design to bring it into today, keeping its beauty and meaning but making it feel current and more relatable.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "The-designers-Archive",
+      "title": "The-designers-Archive",
+      "description": "This zine is a yearbook style time capsule that captures the design voices of a cohort through quotes, reflections, and shared experiences, preserving identity and growth at a specific moment in time.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1779860336946,
+  "status": "applied",
+  "processedAt": 1779887681248
+}
