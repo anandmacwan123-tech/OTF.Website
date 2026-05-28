@@ -358,6 +358,9 @@
   .socials a:hover::before, .socials a:hover::after,
   .socials a:focus-visible::before, .socials a:focus-visible::after,
   .socials a:active::before, .socials a:active::after { opacity: 0; }
+  .nav a[aria-current="page"] { font-weight: 700; }
+  .nav a[aria-current="page"]::before,
+  .nav a[aria-current="page"]::after { opacity: 0; }
 
   /* Prev/next student arrows — pinned to the nav bar edges. */
   .nav-arrow {

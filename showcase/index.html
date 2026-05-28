@@ -168,6 +168,9 @@
   .nav a:hover::before, .nav a:hover::after,
   .nav a:focus-visible::before, .nav a:focus-visible::after,
   .nav a:active::before, .nav a:active::after { opacity: 0; }
+  .nav a[aria-current="page"] { font-weight: 700; }
+  .nav a[aria-current="page"]::before,
+  .nav a[aria-current="page"]::after { opacity: 0; }
 
   /* Keyboard focus rings — including the central headshot link, the
      page's primary interactive target. */
@@ -217,8 +220,8 @@
   </div>
 
   <nav class="nav" aria-label="Primary">
+    <a href="/showcase/" aria-current="page">SHOWCASE</a>
     <a href="/">VISIT</a>
-    <a href="/info/">INFO</a>
     <a href="/index/">INDEX</a>
   </nav>
 

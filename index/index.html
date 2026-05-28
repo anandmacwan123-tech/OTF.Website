@@ -239,6 +239,9 @@
   .nav a:hover::before, .nav a:hover::after,
   .nav a:focus-visible::before, .nav a:focus-visible::after,
   .nav a:active::before, .nav a:active::after { opacity: 0; }
+  .nav a[aria-current="page"] { font-weight: 700; }
+  .nav a[aria-current="page"]::before,
+  .nav a[aria-current="page"]::after { opacity: 0; }
 
   /* List / Faces segmented toggle — a square pill, centred above the nav. */
   .view-toggle {
@@ -331,7 +334,7 @@
   <nav class="nav" aria-label="Primary">
     <a href="/showcase/">SHOWCASE</a>
     <a href="/">VISIT</a>
-    <a href="/index/">INDEX</a>
+    <a href="/index/" aria-current="page">INDEX</a>
   </nav>
 
 <script>
