@@ -174,6 +174,40 @@
     border: 0;
   }
 
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    z-index: 10;
+    padding: 1rem 4vw;
+    background: var(--bg);
+  }
+
+  .nav a {
+    position: relative;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .nav a::before { content: "["; }
+  .nav a::after  { content: "]"; }
+  .nav a::before, .nav a::after { transition: opacity 0.18s ease; }
+  .nav a:hover, .nav a:focus-visible, .nav a:active { font-weight: 700; }
+  .nav a:hover::before, .nav a:hover::after,
+  .nav a:focus-visible::before, .nav a:focus-visible::after,
+  .nav a:active::before, .nav a:active::after { opacity: 0; }
+  .nav a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
   /* ─── Mobile ─── */
   @media (max-width: 768px) {
     .student-img { height: clamp(144px, 25.2vh, 306px); }
@@ -207,6 +241,11 @@
       BOOK YOUR TICKETS
     </a>
   </div>
+  <nav class="nav" aria-label="Primary">
+    <a href="/showcase/">SHOWCASE</a>
+    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">VISIT</a>
+    <a href="/index/">INDEX</a>
+  </nav>
   <script>
   (() => {
     // Mobile autoplay fallback
