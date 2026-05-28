@@ -8,9 +8,60 @@ function json(data, status = 200) {
 // Max size of a stored submission payload (KV value limit is 25 MB).
 const MAX_SUBMISSION_BYTES = 24 * 1024 * 1024;
 
+// m2m100 language-code → language-name map. Workers AI expects the name.
+const TR_LANG_NAMES = {
+  hi: 'hindi', tl: 'tagalog', ig: 'igbo', vi: 'vietnamese',
+  es: 'spanish', pt: 'portuguese', bg: 'bulgarian', fa: 'persian',
+  sq: 'albanian', ru: 'russian', no: 'norwegian', pl: 'polish',
+  az: 'azerbaijani', fr: 'french', tr: 'turkish', lt: 'lithuanian',
+  it: 'italian',
+};
+
+async function sha1Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function handleApi(request, env, url) {
   const kv = env.SUBMISSIONS;
   if (!kv) return json({ error: 'SUBMISSIONS KV namespace is not configured' }, 503);
+
+  // Translate a batch of English strings into a cohort language.
+  // Cached per (target, text) in the same KV namespace under `tr:` prefix.
+  if (url.pathname === '/api/translate' && request.method === 'POST') {
+    if (!env.AI) return json({ error: 'AI binding not configured' }, 503);
+    let body;
+    try { body = await request.json(); } catch { return json({ error: 'Invalid JSON' }, 400); }
+    const target = body && typeof body.target === 'string' ? body.target : '';
+    const texts = body && Array.isArray(body.texts) ? body.texts : null;
+    if (!texts) return json({ error: 'Missing texts array' }, 400);
+    if (texts.length > 200) return json({ error: 'Too many texts (max 200)' }, 413);
+    const langName = TR_LANG_NAMES[target];
+    if (!langName) {
+      return json({ error: 'Unsupported target', supported: Object.keys(TR_LANG_NAMES) }, 400);
+    }
+    const out = new Array(texts.length).fill('');
+    const keys = await Promise.all(texts.map((t) => sha1Hex(target + '\n' + t).then((h) => 'tr:' + target + ':' + h)));
+    const cached = await Promise.all(keys.map((k) => kv.get(k)));
+    for (let i = 0; i < texts.length; i++) {
+      const input = typeof texts[i] === 'string' ? texts[i] : '';
+      if (!input) { out[i] = ''; continue; }
+      if (cached[i] != null) { out[i] = cached[i]; continue; }
+      try {
+        const res = await env.AI.run('@cf/meta/m2m100-1.2b', {
+          text: input,
+          source_lang: 'english',
+          target_lang: langName,
+        });
+        const t = (res && (res.translated_text || res.text)) || input;
+        out[i] = t;
+        await kv.put(keys[i], t);
+      } catch (err) {
+        out[i] = input;
+      }
+    }
+    return json({ translations: out });
+  }
 
   // Student-facing: submit a set of edits.
   if (url.pathname === '/api/submit' && request.method === 'POST') {

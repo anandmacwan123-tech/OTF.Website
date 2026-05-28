@@ -19,5 +19,6 @@
     "run_worker_first": true
   },
   "kv_namespaces": [
-{ "binding": "SUBMISSIONS", "id": "2b783e92b7fb486f91a498e1d35ef284" }  ]
+{ "binding": "SUBMISSIONS", "id": "2b783e92b7fb486f91a498e1d35ef284" }  ],
+  "ai": { "binding": "AI" }
 }

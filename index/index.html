@@ -24,7 +24,7 @@
 <link rel="apple-touch-icon" href="/Favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=IBM+Plex+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -37,7 +37,7 @@
 
   html, body {
     background: var(--bg);
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans', 'IBM Plex Sans Devanagari', 'IBM Plex Sans Arabic', system-ui, sans-serif;
     color: var(--fg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -155,7 +155,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans', 'IBM Plex Sans Devanagari', 'IBM Plex Sans Arabic', system-ui, sans-serif;
     font-size: 18px;
     font-weight: 700;
     line-height: normal;
@@ -384,6 +384,7 @@
   const searchEl = document.getElementById('search');
 
   let allEntries = [];
+  let pageLang = null;
 
   const enc = p => p.split('/').map(encodeURIComponent).join('/');
   const HAS_HEADSHOT = new Set(Object.keys(MANIFEST));
@@ -480,6 +481,7 @@
     listEl.innerHTML = '';
     for (const e of entries) {
       const li = document.createElement('li');
+      li.setAttribute('data-tr-lang', e.firstName);
       const inner = document.createElement(e.href ? 'a' : 'div');
       if (e.href) inner.href = e.href;
       else inner.className = 'row';
@@ -503,6 +505,7 @@
     for (const e of entries) {
       if (!e.headshot) continue;
       const li = document.createElement('li');
+      li.setAttribute('data-tr-lang', e.firstName);
       const lbl = document.createElement('div');
       lbl.className = 'label label-headshot';
       lbl.textContent = e.displayName;
@@ -585,6 +588,13 @@
           e.disciplines.toLowerCase().includes(q))
       : allEntries;
     renderList(filtered);
+    if (window.OTFTranslate && pageLang) {
+      window.OTFTranslate.translateScope({
+        scope: listEl,
+        lang: pageLang,
+        perElementLangAttr: 'data-tr-lang',
+      });
+    }
   });
 
   function reveal(entries) {
@@ -595,6 +605,13 @@
     stateEl.remove();
     const initial = new URLSearchParams(location.search).get('view') === 'faces' ? 'faces' : 'list';
     setView(initial);
+    if (window.OTFTranslate) {
+      pageLang = window.OTFTranslate.pickCohortLang();
+      window.OTFTranslate.translateScope({
+        lang: pageLang,
+        perElementLangAttr: 'data-tr-lang',
+      });
+    }
   }
 
   const sheetUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
@@ -611,5 +628,6 @@
     });
 })();
 </script>
+<script src="/assets/translate.js"></script>
 </body>
 </html>

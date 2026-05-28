@@ -22,7 +22,7 @@
 <link rel="apple-touch-icon" href="/Favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=IBM+Plex+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -37,7 +37,7 @@
 
   html, body {
     background: var(--bg);
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans', 'IBM Plex Sans Devanagari', 'IBM Plex Sans Arabic', system-ui, sans-serif;
     color: var(--fg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -112,7 +112,7 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans', 'IBM Plex Sans Devanagari', 'IBM Plex Sans Arabic', system-ui, sans-serif;
     font-size: 24px;
     font-weight: 700;
     line-height: normal;
@@ -969,6 +969,10 @@
       const row = matchRow(objs, name);
       renderBasic(row);
       renderProjects(row);
+      if (window.OTFTranslate) {
+        const lang = window.OTFTranslate.langFor(name);
+        if (lang) window.OTFTranslate.translateScope({ lang });
+      }
     })
     .catch(err => {
       console.error('[OTF] Sheet fetch failed:', err);
@@ -982,9 +986,14 @@
       notice.style.margin = '2rem auto';
       notice.textContent = "Couldn't load profile";
       portfolioEl.appendChild(notice);
+      if (window.OTFTranslate) {
+        const lang = window.OTFTranslate.langFor(name);
+        if (lang) window.OTFTranslate.translateScope({ lang });
+      }
     })
   );
 })();
 </script>
+<script src="/assets/translate.js"></script>
 </body>
 </html>
