@@ -33,6 +33,10 @@
     --bg: #FC1233;
   }
 
+  html { scroll-behavior: smooth; }
+  html, body, * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
   html, body {
     background: var(--bg);
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
@@ -164,6 +168,9 @@
   .nav a:hover::before, .nav a:hover::after,
   .nav a:focus-visible::before, .nav a:focus-visible::after,
   .nav a:active::before, .nav a:active::after { opacity: 0; }
+  .nav a[aria-current="page"] { font-weight: 700; }
+  .nav a[aria-current="page"]::before,
+  .nav a[aria-current="page"]::after { opacity: 0; }
 
   /* Keyboard focus rings — including the central headshot link, the
      page's primary interactive target. */
@@ -213,8 +220,8 @@
   </div>
 
   <nav class="nav" aria-label="Primary">
-    <a href="https://100969engagecms.campusnexus.cloud/rul-private-view-event-registration?eventid=15563e02-b71b-f111-8342-000d3ad536b0" target="_blank" rel="noopener noreferrer">VISIT</a>
-    <a href="/info/">INFO</a>
+    <a href="/showcase/" aria-current="page">SHOWCASE</a>
+    <a href="/">VISIT</a>
     <a href="/index/">INDEX</a>
   </nav>
 

@@ -75,6 +75,10 @@
     --bg: #000;
   }
 
+  html { scroll-behavior: smooth; }
+  html, body, * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
   html, body {
     background: var(--bg);
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
