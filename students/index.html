@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OTF — Student Portfolio</title>
 <meta name="description" content="A student portfolio from BA (Hons) Graphic Design, Ravensbourne University London.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000000">
 <meta property="og:title" content="OTF — Student Portfolio">
 <meta property="og:description" content="A student portfolio from BA (Hons) Graphic Design, Ravensbourne University London.">
 <meta property="og:image" content="https://otfshow.anandmacwan123.workers.dev/Favicon.jpg">
@@ -27,9 +27,9 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #fff;
-    --fg: #000;
-    --muted: #6a6a6a;
+    --bg: #000;
+    --fg: #fff;
+    --muted: #9a9a9a;
     --col-text: 540px;
     --col-image: 960px;
     --pad-x: 7vw;
@@ -120,7 +120,7 @@
     text-transform: uppercase;
   }
   .label-headshot { background: #FC1233; color: #000; }
-  .label-project  { background: #000;    color: #fff; }
+  .label-project  { background: #fff;    color: #000; }
 
   .hero-headshot {
     height: clamp(280px, 50vh, 560px);
@@ -160,7 +160,7 @@
   }
   .socials a {
     position: relative;
-    color: #000;
+    color: var(--fg);
     text-decoration: none;
     font-weight: 500;
     font-size: 1rem;
@@ -326,7 +326,7 @@
     background: var(--bg);
   }
   .nav a {
-    color: #000;
+    color: var(--fg);
     text-decoration: none;
     font-weight: 500;
     font-size: 1rem;
