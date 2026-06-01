@@ -1,0 +1,46 @@
+{
+  "id": "sub:1780136658470-7872556e",
+  "student": "Arnete",
+  "fullName": "Arnete Kuncyte",
+  "bio": "Arnete Kuncyte is a creative and detail-oriented designer based in London, with a strong passion for graphic editorials and handcrafts. She combines visual storytelling with both digital design and hands-on techniques, creating work that is both cohesive and purposeful. Her skills span composition, aesthetics, and practical execution, allowing her to bring ideas to life across different mediums. Alongside her creative practice, she works in social media marketing, developing strategic and engaging content, while also establishing an event signage business as a focused professional venture.",
+  "practices": [
+    "Editorial",
+    "Handcraft",
+    "Social Media"
+  ],
+  "projects": [
+    {
+      "key": "Aqva",
+      "title": "Aqva",
+      "description": "AQVA is a digital album archive that celebrates music as a living, evolving form of culture. Combining Aqua (water, flow, and connection) with Live (life, energy, and experience), AQVA represents the idea of “living water” — a metaphor for the way music flows through people, communities, and generations, preserving cultural memories while remaining dynamic and alive.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Atsijungti",
+      "title": "Atsijungti",
+      "description": "Atsijungti explores the feeling of being disconnected from Lithuanian culture while growing up in a different country. It combines personal experiences with interviews from close friends and family to understand how identity, language, and distance shape our relationship with where we come from. Through written stories and visual elements, the publication reflects on what it means to feel \"in-between\" cultures and how those connections can change over time.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "InthePresenceofGreen",
+      "title": "in the Presence of Green",
+      "description": "In the Presence of Green – Design project inspired by nature, exploring digital and physical forms to promote slowing down and reconnecting with the natural world through mindful, nature-led design.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "PostcardSeries",
+      "title": "Postcard Series",
+      "description": "Postcard Series – Postcard series inspired by Kumai Kyoko’s artefact ‘Memory’, featuring handwritten stories from survivors and victims of the 2011 Tohoku disaster.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1780136658470,
+  "status": "applied",
+  "processedAt": 1780338688292
+}
