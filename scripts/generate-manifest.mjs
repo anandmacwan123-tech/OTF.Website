@@ -20,6 +20,9 @@ const PAGES = [
   resolve(ROOT, 'display/index.html'),
   resolve(ROOT, 'edit/index.html'),
 ];
+// Invite page just needs the NAMES list (it spawns headshots, not project
+// files), maintained between __NAMES_START__ / __NAMES_END__ sentinels.
+const NAMES_PAGE = resolve(ROOT, 'index.html');
 
 const IMAGE_EXT = /\.webp$/i;
 const PROJECT_EXT = /\.(webp|url)$/i;   // .url holds a YouTube/Vimeo video link
@@ -109,6 +112,28 @@ for (const page of PAGES) {
   }
   const updated = text.replace(re, `$1\n    ${block}\n    $2`);
   writeFileSync(page, updated);
+}
+
+// Sync the invite page's NAMES array with the headshot list.
+const rows = [];
+for (let i = 0; i < students.length; i += 8) rows.push(students.slice(i, i + 8));
+const lastIdx = rows.length - 1;
+const namesBlock = [
+  'const NAMES = [',
+  ...rows.map((row, i) => {
+    const items = row.map(s => `'${s}'`).join(',');
+    return `      ${items}${i === lastIdx ? '' : ','}`;
+  }),
+  '    ];'
+].join('\n');
+const namesRe = /(\/\/ __NAMES_START__[^\n]*\n)[\s\S]*?(\/\/ __NAMES_END__)/;
+{
+  const text = readFileSync(NAMES_PAGE, 'utf8');
+  if (!namesRe.test(text)) {
+    console.warn(`⚠  No __NAMES_START__ / __NAMES_END__ sentinels in ${NAMES_PAGE} — skipped.`);
+  } else {
+    writeFileSync(NAMES_PAGE, text.replace(namesRe, `$1    ${namesBlock}\n    $2`));
+  }
 }
 
 const total = Object.values(manifest).reduce((n, arr) => n + arr.length, 0);

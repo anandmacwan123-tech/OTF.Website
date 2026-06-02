@@ -1,0 +1,28 @@
+/* Bracketed links — the [ ] are pseudo-elements so they drop away on
+   hover / focus / active / aria-current="page", leaving the label in bold.
+   Apply with class="br-links" on any container; every <a> inside inherits
+   the treatment unless it carries data-no-brackets. Link colour follows
+   the container's color. */
+
+.br-links a:not([data-no-brackets]) {
+  position: relative;
+}
+
+.br-links a:not([data-no-brackets])::before { content: "["; }
+.br-links a:not([data-no-brackets])::after  { content: "]"; }
+.br-links a:not([data-no-brackets])::before,
+.br-links a:not([data-no-brackets])::after { transition: opacity 0.18s ease; }
+
+.br-links a:not([data-no-brackets]):hover,
+.br-links a:not([data-no-brackets]):focus-visible,
+.br-links a:not([data-no-brackets]):active,
+.br-links a:not([data-no-brackets])[aria-current="page"] { font-weight: 700; }
+
+.br-links a:not([data-no-brackets]):hover::before,
+.br-links a:not([data-no-brackets]):hover::after,
+.br-links a:not([data-no-brackets]):focus-visible::before,
+.br-links a:not([data-no-brackets]):focus-visible::after,
+.br-links a:not([data-no-brackets]):active::before,
+.br-links a:not([data-no-brackets]):active::after,
+.br-links a:not([data-no-brackets])[aria-current="page"]::before,
+.br-links a:not([data-no-brackets])[aria-current="page"]::after { opacity: 0; }
