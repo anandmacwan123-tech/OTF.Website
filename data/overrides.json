@@ -53,8 +53,8 @@
       "Based": "Based questions alcohol brands that glorify consumption. Shifting the narrative from 'getting wasted is necessary to have fun' to encouraging mindful consumption, guided through design that puts transparency and clarity at the forefront.",
       "Evolving": "This interactive projection-mapping piece uses a feedback loop: a camera records its own projection, layering on itself like two mirrors facing each other. Time becomes visible as the image compounds on itself, each frame carrying the weight of what came before. Change isn't abstract here. You watch it happen. You are a part of it.",
       "Non-Consensual-INtelligence": "Non-Consensual Intelligence is an interactive experience that makes surveillance visible. AI-backed surveillance is a constant, unconsented breach of privacy, centralised, opaque, and controlled by a handful of companies. This project pulls it into view.",
-      "RaveBadge": "A badge that embodies the graphic design culture at Ravensbourne University London, crafted carefully to balance nostalgic charm with everyday accessibility.",
-      "ThinkingBlock": "A research-led short film demonstrating the incompatibility of AI with non-Western cultures. It explores how the lack of diverse training data shapes inclusivity in design."
+      "Rave-Badge": "A badge that embodies the graphic design culture at Ravensbourne University London, crafted carefully to balance nostalgic charm with everyday accessibility.",
+      "Thinking-Block": "A research-led short film demonstrating the incompatibility of AI with non-Western cultures. It explores how the lack of diverse training data shapes inclusivity in design."
     }
   },
   "Jaeden": {
@@ -76,9 +76,9 @@
       "Social Media"
     ],
     "projectDescriptions": {
-      "Project1": "Patchwork is an independent print magazine documenting London's subcultures. These are moments that happen after and inbetween the main event in smoking areas and in the back of the event space. Through candid photography, interviews, and personal reflection, each issue fossilises voices and moments unheard.",
+      "patchwork": "Patchwork is an independent print magazine documenting London's subcultures. These are moments that happen after and inbetween the main event in smoking areas and in the back of the event space. Through candid photography, interviews, and personal reflection, each issue fossilises voices and moments unheard.",
       "Project2": "An anti-brand workwear system for London's invisible workforce. Rejecting scarcity and resale culture, it distributes freely through pop‑ups and open‑source manuals.",
-      "Project3": "MoreThanShows is an open‑mic night founded by Joshua Alexander, spotlighting spoken word, rap, and DJ sets. Volume 3 took place on 8th April at the Prince of Peckham, featuring performances from Charlene the Poet, Chloe Tenesha, and Nolais."
+      "more-than-shows": "MoreThanShows is an open‑mic night founded by Joshua Alexander, spotlighting spoken word, rap, and DJ sets. Volume 3 took place on 8th April at the Prince of Peckham, featuring performances from Charlene the Poet, Chloe Tenesha, and Nolais."
     }
   },
   "Surayya": {
@@ -300,7 +300,7 @@
       "Editorial"
     ],
     "projectDescriptions": {
-      "Untitled": "The Algorithmic Edit is an exploration of what happens when we swap human intuition for machine logic. In this project, metadata isn't just a background tool, it’s the main driver of the design. I wanted to see if I could replace my own \"designer’s voice\" with the cold logic of a system, using data to dictate the structure of the work rather than just my own feeling."
+      "The-Algorithmic-Edit": "The Algorithmic Edit is an exploration of what happens when we swap human intuition for machine logic. In this project, metadata isn't just a background tool, it’s the main driver of the design. I wanted to see if I could replace my own \"designer’s voice\" with the cold logic of a system, using data to dictate the structure of the work rather than just my own feeling."
     }
   },
   "Maseray": {
