@@ -1,0 +1,39 @@
+{
+  "id": "sub:1780520754672-c753e2bf",
+  "student": "Jenna",
+  "fullName": "Jenna Winckless",
+  "bio": "Jenna is a London/Essex-based graphic designer with a focus on branding, marketing, and immersive visual experiences. Her work explores how design can move beyond static outcomes to create engaging, sensory-driven interactions that connect with audiences on a deeper level. She has worked with local and independent clients, developing her ability to translate ideas into considered visual identities across both print and digital formats. Her approach is shaped by a strong interest in how design operates within real-world contexts, balancing creativity with clear communication. Jenna is particularly interested in the intersection of design and experience, often drawing inspiration from automotive and motorsport culture. She approaches briefs with energy and curiosity, aiming to create work that is both visually striking and memorable.",
+  "practices": [
+    "Immersive Design",
+    "Branding",
+    "Marketing"
+  ],
+  "projects": [
+    {
+      "key": "Aer",
+      "title": "Aer",
+      "description": "AER – AER is a speculative brand concept for a high-performance racing team, centred around an AI-driven system that supports drivers both on and off the track. The project explores how data, technology, and design can work together to enhance performance while creating a strong and immersive brand identity.\n \n The visual language reflects precision, speed, and control, combining clean design with dynamic elements to communicate a forward-thinking approach to motorsport. AER positions itself as more than a team, but as a system built to optimise performance and redefine the relationship between driver and machine.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "Veil",
+      "title": "Veil",
+      "description": "VEIL – Veil is an brand designed for immersive spaces, where visuals are activated through the presence of the viewer. Combining static posters with projection and real-time interaction.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "YOUR-PRIVACY-MATTERS",
+      "title": "“Your Privacy Matters”",
+      "description": "“Your Privacy Matters” is a UX-focused project that explores how website cookie consent systems influence user behaviour. Through research into dark patterns and online privacy, the project highlights how many digital interfaces encourage users to accept tracking through confusing layouts, visual hierarchy, and decision fatigue. Rather than redesigning the consent process, the website exposes these manipulative patterns, encouraging users to question the choices they make online and become more aware of how their decisions can be influenced by interface design.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1780520754672,
+  "status": "applied",
+  "processedAt": 1780521971941
+}
