@@ -1,0 +1,32 @@
+{
+  "id": "sub:1780524871140-4eddd2c7",
+  "student": "Tallulah",
+  "fullName": "Tallulah Stott",
+  "bio": "Tallulah is a graphic designer whose critical, experimental approach questions the boundaries of possibility. A winner of the Made Thought x Baddeley Brothers printing prize, she is currently part of the Soho House mentorship programme.",
+  "practices": [
+    "Experimental Design",
+    "Print",
+    "Graphic Design"
+  ],
+  "projects": [
+    {
+      "key": "Moments-In-Between",
+      "title": "Moments-In-Between",
+      "description": "Moments In-Between is a photographic project led by a design approach to image-making. By working within a self-imposed set of limitations, the project encourages a slower and more attentive way of seeing. Rather than documenting recognisable subjects, it explores the visual relationships that emerge through observation, producing images that invite ambiguity and encourage prolonged viewing. The work was later extended through projection onto aluminium, where the reflective surface allows light to shift across the image and reintroduce qualities that were present in the original moment. The publication uses a lightweight stock, allowing photographs to subtly imprint onto the following pages. Combined with the exposed page edges, this creates an object that feels delicate and raw, reflecting the transient nature of the moments being observed. The publication uses a lightweight stock, allowing photographs to subtly imprint onto the following pages. Combined with the exposed page edges, this creates an object that feels delicate and raw, mirroring the fragility of the moments from which the images emerged.",
+      "removedFiles": [],
+      "newImageCount": 0
+    },
+    {
+      "key": "nolocation",
+      "title": "nolocation",
+      "description": "NoLocation reimagines how music is shared, collected, and experienced through the physical language of the cassette tape. Blending analogue culture with contemporary listening habits, it offers a more deliberate and personal relationship with sound, transforming music from a disposable stream into a tangible object of connection and exchange. The packaging uses an uncoated paper stock to create a tactile and considered feel, reinforcing the physical nature of the object. Foil detailing adds moments of contrast and value, while the colourways distinguish individual releases and support a cohesive collection. Together, these material and visual choices encourage a stronger sense of ownership and collectability.",
+      "removedFiles": [],
+      "newImageCount": 0
+    }
+  ],
+  "note": "",
+  "headshotProvided": false,
+  "createdAt": 1780524871140,
+  "status": "applied",
+  "processedAt": 1780524882793
+}
