@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OTF — Student URL Labels (A4 print sheet)</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* ── Page setup: A4 portrait, 10mm safe margin. */
+  @page { size: A4 portrait; margin: 10mm; }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #fff;
+    color: #000;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* One .sheet = one A4 page. Inner area = A4 - 10mm margins = 190 × 277 mm. */
+  .sheet {
+    width: 190mm;
+    height: 277mm;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    page-break-after: always;
+  }
+  .sheet:last-of-type { page-break-after: auto; }
+
+  /* Each cell holds one label, centred, with corner crop marks at the trim
+     edge. The cut line IS the cell boundary — corner ticks sit at each
+     corner, opening inward into the cell. */
+  .cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10mm 12mm;
+  }
+
+  /* The label itself — same typeset as the show's headshot name label.
+     14pt, weight 700, tight tracking, uppercase. Black on white because
+     we're printing onto red paper. */
+  .label {
+    font-size: 14pt;
+    font-weight: 700;
+    letter-spacing: -0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #000;
+    white-space: nowrap;
+  }
+
+  /* ── Crop marks: four L-shaped corner ticks per cell.
+        Each leg is 5mm × 0.25mm, sitting flush with the cell corner.
+        Cut along the line connecting opposing marks. */
+  .cell::before,
+  .cell::after,
+  .cell > .crop-tr::before,
+  .cell > .crop-tr::after,
+  .cell > .crop-bl::before,
+  .cell > .crop-bl::after,
+  .cell > .crop-br::before,
+  .cell > .crop-br::after {
+    content: "";
+    position: absolute;
+    background: #000;
+  }
+  /* Top-left corner (uses .cell ::before for horizontal, ::after for vertical) */
+  .cell::before { top: 0; left: 0; width: 5mm; height: 0.25mm; }
+  .cell::after  { top: 0; left: 0; width: 0.25mm; height: 5mm; }
+  /* Top-right */
+  .crop-tr::before { top: 0; right: 0; width: 5mm; height: 0.25mm; }
+  .crop-tr::after  { top: 0; right: 0; width: 0.25mm; height: 5mm; }
+  /* Bottom-left */
+  .crop-bl::before { bottom: 0; left: 0; width: 5mm; height: 0.25mm; }
+  .crop-bl::after  { bottom: 0; left: 0; width: 0.25mm; height: 5mm; }
+  /* Bottom-right */
+  .crop-br::before { bottom: 0; right: 0; width: 5mm; height: 0.25mm; }
+  .crop-br::after  { bottom: 0; right: 0; width: 0.25mm; height: 5mm; }
+  .crop-tr, .crop-bl, .crop-br {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+
+  /* ── Screen preview only: show page boundaries on a grey backdrop so
+        the operator can sanity-check before printing. Print output is
+        unaffected. */
+  @media screen {
+    body { background: #d8d8d8; padding: 24px 0; }
+    .sheet {
+      background: #fff;
+      margin: 0 auto 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      padding: 10mm;
+      width: 210mm;
+      height: 297mm;
+    }
+  }
+  @media print {
+    /* Reset the screen padding so the cell grid fills the @page margin box. */
+    .sheet { padding: 0; width: 190mm; height: 277mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">anand.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">arnete.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">becky.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">carolina.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">charles.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">darcy.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">divine.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">elise.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">emily.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">jaeden.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">jamie.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">jenna.otf.show</span></div>
+</div>
+
+<div class="sheet">
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">jess.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">kami.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">kye.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">martim.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">maseray.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">nikol.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">noora.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">nora.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">nuria.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">oli.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">olya.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">oscar.otf.show</span></div>
+</div>
+
+<div class="sheet">
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">rebecca.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">sara.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">sasha.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">sebastian.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">shalom.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">surayya.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">taleb.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">tallulah.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">valentina.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">vanessa.otf.show</span></div>
+  <div class="cell"><span class="crop-tr"></span><span class="crop-bl"></span><span class="crop-br"></span><span class="label">will.otf.show</span></div>
+</div>
+
+</body>
+</html>
