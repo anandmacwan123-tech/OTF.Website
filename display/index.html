@@ -247,13 +247,6 @@
   .ctl-num-px { width: 3.6rem; text-align: center; }
   .ctl-x { opacity: 0.45; font-size: 0.7rem; }
 
-  /* When export is running, hide the controls panel so the captured tab shows
-     only the animation (headshot + floating projects + name label). The
-     browser's own "sharing" bar gives the operator visual confirmation that
-     recording is in progress; Escape aborts. */
-  body.exporting .controls { display: none !important; }
-  body.exporting { cursor: none; }
-
   .sr-only {
     position: absolute;
     width: 1px;
@@ -673,14 +666,13 @@
       labelsCtl.setAttribute('aria-pressed', String(!off));
     });
 
-    /* ───── Export MP4 — captures this tab via getDisplayMedia and re-renders
-       each frame onto an off-screen canvas at the user-specified pixel
-       dimensions (letterboxed to preserve the source's aspect ratio). The
-       canvas stream is then recorded with MediaRecorder at the best codec
-       the browser supports (MP4/H.264 in modern Chrome 130+, WebM/VP9
-       fallback) and a bitrate that scales with the output resolution.
-       Auto-stops after N full cohort cycles at the current speed. Escape
-       aborts. */
+    /* ───── Export MP4 — renders the animation directly to an off-screen
+       canvas at the user-specified pixel dimensions, then records the
+       canvas's own captureStream with MediaRecorder. No screen capture,
+       no letterboxing — the output IS rendered at the target size, so any
+       aspect ratio comes out clean. Codec: MP4/H.264 in Chrome 130+,
+       WebM/VP9 fallback. Bitrate scales with resolution. Auto-stops after
+       N full cohort cycles at the current speed. Escape aborts. */
     const exportBtns = document.querySelectorAll('.ctl-export');
     const wIn = document.getElementById('exportW');
     const hIn = document.getElementById('exportH');
@@ -713,16 +705,289 @@
       return { w: w - (w & 1), h: h - (h & 1) };
     }
 
+    /* CanvasRenderer — a parallel implementation of the live animation, but
+       drawn directly to a canvas at arbitrary dimensions. Mirrors the
+       structure of the DOM renderer (headshot crossfade + floating projects
+       + name labels) but owns its own state and image cache so it can run
+       independently of what's on screen. */
+    class CanvasRenderer {
+      constructor(canvas, w, h, opts) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d', { alpha: false });
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
+        this.W = w;
+        this.H = h;
+        this.scale = opts.scale ?? 1;
+        this.speed = opts.speed ?? 1;
+        this.showLabels = opts.showLabels ?? false;
+        this.fullNames = opts.fullNames || new Map();
+
+        // Headshot crossfade
+        this.activeImg = null;
+        this.activeName = null;
+        this.outgoingImg = null;
+        this.outgoingName = null;
+        this.crossfadeStart = -Infinity;
+        this.crossfadeMs = 600 / this.speed;
+
+        // Project bag (per-student) + currently-on-screen projects
+        this.projectQueue = [];
+        this.floats = []; // {img, x, y, w, h, label, front}
+
+        // Student picking (own bag, independent of DOM)
+        this.bag = [];
+        this.lastStudent = null;
+        this.brokenStudents = new Set();
+
+        // Image caches (separate from DOM's preload — guarantees images
+        // available for canvas drawing even if the DOM hasn't shown them)
+        this.headshotCache = new Map();
+        this.projectCache = new Map();
+
+        // Timing
+        this.startTime = 0;
+        this.lastHeadshotAt = -Infinity;
+        this.lastSpawnAt = -Infinity;
+      }
+
+      loadImage(url) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(null);
+          img.src = enc(url);
+        });
+      }
+
+      async preloadHeadshots() {
+        await Promise.all(STUDENTS.map(async name => {
+          const img = await this.loadImage(`/Student Work/Headshots/${name}.webp`);
+          if (img) this.headshotCache.set(name, img);
+          else this.brokenStudents.add(name);
+        }));
+      }
+
+      refillBag() {
+        const eligible = STUDENTS.filter(n => !this.brokenStudents.has(n));
+        this.bag = shuffled(eligible);
+        if (this.bag.length > 1 && this.bag[this.bag.length - 1] === this.lastStudent) {
+          [this.bag[0], this.bag[this.bag.length - 1]] = [this.bag[this.bag.length - 1], this.bag[0]];
+        }
+      }
+
+      pickStudent() {
+        for (let guard = 0; guard <= STUDENTS.length; guard++) {
+          if (this.bag.length === 0) this.refillBag();
+          if (this.bag.length === 0) return null;
+          const name = this.bag.pop();
+          if (!this.brokenStudents.has(name)) { this.lastStudent = name; return name; }
+        }
+        return null;
+      }
+
+      swapHeadshot() {
+        const name = this.pickStudent();
+        if (!name) return;
+        const img = this.headshotCache.get(name);
+        if (!img) return;
+        this.outgoingImg = this.activeImg;
+        this.outgoingName = this.activeName;
+        this.activeImg = img;
+        this.activeName = name;
+        this.crossfadeStart = performance.now();
+        this.floats = [];
+        // Refill project queue + warm cache for this student's projects.
+        this.projectQueue = shuffled((MANIFEST[name] || []).filter(f => /\.webp$/i.test(f)));
+        for (const file of this.projectQueue) {
+          if (!this.projectCache.has(file)) {
+            const img = new Image();
+            img.src = enc(`/Student Work/Projects/${file}`);
+            this.projectCache.set(file, img);
+          }
+        }
+      }
+
+      // Layout: matches the DOM's percentage-of-viewport rule, but using the
+      // canvas's own (W,H) so the proportions hold at any export size.
+      headshotRect() {
+        if (!this.activeImg) return null;
+        const hh = Math.max(269, Math.min(595, this.H * 0.528)) * this.scale;
+        const aspect = this.activeImg.naturalWidth / this.activeImg.naturalHeight;
+        const hw = hh * aspect;
+        return { x: (this.W - hw) / 2, y: (this.H - hh) / 2, w: hw, h: hh };
+      }
+
+      baseProjectH() {
+        return Math.max(224, Math.min(496, this.H * 0.44));
+      }
+
+      spawn() {
+        if (!this.activeName) return;
+        if (this.projectQueue.length === 0) return;
+        if (this.floats.length >= MAX_ACTIVE) return;
+        if (this.floats.length > 0 && Math.random() < 0.4) return;
+
+        const file = this.projectQueue.pop();
+        const img = this.projectCache.get(file);
+        if (!img || !img.complete || img.naturalWidth === 0) return; // skip if not ready
+
+        const renderedH = Math.round(this.baseProjectH() * this.scale);
+        const renderedW = Math.round(img.naturalWidth * (renderedH / img.naturalHeight));
+
+        const hs = this.headshotRect();
+        if (!hs) return;
+        const hsMidY = hs.y + hs.h / 2;
+        const minVisibleArea = 0.8 * renderedW * renderedH;
+        const maxHsOverlap = 0.3 * hs.w * hs.h;
+
+        const ok = (x, y) => {
+          const visW = Math.max(0, Math.min(x + renderedW, this.W) - Math.max(x, 0));
+          const visH = Math.max(0, Math.min(y + renderedH, this.H) - Math.max(y, 0));
+          if (visW * visH < minVisibleArea) return false;
+          if (x + renderedW > hs.x && x < hs.x + hs.w && y + renderedH > hs.y && y < hsMidY) return false;
+          const ow = Math.max(0, Math.min(x + renderedW, hs.x + hs.w) - Math.max(x, hs.x));
+          const oh = Math.max(0, Math.min(y + renderedH, hs.y + hs.h) - Math.max(y, hs.y));
+          return ow * oh <= maxHsOverlap;
+        };
+
+        const xMin = -Math.round(renderedW * 0.2);
+        const xMax = this.W - Math.round(renderedW * 0.8);
+        const yMin = -Math.round(renderedH * 0.2);
+        const yMax = this.H - Math.round(renderedH * 0.8);
+        const xRange = xMax - xMin, yRange = yMax - yMin;
+        const halfW = renderedW / 2, halfH = renderedH / 2;
+
+        const centers = this.floats.map(f => [f.x + f.w / 2, f.y + f.h / 2]);
+        let best = null, bestScore = -1;
+        for (let tries = 0; tries < 40; tries++) {
+          const px = Math.round(xMin + Math.random() * xRange);
+          const py = Math.round(yMin + Math.random() * yRange);
+          if (!ok(px, py)) continue;
+          const mx = px + halfW, my = py + halfH;
+          let nearest = Infinity;
+          for (const [ox, oy] of centers) nearest = Math.min(nearest, Math.hypot(mx - ox, my - oy));
+          const dist = nearest === Infinity ? 1e6 : nearest;
+          const score = dist * (0.75 + Math.random() * 0.5);
+          if (score > bestScore) { bestScore = score; best = { x: px, y: py }; }
+        }
+        if (!best) return;
+
+        this.floats.push({
+          img,
+          x: best.x, y: best.y,
+          w: renderedW, h: renderedH,
+          label: projectLabelFor(this.activeName, file).toUpperCase(),
+          front: Math.random() < FRONT_CHANCE
+        });
+      }
+
+      drawLabel(text, anchorX, anchorY) {
+        const ctx = this.ctx;
+        const fontPx = 19.2 * this.scale;
+        ctx.font = `700 ${fontPx}px "IBM Plex Sans", system-ui, sans-serif`;
+        // Canvas letter-spacing — Chrome 99+, Safari 17+, FF 119+.
+        ctx.letterSpacing = `${(-0.12 * fontPx).toFixed(2)}px`;
+        const metrics = ctx.measureText(text);
+        const textW = metrics.width;
+        // Box dimensions roughly match the CSS .label box (padding 0 2px,
+        // line-height "normal" ≈ 1.2 × font size).
+        const padX = 2;
+        const boxH = Math.round(fontPx * 1.2);
+        const boxW = Math.ceil(textW + padX * 2);
+        const boxX = Math.round(anchorX);
+        const boxY = Math.round(anchorY - boxH);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.fillStyle = '#fff';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, boxX + padX, boxY + boxH / 2);
+      }
+
+      drawHeadshotPair(now) {
+        const t = Math.max(0, Math.min(1, (now - this.crossfadeStart) / this.crossfadeMs));
+        const drawOne = (img, alpha) => {
+          if (!img || alpha <= 0) return;
+          const hh = Math.max(269, Math.min(595, this.H * 0.528)) * this.scale;
+          const hw = hh * (img.naturalWidth / img.naturalHeight);
+          const hx = (this.W - hw) / 2, hy = (this.H - hh) / 2;
+          this.ctx.globalAlpha = alpha;
+          this.ctx.drawImage(img, hx, hy, hw, hh);
+        };
+        drawOne(this.outgoingImg, 1 - t);
+        drawOne(this.activeImg, t);
+        this.ctx.globalAlpha = 1;
+        if (t === 1) this.outgoingImg = null;
+      }
+
+      draw(now) {
+        const ctx = this.ctx;
+        // Red background — matches :root --bg.
+        ctx.fillStyle = '#FF002F';
+        ctx.fillRect(0, 0, this.W, this.H);
+
+        // Behind-headshot floats (zIndex < headshot's 2)
+        for (const f of this.floats) {
+          if (f.front) continue;
+          ctx.drawImage(f.img, f.x, f.y, f.w, f.h);
+          if (this.showLabels) this.drawLabel(f.label, f.x, f.y);
+        }
+
+        this.drawHeadshotPair(now);
+
+        // Front floats (zIndex > headshot's 2)
+        for (const f of this.floats) {
+          if (!f.front) continue;
+          ctx.drawImage(f.img, f.x, f.y, f.w, f.h);
+          if (this.showLabels) this.drawLabel(f.label, f.x, f.y);
+        }
+
+        // Headshot name label — flush above the headshot's top-left.
+        if (this.activeName) {
+          const hs = this.headshotRect();
+          if (hs) {
+            const display = (this.fullNames.get(this.activeName) || this.activeName).toUpperCase();
+            this.drawLabel(display, hs.x, hs.y);
+          }
+        }
+      }
+
+      tick(now) {
+        if (now - this.lastHeadshotAt >= BASE_HEADSHOT_MS / this.speed) {
+          this.swapHeadshot();
+          this.lastHeadshotAt = now;
+        }
+        if (now - this.lastSpawnAt >= BASE_SPAWN_MS / this.speed) {
+          this.spawn();
+          this.lastSpawnAt = now;
+        }
+        this.draw(now);
+      }
+
+      run(durationMs) {
+        return new Promise(resolve => {
+          this.startTime = performance.now();
+          this.lastHeadshotAt = -Infinity;
+          this.lastSpawnAt = -Infinity;
+          const loop = (now) => {
+            if (this._aborted) { resolve(false); return; }
+            this.tick(now);
+            if (now - this.startTime >= durationMs) { resolve(true); return; }
+            this._rafId = requestAnimationFrame(loop);
+          };
+          this._rafId = requestAnimationFrame(loop);
+        });
+      }
+
+      abort() {
+        this._aborted = true;
+        cancelAnimationFrame(this._rafId);
+      }
+    }
+
     async function runExport(mult) {
-      if (!navigator.mediaDevices?.getDisplayMedia) {
-        alert('Screen capture is not available in this browser. Use a recent Chrome, Edge, or Safari on macOS.');
-        return;
-      }
       const mime = pickRecorderMime();
-      if (!mime) {
-        alert('No supported video codec for MediaRecorder in this browser.');
-        return;
-      }
+      if (!mime) { alert('No supported video codec for MediaRecorder in this browser.'); return; }
 
       const { w: targetW, h: targetH } = readTargetSize();
       // 7 bits per pixel per second is roughly broadcast-quality H.264;
@@ -737,106 +1002,51 @@
 
       const ok = confirm(
         `Export ${mult}× cohort sequence at ${targetW} × ${targetH} (${fmtDuration(totalMs)}) — speed ${lockedSpeed.toFixed(2)}×.\n\n` +
-        `When the share dialog opens, choose "this tab" so only the animation is captured.\n` +
-        `Press OK to begin. Press Escape during recording to cancel.`
+        `Rendering happens in the background; no screen-share prompt.\n` +
+        `Press Escape during recording to cancel.`
       );
       if (!ok) return;
 
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getDisplayMedia({
-          video: { frameRate: 60, displaySurface: 'browser' },
-          audio: false,
-          preferCurrentTab: true,
-          selfBrowserSurface: 'include',
-          surfaceSwitching: 'exclude'
-        });
-      } catch (e) {
-        return; // user cancelled or denied
-      }
-
       exportBtns.forEach(b => b.disabled = true);
       wIn.disabled = hIn.disabled = true;
-      document.body.classList.add('exporting');
 
-      // Source video element — drains the screen-capture stream and feeds
-      // frames to the canvas below. Off-screen and muted.
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.muted = true;
-      video.playsInline = true;
-      try { await video.play(); } catch (e) {}
-      if (!video.videoWidth) {
-        await new Promise(r => video.addEventListener('loadedmetadata', r, { once: true }));
-      }
-
-      // Output canvas at the requested pixel dimensions.
       const canvas = document.createElement('canvas');
       canvas.width = targetW;
       canvas.height = targetH;
-      const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, targetW, targetH);
 
-      let running = true;
-      const drawFrame = () => {
-        if (!running) return;
-        const srcW = video.videoWidth, srcH = video.videoHeight;
-        if (srcW && srcH && video.readyState >= 2) {
-          // Letterbox: fit source inside target, preserve aspect ratio.
-          const s = Math.min(targetW / srcW, targetH / srcH);
-          const dw = Math.round(srcW * s);
-          const dh = Math.round(srcH * s);
-          const dx = Math.round((targetW - dw) / 2);
-          const dy = Math.round((targetH - dh) / 2);
-          ctx.fillRect(0, 0, targetW, targetH);
-          ctx.drawImage(video, dx, dy, dw, dh);
-        }
-        requestAnimationFrame(drawFrame);
-      };
-      requestAnimationFrame(drawFrame);
+      const renderer = new CanvasRenderer(canvas, targetW, targetH, {
+        scale: imgScale,
+        speed: lockedSpeed,
+        showLabels: !document.body.classList.contains('no-project-labels'),
+        fullNames
+      });
 
-      // Record from the canvas, not the original stream — guarantees the
-      // output is exactly targetW × targetH regardless of the screen.
-      const canvasStream = canvas.captureStream(60);
+      // Make sure the IBM Plex Sans 700 face is ready (otherwise the first
+      // few label frames fall back to system sans), then load all headshots.
+      try { await document.fonts.load('700 19.2px "IBM Plex Sans"'); } catch (e) {}
+      await renderer.preloadHeadshots();
 
+      const stream = canvas.captureStream(60);
       const chunks = [];
-      const rec = new MediaRecorder(canvasStream, {
+      const rec = new MediaRecorder(stream, {
         mimeType: mime,
         videoBitsPerSecond: Math.round(bitrate)
       });
       rec.ondataavailable = e => { if (e.data?.size) chunks.push(e.data); };
 
-      const cleanup = () => {
-        running = false;
-        try { video.pause(); } catch (e) {}
-        video.srcObject = null;
-        stream.getTracks().forEach(t => t.stop());
-        canvasStream.getTracks().forEach(t => t.stop());
-        document.body.classList.remove('exporting');
-        exportBtns.forEach(b => b.disabled = false);
-        wIn.disabled = hIn.disabled = false;
-        window.removeEventListener('keydown', onKey);
-      };
-
-      const onKey = (e) => { if (e.key === 'Escape') rec.stop(); };
+      const onKey = (e) => { if (e.key === 'Escape') { renderer.abort(); rec.stop(); } };
       window.addEventListener('keydown', onKey);
-      // User clicks browser's "Stop sharing" → ends the track.
-      stream.getVideoTracks()[0].addEventListener('ended', () => {
-        if (rec.state === 'recording') rec.stop();
-      });
-
-      const stopTimer = setTimeout(() => {
-        if (rec.state === 'recording') rec.stop();
-      }, totalMs);
 
       const stopped = new Promise(r => rec.addEventListener('stop', r, { once: true }));
       rec.start();
+      await renderer.run(totalMs);
+      if (rec.state === 'recording') rec.stop();
       await stopped;
-      clearTimeout(stopTimer);
-      cleanup();
+
+      window.removeEventListener('keydown', onKey);
+      stream.getTracks().forEach(t => t.stop());
+      exportBtns.forEach(b => b.disabled = false);
+      wIn.disabled = hIn.disabled = false;
 
       if (chunks.length === 0) return;
 
