@@ -768,6 +768,21 @@
         }));
       }
 
+      async preloadAllProjects() {
+        const allFiles = STUDENTS.flatMap(name =>
+          (MANIFEST[name] || []).filter(f => /\.webp$/i.test(f))
+        );
+        await Promise.all(allFiles.map(file => {
+          if (this.projectCache.has(file)) return Promise.resolve();
+          return new Promise(resolve => {
+            const img = new Image();
+            img.onload = img.onerror = () => resolve();
+            img.src = enc(`/Student Work/Projects/${file}`);
+            this.projectCache.set(file, img);
+          });
+        }));
+      }
+
       refillBag() {
         const eligible = STUDENTS.filter(n => !this.brokenStudents.has(n));
         this.bag = shuffled(eligible);
@@ -828,9 +843,19 @@
         if (this.floats.length >= MAX_ACTIVE) return;
         if (this.floats.length > 0 && Math.random() < 0.4) return;
 
-        const file = this.projectQueue.pop();
-        const img = this.projectCache.get(file);
-        if (!img || !img.complete || img.naturalWidth === 0) return; // skip if not ready
+        // Find the last ready image in the queue; don't consume an entry if
+        // nothing is loaded yet (prevents silent drops on the first few spawns).
+        let file = null, img = null;
+        for (let i = this.projectQueue.length - 1; i >= 0; i--) {
+          const f = this.projectQueue[i];
+          const im = this.projectCache.get(f);
+          if (im && im.complete && im.naturalWidth > 0) {
+            file = f; img = im;
+            this.projectQueue.splice(i, 1);
+            break;
+          }
+        }
+        if (!img) return;
 
         const renderedH = Math.round(this.baseProjectH() * this.scale);
         const renderedW = Math.round(img.naturalWidth * (renderedH / img.naturalHeight));
@@ -1025,6 +1050,7 @@
       // few label frames fall back to system sans), then load all headshots.
       try { await document.fonts.load('700 19.2px "IBM Plex Sans"'); } catch (e) {}
       await renderer.preloadHeadshots();
+      await renderer.preloadAllProjects();
 
       const stream = canvas.captureStream(60);
       const chunks = [];
