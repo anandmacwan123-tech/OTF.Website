@@ -240,6 +240,14 @@
   }
   .ctl-toggle[aria-pressed="false"] { opacity: 0.4; }
   .ctl-toggle:hover { opacity: 1; background: #fff; color: var(--bg); }
+  .ctl-toggle[disabled] { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+  /* When export is running, hide the controls panel so the captured tab shows
+     only the animation (headshot + floating projects + name label). The
+     browser's own "sharing" bar gives the operator visual confirmation that
+     recording is in progress; Escape aborts. */
+  body.exporting .controls { display: none !important; }
+  body.exporting { cursor: none; }
 
   .sr-only {
     position: absolute;
@@ -278,6 +286,12 @@
       <input type="number" class="ctl-num" id="speedNum" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed value">
     </div>
     <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="false">Project labels</button>
+    <div class="ctl">
+      <span class="ctl-name">Export MP4</span>
+      <button class="ctl-toggle ctl-export" type="button" data-mult="1" aria-label="Export one cohort cycle">1×</button>
+      <button class="ctl-toggle ctl-export" type="button" data-mult="2" aria-label="Export two cohort cycles">2×</button>
+      <button class="ctl-toggle ctl-export" type="button" data-mult="3" aria-label="Export three cohort cycles">3×</button>
+    </div>
   </div>
 
   <script>
@@ -649,6 +663,120 @@
     labelsCtl.addEventListener('click', () => {
       const off = document.body.classList.toggle('no-project-labels');
       labelsCtl.setAttribute('aria-pressed', String(!off));
+    });
+
+    /* ───── Export MP4 — captures this tab via getDisplayMedia, records at
+       16 Mbps with the best codec the browser supports (MP4/H.264 in modern
+       Chrome 130+, WebM/VP9 fallback elsewhere), auto-stops after N full
+       cohort cycles at the current speed setting. Press Escape to abort. */
+    const exportBtns = document.querySelectorAll('.ctl-export');
+
+    function pickRecorderMime() {
+      const candidates = [
+        'video/mp4;codecs=avc1.640028,mp4a.40.2',
+        'video/mp4;codecs=avc1.640028',
+        'video/mp4;codecs=avc1.42E01F',
+        'video/mp4',
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=vp8',
+        'video/webm'
+      ];
+      return candidates.find(m => MediaRecorder.isTypeSupported(m)) || '';
+    }
+
+    function fmtDuration(ms) {
+      const total = Math.round(ms / 1000);
+      const m = Math.floor(total / 60), s = total % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    async function runExport(mult) {
+      if (!navigator.mediaDevices?.getDisplayMedia) {
+        alert('Screen capture is not available in this browser. Use a recent Chrome, Edge, or Safari on macOS.');
+        return;
+      }
+      const mime = pickRecorderMime();
+      if (!mime) {
+        alert('No supported video codec for MediaRecorder in this browser.');
+        return;
+      }
+
+      // Lock the timing at "now" — duration scales with the speed slider's
+      // current value, not whatever the user nudges it to mid-recording.
+      const lockedSpeed = speed;
+      const cycleMs = STUDENTS.length * (BASE_HEADSHOT_MS / lockedSpeed);
+      const totalMs = cycleMs * mult;
+
+      const ok = confirm(
+        `Export ${mult}× cohort sequence (${fmtDuration(totalMs)}) at speed ${lockedSpeed.toFixed(2)}×.\n\n` +
+        `When the share dialog opens, choose "this tab" so only the animation is captured.\n` +
+        `Press OK to begin. Press Escape during recording to cancel.`
+      );
+      if (!ok) return;
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { frameRate: 60, displaySurface: 'browser' },
+          audio: false,
+          preferCurrentTab: true,
+          selfBrowserSurface: 'include',
+          surfaceSwitching: 'exclude'
+        });
+      } catch (e) {
+        return; // user cancelled or denied
+      }
+
+      exportBtns.forEach(b => b.disabled = true);
+      document.body.classList.add('exporting');
+
+      const chunks = [];
+      const rec = new MediaRecorder(stream, {
+        mimeType: mime,
+        videoBitsPerSecond: 16_000_000
+      });
+      rec.ondataavailable = e => { if (e.data?.size) chunks.push(e.data); };
+
+      const cleanup = () => {
+        stream.getTracks().forEach(t => t.stop());
+        document.body.classList.remove('exporting');
+        exportBtns.forEach(b => b.disabled = false);
+        window.removeEventListener('keydown', onKey);
+      };
+
+      const onKey = (e) => { if (e.key === 'Escape') rec.stop(); };
+      window.addEventListener('keydown', onKey);
+      // User clicks browser's "Stop sharing" → ends the track.
+      stream.getVideoTracks()[0].addEventListener('ended', () => {
+        if (rec.state === 'recording') rec.stop();
+      });
+
+      const stopTimer = setTimeout(() => {
+        if (rec.state === 'recording') rec.stop();
+      }, totalMs);
+
+      const stopped = new Promise(r => rec.addEventListener('stop', r, { once: true }));
+      rec.start();
+      await stopped;
+      clearTimeout(stopTimer);
+      cleanup();
+
+      if (chunks.length === 0) return;
+
+      const blob = new Blob(chunks, { type: mime });
+      const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
+      const filename = `otf-cohort-${mult}x.${ext}`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+    }
+
+    exportBtns.forEach(btn => {
+      btn.addEventListener('click', () => runExport(+btn.dataset.mult));
     });
   })();
   </script>
