@@ -243,6 +243,11 @@
   .ctl-toggle[aria-pressed="true"]:hover { opacity: 1; }
   .ctl-toggle[disabled] { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
 
+  /* Pixel inputs alongside the Export buttons — wider than the speed/scale
+     ones so 4-digit values fit without truncation. */
+  .ctl-num-px { width: 3.6rem; text-align: center; }
+  .ctl-x { opacity: 0.45; font-size: 0.7rem; }
+
   /* When export is running, hide the controls panel so the captured tab shows
      only the animation (headshot + floating projects + name label). The
      browser's own "sharing" bar gives the operator visual confirmation that
@@ -289,6 +294,9 @@
     <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="false">Project labels</button>
     <div class="ctl">
       <span class="ctl-name">Export MP4</span>
+      <input type="number" class="ctl-num ctl-num-px" id="exportW" min="320" max="7680" step="2" value="1920" aria-label="Export width in pixels">
+      <span class="ctl-x" aria-hidden="true">×</span>
+      <input type="number" class="ctl-num ctl-num-px" id="exportH" min="240" max="4320" step="2" value="1080" aria-label="Export height in pixels">
       <button class="ctl-toggle ctl-export" type="button" data-mult="1" aria-label="Export one cohort cycle">1×</button>
       <button class="ctl-toggle ctl-export" type="button" data-mult="2" aria-label="Export two cohort cycles">2×</button>
       <button class="ctl-toggle ctl-export" type="button" data-mult="3" aria-label="Export three cohort cycles">3×</button>
@@ -663,11 +671,17 @@
       labelsCtl.setAttribute('aria-pressed', String(!off));
     });
 
-    /* ───── Export MP4 — captures this tab via getDisplayMedia, records at
-       16 Mbps with the best codec the browser supports (MP4/H.264 in modern
-       Chrome 130+, WebM/VP9 fallback elsewhere), auto-stops after N full
-       cohort cycles at the current speed setting. Press Escape to abort. */
+    /* ───── Export MP4 — captures this tab via getDisplayMedia and re-renders
+       each frame onto an off-screen canvas at the user-specified pixel
+       dimensions (letterboxed to preserve the source's aspect ratio). The
+       canvas stream is then recorded with MediaRecorder at the best codec
+       the browser supports (MP4/H.264 in modern Chrome 130+, WebM/VP9
+       fallback) and a bitrate that scales with the output resolution.
+       Auto-stops after N full cohort cycles at the current speed. Escape
+       aborts. */
     const exportBtns = document.querySelectorAll('.ctl-export');
+    const wIn = document.getElementById('exportW');
+    const hIn = document.getElementById('exportH');
 
     function pickRecorderMime() {
       const candidates = [
@@ -688,6 +702,15 @@
       return `${m}:${String(s).padStart(2, '0')}`;
     }
 
+    function readTargetSize() {
+      // Clamp to the input's min/max, then snap to an even number so H.264
+      // encoders (which require even macroblock dimensions) don't reject it.
+      const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n | 0));
+      const w = clamp(+wIn.value || 1920, +wIn.min, +wIn.max);
+      const h = clamp(+hIn.value || 1080, +hIn.min, +hIn.max);
+      return { w: w - (w & 1), h: h - (h & 1) };
+    }
+
     async function runExport(mult) {
       if (!navigator.mediaDevices?.getDisplayMedia) {
         alert('Screen capture is not available in this browser. Use a recent Chrome, Edge, or Safari on macOS.');
@@ -699,6 +722,11 @@
         return;
       }
 
+      const { w: targetW, h: targetH } = readTargetSize();
+      // 7 bits per pixel per second is roughly broadcast-quality H.264;
+      // floor at 8 Mbps for tiny resolutions, cap at 80 Mbps for 4K+.
+      const bitrate = Math.max(8_000_000, Math.min(80_000_000, targetW * targetH * 7));
+
       // Lock the timing at "now" — duration scales with the speed slider's
       // current value, not whatever the user nudges it to mid-recording.
       const lockedSpeed = speed;
@@ -706,7 +734,7 @@
       const totalMs = cycleMs * mult;
 
       const ok = confirm(
-        `Export ${mult}× cohort sequence (${fmtDuration(totalMs)}) at speed ${lockedSpeed.toFixed(2)}×.\n\n` +
+        `Export ${mult}× cohort sequence at ${targetW} × ${targetH} (${fmtDuration(totalMs)}) — speed ${lockedSpeed.toFixed(2)}×.\n\n` +
         `When the share dialog opens, choose "this tab" so only the animation is captured.\n` +
         `Press OK to begin. Press Escape during recording to cancel.`
       );
@@ -726,19 +754,68 @@
       }
 
       exportBtns.forEach(b => b.disabled = true);
+      wIn.disabled = hIn.disabled = true;
       document.body.classList.add('exporting');
 
+      // Source video element — drains the screen-capture stream and feeds
+      // frames to the canvas below. Off-screen and muted.
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+      try { await video.play(); } catch (e) {}
+      if (!video.videoWidth) {
+        await new Promise(r => video.addEventListener('loadedmetadata', r, { once: true }));
+      }
+
+      // Output canvas at the requested pixel dimensions.
+      const canvas = document.createElement('canvas');
+      canvas.width = targetW;
+      canvas.height = targetH;
+      const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, targetW, targetH);
+
+      let running = true;
+      const drawFrame = () => {
+        if (!running) return;
+        const srcW = video.videoWidth, srcH = video.videoHeight;
+        if (srcW && srcH && video.readyState >= 2) {
+          // Letterbox: fit source inside target, preserve aspect ratio.
+          const s = Math.min(targetW / srcW, targetH / srcH);
+          const dw = Math.round(srcW * s);
+          const dh = Math.round(srcH * s);
+          const dx = Math.round((targetW - dw) / 2);
+          const dy = Math.round((targetH - dh) / 2);
+          ctx.fillRect(0, 0, targetW, targetH);
+          ctx.drawImage(video, dx, dy, dw, dh);
+        }
+        requestAnimationFrame(drawFrame);
+      };
+      requestAnimationFrame(drawFrame);
+
+      // Record from the canvas, not the original stream — guarantees the
+      // output is exactly targetW × targetH regardless of the screen.
+      const canvasStream = canvas.captureStream(60);
+
       const chunks = [];
-      const rec = new MediaRecorder(stream, {
+      const rec = new MediaRecorder(canvasStream, {
         mimeType: mime,
-        videoBitsPerSecond: 16_000_000
+        videoBitsPerSecond: Math.round(bitrate)
       });
       rec.ondataavailable = e => { if (e.data?.size) chunks.push(e.data); };
 
       const cleanup = () => {
+        running = false;
+        try { video.pause(); } catch (e) {}
+        video.srcObject = null;
         stream.getTracks().forEach(t => t.stop());
+        canvasStream.getTracks().forEach(t => t.stop());
         document.body.classList.remove('exporting');
         exportBtns.forEach(b => b.disabled = false);
+        wIn.disabled = hIn.disabled = false;
         window.removeEventListener('keydown', onKey);
       };
 
@@ -763,7 +840,7 @@
 
       const blob = new Blob(chunks, { type: mime });
       const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
-      const filename = `otf-cohort-${mult}x.${ext}`;
+      const filename = `otf-cohort-${mult}x-${targetW}x${targetH}.${ext}`;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
