@@ -14,7 +14,7 @@ const ROOT = process.cwd();
 const HEADSHOTS_DIR = resolve(ROOT, 'Student Work/Headshots');
 const PROJECTS_DIR = resolve(ROOT, 'Student Work/Projects');
 const PAGES = [
-  resolve(ROOT, 'showcase/index.html'),
+  resolve(ROOT, 'index.html'),
   resolve(ROOT, 'students/index.html'),
   resolve(ROOT, 'index/index.html'),
   resolve(ROOT, 'display/index.html'),
