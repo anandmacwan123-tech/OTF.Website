@@ -129,6 +129,11 @@ export default {
       return handleApi(request, env, url);
     }
 
+    // /showcase/ moved to / on launch — keep shared links alive.
+    if (url.pathname === '/showcase' || url.pathname === '/showcase/') {
+      return Response.redirect(url.origin + '/', 301);
+    }
+
     // /files/ is open — no password required.
     if (url.pathname === '/files') {
       return Response.redirect(url.origin + '/files/', 301);
