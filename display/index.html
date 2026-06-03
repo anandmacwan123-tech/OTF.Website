@@ -368,9 +368,9 @@
     <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="false">Project labels</button>
     <div class="ctl">
       <span class="ctl-name">Export MP4</span>
-      <input type="number" class="ctl-num ctl-num-px" id="exportW" min="320" max="7680" step="2" value="1920" aria-label="Export width in pixels">
+      <input type="number" class="ctl-num ctl-num-px" id="exportW" min="320" max="7680" step="2" value="1080" aria-label="Export width in pixels">
       <span class="ctl-x" aria-hidden="true">×</span>
-      <input type="number" class="ctl-num ctl-num-px" id="exportH" min="240" max="4320" step="2" value="1080" aria-label="Export height in pixels">
+      <input type="number" class="ctl-num ctl-num-px" id="exportH" min="240" max="4320" step="2" value="1920" aria-label="Export height in pixels">
       <button class="ctl-toggle ctl-export" type="button" data-mult="1" aria-label="Export one cohort cycle">1×</button>
       <button class="ctl-toggle ctl-export" type="button" data-mult="2" aria-label="Export two cohort cycles">2×</button>
       <button class="ctl-toggle ctl-export" type="button" data-mult="3" aria-label="Export three cohort cycles">3×</button>
@@ -823,8 +823,8 @@
       // Clamp to the input's min/max, then snap to an even number so H.264
       // encoders (which require even macroblock dimensions) don't reject it.
       const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n | 0));
-      const w = clamp(+wIn.value || 1920, +wIn.min, +wIn.max);
-      const h = clamp(+hIn.value || 1080, +hIn.min, +hIn.max);
+      const w = clamp(+wIn.value || 1080, +wIn.min, +wIn.max);
+      const h = clamp(+hIn.value || 1920, +hIn.min, +hIn.max);
       return { w: w - (w & 1), h: h - (h & 1) };
     }
 
