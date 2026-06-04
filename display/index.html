@@ -969,8 +969,12 @@
       spawn() {
         if (!this.activeName) return;
         if (this.projectQueue.length === 0) return;
-        if (this.floats.length >= MAX_ACTIVE) return;
-        if (this.floats.length > 0 && Math.random() < 0.4) return;
+        // No MAX_ACTIVE cap here. The live DOM's check is on the *pending*
+        // (in-flight image load) set, which is effectively always empty once
+        // images are cached — so the live page accumulates 10–15 projects per
+        // student. The canvas renderer has no async load to gate on; the
+        // natural cap is the 40-tries placement loop below, which rejects
+        // spawns that can't find a non-overlapping spot.
 
         // Find the last ready image in the queue; don't consume an entry if
         // nothing is loaded yet (prevents silent drops on the first few spawns).
