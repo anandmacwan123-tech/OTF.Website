@@ -13,7 +13,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #FF002F;   /* red display background */
+    --bg: #FC1233;   /* red display background */
     --scale: 1;      /* image-size multiplier (scale control) */
     --speed: 1;      /* animation-rate multiplier (speed control) */
   }
@@ -76,6 +76,12 @@
 
   /* Project labels can be switched off; headshot labels stay on. */
   body.no-project-labels .label-project { display: none; }
+
+  /* Headshots can be switched off — the portrait and its name label drop
+     out, and projects fill the freed space (a display:none headshot-link
+     reports a zero rect, so the spawn placement stops avoiding it). */
+  body.no-headshots .headshot-link { display: none; }
+  body.no-headshots #headshotLabel { display: none; }
 
   /* Central headshot name label — JS-positioned above the headshot. */
   #headshotLabel {
@@ -366,6 +372,7 @@
       <input type="number" class="ctl-num" id="speedNum" min="0.25" max="3" step="0.05" value="1" aria-label="Animation speed value">
     </div>
     <button class="ctl-toggle" id="labelsCtl" type="button" aria-pressed="false">Project labels</button>
+    <button class="ctl-toggle" id="headshotsCtl" type="button" aria-pressed="true">Headshots</button>
     <div class="ctl">
       <span class="ctl-name">Export MP4</span>
       <input type="number" class="ctl-num ctl-num-px" id="exportW" min="320" max="7680" step="2" value="1080" aria-label="Export width in pixels">
@@ -748,6 +755,14 @@
       labelsCtl.setAttribute('aria-pressed', String(!off));
     });
 
+    // Headshots — toggles the central portrait + name label (live + export).
+    // Shown by default; pressing it dims the button and frees the centre.
+    const headshotsCtl = document.getElementById('headshotsCtl');
+    headshotsCtl.addEventListener('click', () => {
+      const off = document.body.classList.toggle('no-headshots');
+      headshotsCtl.setAttribute('aria-pressed', String(!off));
+    });
+
     /* ───── Export MP4 — renders the animation directly to an off-screen
        canvas at the user-specified pixel dimensions, then records the
        canvas's own captureStream with MediaRecorder. No screen capture,
@@ -844,6 +859,7 @@
         this.scale = opts.scale ?? 1;
         this.speed = opts.speed ?? 1;
         this.showLabels = opts.showLabels ?? false;
+        this.showHeadshot = opts.showHeadshot ?? true;
         this.fullNames = opts.fullNames || new Map();
 
         // Headshot crossfade
@@ -998,11 +1014,16 @@
         const hsMidY = hs.y + hs.h / 2;
         const minVisibleArea = 0.8 * renderedW * renderedH;
         const maxHsOverlap = 0.3 * hs.w * hs.h;
+        // When headshots are hidden, projects fill the centre freely — this
+        // matches the live DOM, where a display:none headshot reports a zero
+        // rect and the avoidance check stops applying.
+        const avoidHs = this.showHeadshot;
 
         const ok = (x, y) => {
           const visW = Math.max(0, Math.min(x + renderedW, this.W) - Math.max(x, 0));
           const visH = Math.max(0, Math.min(y + renderedH, this.H) - Math.max(y, 0));
           if (visW * visH < minVisibleArea) return false;
+          if (!avoidHs) return true;
           if (x + renderedW > hs.x && x < hs.x + hs.w && y + renderedH > hs.y && y < hsMidY) return false;
           const ow = Math.max(0, Math.min(x + renderedW, hs.x + hs.w) - Math.max(x, hs.x));
           const oh = Math.max(0, Math.min(y + renderedH, hs.y + hs.h) - Math.max(y, hs.y));
@@ -1081,7 +1102,7 @@
       draw() {
         const ctx = this.ctx;
         // Red background — matches :root --bg.
-        ctx.fillStyle = '#FF002F';
+        ctx.fillStyle = '#FC1233';
         ctx.fillRect(0, 0, this.W, this.H);
 
         // Behind-headshot floats (zIndex < headshot's 2)
@@ -1091,7 +1112,7 @@
           if (this.showLabels) this.drawLabel(f.label, f.x, f.y);
         }
 
-        this.drawHeadshotPair();
+        if (this.showHeadshot) this.drawHeadshotPair();
 
         // Front floats (zIndex > headshot's 2)
         for (const f of this.floats) {
@@ -1101,7 +1122,7 @@
         }
 
         // Headshot name label — flush above the headshot's top-left.
-        if (this.activeName) {
+        if (this.showHeadshot && this.activeName) {
           const hs = this.headshotRect();
           if (hs) {
             const display = (this.fullNames.get(this.activeName) || this.activeName).toUpperCase();
@@ -1204,6 +1225,7 @@
           scale: imgScale,
           speed: lockedSpeed,
           showLabels: !document.body.classList.contains('no-project-labels'),
+          showHeadshot: !document.body.classList.contains('no-headshots'),
           fullNames
         });
 
